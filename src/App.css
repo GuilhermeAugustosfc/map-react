@@ -36,3 +36,38 @@
     transform: rotate(360deg);
   }
 }
+
+
+.owl-carousel  {
+  position: absolute !important;
+  bottom: 0 !important;
+  z-index: 999 !important;
+  display: block;
+}
+
+.template-scrol-horizontal {
+  
+  height: 200px;
+  padding: 18px 47px;
+  background-color: #282c34;
+  color: white;
+  border-right: 2px solid #ccc;
+}
+
+.template-scrol-horizontal > ul {
+  list-style: none;
+  padding: 0;
+}
+
+.template-scrol-horizontal > h5 {
+  margin: 0;
+}
+
+
+.BrainhubCarousel__container {
+  position: absolute;
+  bottom: 0;
+  z-index: 999;
+  display: block;
+  z-index: 999;
+}
