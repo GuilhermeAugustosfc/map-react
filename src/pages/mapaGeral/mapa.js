@@ -1,8 +1,9 @@
-import React from 'react'
-import {Circle, LayersControl, MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
-import L from 'leaflet';
-import './App.css';
+import React, { useEffect, useState } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server';
+import {LayersControl, MapContainer, Marker, Popup, TileLayer, Polyline} from "react-leaflet";
+import L, { divIcon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import '../../App.css'
 
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -14,16 +15,20 @@ let DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
-function MAPA() {
+function MAPA({ polyline, makers, centerMap }) {
 
-  const center = [51.505, -0.09]
-  const center1 = [55.505, -0.09]
-  const center2 = [53.505, -0.09]
-  const center3 = [52.505, -0.09]
+    const blackOptions = { color: 'black' }
 
+    const [map, setMap] = useState(null);
+
+    useEffect(() => {
+      map?.setView(centerMap, 12 )
+    }, [centerMap])
   
   return (
-      <MapContainer style={{width:"100%", height:"97vh"}} center={center} zoom={13} scrollWheelZoom={true}>
+      <MapContainer
+        whenCreated={(ref) => { setMap(ref); }}
+        style={{width:"100%", height:"97vh"}} center={centerMap} zoom={13} scrollWheelZoom={true}>
         <LayersControl position="topright">
           <LayersControl.BaseLayer checked name="OpenStreetMap.Mapnik">
             <TileLayer
@@ -39,35 +44,18 @@ function MAPA() {
           </LayersControl.BaseLayer>
         </LayersControl>
 
-        <Circle
-          center={center}
-          pathOptions={{ fillColor: 'blue' }}
-          radius={1000}
-        />
+          {
+            makers.length && (
+              <Marker key={0} position={makers}>
+                <Popup>
+                {makers.join(", ")}
+                </Popup>
+              </Marker>
+            )
+          }
+
+        <Polyline pathOptions={blackOptions} positions={polyline} />
         
-        <Marker position={center}>
-            <Popup>
-              Guilherme
-            </Popup>
-        </Marker>
-
-        <Marker position={center1}>
-            <Popup>
-              Guilherme
-            </Popup>
-        </Marker>
-
-        <Marker position={center2}>
-            <Popup>
-              Guilherme
-            </Popup>
-        </Marker>
-
-        <Marker position={center3}>
-            <Popup>
-              Guilherme
-            </Popup>
-        </Marker>
       </MapContainer>
   );
 }

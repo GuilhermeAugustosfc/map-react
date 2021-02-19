@@ -3,11 +3,7 @@ import React from 'react'
 // import '@brainhubeu/react-carousel/lib/style.css';
 import OwlCarousel from 'react-owl-carousel2';
 import 'react-owl-carousel2/lib/styles.css'; //Allows for server-side rendering.
-import './App.css';
-
-
- 
-
+import './../../App.css';
 
 function Carrosel() {
 

@@ -1,15 +1,11 @@
 import React from 'react'
 import './App.css';
-import Mapa from "./mapa"
-// import Toolbar from "./toolbar"
-import Carrosel from "./carroseu"
+import MapaGeral from "./pages/mapaGeral"
 
 function App() {
   return (
     <>
-      <Mapa/>
-      {/* <Toolbar/> */}
-      <Carrosel/>;
+      <MapaGeral/>
     </>
   );
 }
