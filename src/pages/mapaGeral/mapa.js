@@ -5,6 +5,8 @@ import L, { divIcon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import '../../App.css'
 
+import Demo from "./myPolyline"
+
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
@@ -15,7 +17,7 @@ let DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
-function MAPA({ polyline, makers, centerMap }) {
+function MAPA({ dados ,polyline, makers, centerMap }) {
 
     const blackOptions = { color: 'black' }
 
@@ -24,6 +26,12 @@ function MAPA({ polyline, makers, centerMap }) {
     useEffect(() => {
       map?.setView(centerMap, 12 )
     }, [centerMap])
+
+
+    useEffect(() => {
+      if(!polyline.length) return 
+      new Demo(map, 'speed').loadData(dados);
+    }, [polyline])
   
   return (
       <MapContainer
