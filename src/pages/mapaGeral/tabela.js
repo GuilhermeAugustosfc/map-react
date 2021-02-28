@@ -57,20 +57,20 @@ function Tabela({ dados, onHoverRow }) {
         <table className="tabela" onScroll={() => onScrollTable()}>
             <thead>
                 <tr>
-                    <th>A</th>
-                    <th>B</th>
-                    <th>C</th>
-                    <th>D</th>
+                    <th>Data</th>
+                    <th>Ativo</th>
+                    <th>Ignicao</th>
+                    <th>Velocidade</th>
                     <th>E</th>
                 </tr>
             </thead>
             <tbody>
                 {dadosVisiveis.map((data, index) => (
-                    <tr className={`linha_${index + 1}`} onMouseOver={() => onHoverRow(data)} key={index}>
-                        <td>a</td>
-                        <td>b</td>
-                        <td>v</td>
-                        <td>c</td>
+                    <tr className={`linha_${index + 1}`} onMouseOver={() => onHoverRow(data.lst_localizacao)} key={index}>
+                        <td>{data.dt_gps}</td>
+                        <td>{data.desc_ativo}</td>
+                        <td>{data.flg_ignicao}</td>
+                        <td>{data.vl_velocidade}</td>
                         <td>{index + 1}</td>
                     </tr>
                 ))}

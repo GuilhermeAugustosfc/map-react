@@ -22,6 +22,7 @@ function MAPA({ dados ,polyline, makers, centerMap }) {
     const blackOptions = { color: 'black' }
 
     const [map, setMap] = useState(null);
+    const [polyline, setPolyline] = useState(null);
 
     useEffect(() => {
       map?.setView(centerMap, 12 )
