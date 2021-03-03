@@ -102,7 +102,6 @@ Demo.prototype = {
 
     trackPointFactory: function (data) {
         return data.map(function (item) {
-            debugger
             var trkpt = L.latLng(item.lst_localizacao[0], item.lst_localizacao[1]);
             return trkpt;
         });
@@ -158,9 +157,7 @@ Demo.prototype = {
                 var i, speed,
                     speedThresholds = [30, 35, 40, 45, 50, 55, 60, 65];
 
-                speed = latLng.distanceTo(prevLatLng); // meters
-                speed /= (latLng.meta.time - prevLatLng.meta.time) / 1000; // m/s
-                speed *= 3.6; // km/h
+                speed = latLng.speed
 
                 for (i = 0; i < speedThresholds.length; ++i) {
                     if (speed <= speedThresholds[i]) {

@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import api from '../../services/api';
-import Mapa from './mapa'
-import Tabela from './tabela'
-import Carrosel from "./carrosel"
+import Mapa from './mapa';
+import Mapa2 from './mapa2';
+
+import Tabela from './tabela';
+import Carrosel from "./carrosel";
+
 
 function MapaGeral() {
 
@@ -10,7 +13,10 @@ function MapaGeral() {
 
     const [markerTabela, setMarkerTabela] = useState([]);
     const [center, setCenter] = useState([-22.21537,-49.653947]);
-    const [dados, setDados] = useState([-22.21537,-49.653947]);
+    const [dados, setDados] = useState([]);
+    const [geojson, setGeoJson] = useState([]);
+
+    
 
     function onHoverRow (latlon) {
       setCenter(latlon);
@@ -18,7 +24,6 @@ function MapaGeral() {
     }
 
     useEffect( async () => {
-        console.log(posicoes);
         let form = new FormData();
         form.append('id_cliente', 200078);
         form.append('id_ativo', 525942);
@@ -36,7 +41,12 @@ function MapaGeral() {
         let posicoesTratadas = rows.map((row) => {
           return row.lst_localizacao
         })
-        
+
+        let retorno = await fetch("https://fulltrackstatic.s3.amazonaws.com/kmz/118z18onond7713j617j6s6j738fao3a18ann7sn177jzad78-pt-br.json")
+        // let retorno = await fetch("https://cartovis-server.herokuapp.com/hospitales")
+        let geojson = await retorno.json();
+
+        setGeoJson(geojson)
         setDados(rows)
         setPosicoes(posicoesTratadas)
 
@@ -45,8 +55,9 @@ function MapaGeral() {
   
   return (
       <>
-        <Mapa dados={dados} polyline={posicoes} makers={markerTabela} centerMap={center} />
-        <Tabela onHoverRow={onHoverRow} dados={posicoes} />
+        <Mapa geojson={geojson} dados={dados} polyline={posicoes} makers={markerTabela} centerMap={center} />
+        {/* <Mapa2 /> */}
+        <Tabela onHoverRow={onHoverRow} dados={dados} />
         <Carrosel />
       </>
   );

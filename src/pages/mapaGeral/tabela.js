@@ -11,7 +11,7 @@ function Tabela({ dados, onHoverRow }) {
     useEffect(() => {
         setDadosVisiveis(dados.slice(offset, limit))
         setTodosDados(dados)
-    }, [dados])
+    }, [dados, limit, offset])
 
     function onScrollTable() {
         let elementLast = document.querySelector(`.linha_${limit}`);
