@@ -46,7 +46,7 @@ function MAPA({geojson, dados , polyline, makers, centerMap }) {
     
         fazendaGeojson.addTo(map);
   
-        new Demo(map, 'speed').loadData(dados);
+        // new Demo(map, 'speed').loadData(dados);
       } 
       
 
@@ -56,7 +56,7 @@ function MAPA({geojson, dados , polyline, makers, centerMap }) {
   return (
       <MapContainer
         whenCreated={(ref) => { setMap(ref); }}
-        style={{width:"100%", height:"97vh"}} center={centerMap} zoom={13} scrollWheelZoom={true}>
+        style={{width:"100%", height:"97vh"}} center={centerMap} zoom={20} scrollWheelZoom={true}>
         <LayersControl>
           <LayersControl.BaseLayer checked name="OpenStreetMap.Mapnik">
             <TileLayer
