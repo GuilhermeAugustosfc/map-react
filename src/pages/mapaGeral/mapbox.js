@@ -10,13 +10,6 @@ const Map = ReactMapboxGl({
 });
 
 const Mapbox = forwardRef((props, refMap) => {
-    const [lng, setLng] = useState(-70.9);
-    const [lat, setLat] = useState(42.35);
-    const [zoom, setZoom] = useState(9);
-
-    useEffect(() => {
-        console.log(props, refMap);
-    }, [props])
 
     return (
         <div>

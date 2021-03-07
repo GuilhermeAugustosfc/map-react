@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react'
+import mapboxgl from 'mapbox-gl';
 import api from '../../services/api';
 import Mapa from './mapa';
 import Mapa2 from './mapa2';
-
-
 import MapBox from './mapbox';
-
 import Tabela from './tabela';
 import Carrosel from "./carrosel";
+
+import './mapbox.css'
 
 
 function MapaGeral() {
@@ -18,6 +18,7 @@ function MapaGeral() {
   const [center, setCenter] = useState([-22.21537, -49.653947]);
   const [dados, setDados] = useState([]);
   const [geojson, setGeoJson] = useState([]);
+  const [popups, setPopups] = useState([]);
 
   const [colorsSpeed, setColorSpeed] = useState([
     { color: '#0000FF' }, { color: '#0040FF' }, { color: '#0080FF' },
@@ -28,7 +29,7 @@ function MapaGeral() {
   const mapContainer = useRef(null);
 
   const [mapOptions, setMapOptions] = useState({
-    center: [-49.654063, -22.215288 ],
+    center: [-49.654063, -22.215288],
     style: "mapbox://styles/mapbox/satellite-v9",
     containerStyle: {
       height: '100vh',
@@ -47,24 +48,40 @@ function MapaGeral() {
       // Limit the number of properties we're displaying for
       // legibility and performance
       var displayProperties = [
-          'id',
-          'layer',
-          'source',
-          'sourceLayer',
-          'state',
-          'properties',
+        'id',
+        'layer',
+        'source',
+        'sourceLayer',
+        'state',
+        'properties',
+        'geometry'
       ];
 
       var displayFeatures = features.map(function (feat) {
-          var displayFeat = {};
-          displayProperties.forEach(function (prop) {
-              displayFeat[prop] = feat[prop];
-          });
-          return displayFeat;
+        var displayFeat = {};
+        displayProperties.forEach(function (prop) {
+          displayFeat[prop] = feat[prop];
+        });
+        return displayFeat;
       });
 
-      console.log(displayFeatures);
-  });
+      if (displayFeatures.length) {
+
+        if (popups.length > 0) {
+          for (var i in popups) {
+            popups[i].remove();
+          }
+        }
+
+        let popup = new mapboxgl.Popup()
+          .setLngLat(e.lngLat)
+          .setHTML(templatePopup(displayFeatures[0].properties))
+          .addTo(map);
+
+        popups.push(popup)
+
+      }
+    });
 
 
 
@@ -115,7 +132,7 @@ function MapaGeral() {
         return [row.lst_localizacao[1], row.lst_localizacao[0]]
       })
 
-      for(var i in data) {
+      for (var i in data) {
         data[i].lst_localizacao = [data[i].lst_localizacao[1], data[i].lst_localizacao[0]];
       }
 
@@ -139,10 +156,10 @@ function MapaGeral() {
 
     for (i = 0; i < speedThresholds.length; ++i) {
       if (speed <= speedThresholds[i]) {
-        return i;
+        return { index: i, velocidade: speed };
       }
     }
-    return speedThresholds.length;
+    return { index: speedThresholds.length, velocidade: speed };
   }
 
   function formatPolilyneColor(dados) {
@@ -166,11 +183,14 @@ function MapaGeral() {
 
       segmentLatlngs.push(dados[i].lst_localizacao);
 
-      if (prevOptionIdx !== optionIdx || i === len - 1) {
+      if (prevOptionIdx.index !== optionIdx.index || i === len - 1) {
         geojson.features.push({
           'type': 'Feature',
           'properties': {
-            'color': colorsSpeed[optionIdx].color
+            'color': colorsSpeed[optionIdx.index].color,
+            'velocidade': optionIdx.velocidade,
+            'dt_gps':dados[i].dt_gps,
+            'desc_ativo': dados[i].desc_ativo
           },
           'geometry': {
             'type': 'LineString',
@@ -178,7 +198,7 @@ function MapaGeral() {
           }
         })
 
-        prevOptionIdx = optionIdx;
+        prevOptionIdx.index = optionIdx.index;
         segmentLatlngs = [dados[i].lst_localizacao];
       }
     }
@@ -208,9 +228,17 @@ function MapaGeral() {
       },
       'paint': {
         'line-color': ['get', 'color'],
-        'line-width': 3,
+        'line-width': 5,
       }
     });
+
+
+    map.on('click', 'rota', function (e, a) {
+      // new mapboxgl.Popup()
+      //   .setLngLat(e.lngLat)
+      //   .setHTML(templatePopup(e.features[0].properties.velocidade, e.features[0].properties.color))
+      //   .addTo(map);
+    })
 
 
     // map.addLayer({
@@ -252,7 +280,15 @@ function MapaGeral() {
 
   useEffect(() => { }, [dados])
 
-
+  function templatePopup(obj) {
+    return `<div id="popup" style="border-bottom:1px solid ${obj.color}">
+              <strong>Data:</strong> ${obj.dt_gps}
+              </br>
+              <strong>Velocidade:</strong> ${obj.velocidade}
+              </br>
+              <strong>Descrição:</strong> ${obj.desc_ativo}
+            </div>`
+  }
   return (
     <>
       {/* <Mapa geojson={geojson} dados={dados} polyline={posicoes} makers={markerTabela} centerMap={center} /> */}
