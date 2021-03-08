@@ -10,3 +10,13 @@
 #popup {
     padding: 1px 25px;
 }
+
+.mapboxgl-ctrl {
+    display: flex;
+    flex-direction: column;
+}
+
+.mapboxgl-ctrl > button {
+    width: auto;
+    padding: 0 8px;
+}

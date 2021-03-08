@@ -122,6 +122,53 @@ export default Mapbox;
 // }, 10);
 
 
+// SETINHA NAS LINHAS
+
+
+ // map.addLayer({
+//   id: 'routearrows',
+//   type: 'symbol',
+//   source: 'rota',
+//   layout: {
+//     'symbol-placement': 'line',
+//     'text-field': '▶',
+//     'text-size': [
+//       "interpolate",
+//       ["linear"],
+//       ["zoom"],
+//       12, 24,
+//       22, 60
+//     ],
+//     'symbol-spacing': [
+//       "interpolate",
+//       ["linear"],
+//       ["zoom"],
+//       12, 30,
+//       22, 160
+//     ],
+//     'text-keep-upright': false
+//   },
+//   paint: {
+//     'text-color': '#3887be',
+//     'text-halo-color': 'yellow',
+//     'text-halo-width': 1
+//   }
+// }, 'rota');
+
+
+
+  // map.addLayer({
+    //   'id': 'sky',
+    //   'type': 'sky',
+    //   'paint': {
+    //     'sky-type': 'atmosphere',
+    //     'sky-atmosphere-sun': [0.0, 0.0],
+    //     'sky-atmosphere-sun-intensity': 15
+    //   }
+    // });
+
+
+
 
 
 

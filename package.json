@@ -11,6 +11,7 @@
     "axios": "^0.21.1",
     "leaflet": "^1.7.1",
     "mapbox-gl": "^2.1.1",
+    "mapbox-gl-controls": "^1.8.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-leaflet": "^3.1.0",

@@ -1,6 +1,6 @@
-import React, { useEffect, useState, forwardRef } from 'react'
+import React, { forwardRef } from 'react'
 
-import ReactMapboxGl, { Layer, Feature, MapContext } from 'react-mapbox-gl';
+import ReactMapboxGl, { Layer, Feature } from 'react-mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 
