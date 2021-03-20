@@ -5,7 +5,7 @@ import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import * as turf from "@turf/turf"
 import api from '../../services/api';
 
-import { formatLineInMap } from "../../helpers/mapHelper"
+import { consolidado, formatLineInMap } from "../../helpers/mapHelper"
 
 import MapBox from './mapbox';
 import Tabela from './tabela';
@@ -100,7 +100,7 @@ function MapaGeral(props) {
     });
 
     formatLineInMap.animacao(dados, map, function (posAtual) {
-      console.log("animação " + posAtual);
+      consolidado.consolidarRealTime(cercaConsolidado, posAtual)
     });
 
 
