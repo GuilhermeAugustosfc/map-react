@@ -124,7 +124,6 @@ export default Mapbox;
 
 // SETINHA NAS LINHAS
 
-
  // map.addLayer({
 //   id: 'routearrows',
 //   type: 'symbol',

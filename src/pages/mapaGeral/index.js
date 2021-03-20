@@ -1,14 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react'
 import mapboxgl from 'mapbox-gl';
 import StylesControl from 'mapbox-gl-controls/lib/styles';
-import 'mapbox-gl-controls/theme.css'
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import * as turf from "@turf/turf"
 import api from '../../services/api';
-import Mapa from './mapa';
-import Mapa2 from './mapa2';
+
+import { formatLineInMap } from "../../helpers/mapHelper"
+
 import MapBox from './mapbox';
 import Tabela from './tabela';
-import Carrosel from "./carrosel";
+import Filtro from './filtro';
 
+import 'mapbox-gl-controls/theme.css'
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 import './mapbox.css'
 
 
@@ -20,15 +24,17 @@ function MapaGeral(props) {
   const [center, setCenter] = useState([-22.21537, -49.653947]);
   const [dados, setDados] = useState([]);
   const [geojson, setGeoJson] = useState([]);
-
+  const [cercaConsolidado, setCercaConsolidado] = useState([]);
 
   var popups = [];
+  var draw = null;
 
-  const [colorsSpeed, setColorSpeed] = useState([
-    { color: '#0000FF' }, { color: '#0040FF' }, { color: '#0080FF' },
+  const colorsSpeed = [
+    { color: 'yellow' }, { color: '#0040FF' }, { color: 'red' },
+    // { color: '#0000FF' }, { color: '#0040FF' }, { color: '#0080FF' },
     { color: '#00FFB0' }, { color: '#00E000' }, { color: '#80FF00' },
     { color: '#FFFF00' }, { color: '#FFC000' }, { color: '#FF0000' }
-  ])
+  ]
 
   // onStyleData.bind(this)
 
@@ -36,7 +42,7 @@ function MapaGeral(props) {
 
   const [mapOptions, setMapOptions] = useState({
     center: [-49.654063, -22.215288],
-    style: "mapbox://styles/mapbox/streets-v9",
+    style: "mapbox://styles/mapbox/satellite-v9",
     containerStyle: {
       height: '100vh',
       width: '100vw'
@@ -47,46 +53,36 @@ function MapaGeral(props) {
     // style: "mapbox://styles/mapbox/satellite-v9",
   })
 
-  useEffect(async () => {
-    let form = {
-      id_cliente: 200078,
-      id_ativo: 156167,
-      id_motorista: 0,
-      timezone: 'America/Sao_Paulo',
-      dt_inicial: '02/02/2021 00:00:00',
-      dt_final: '05/03/2021 23:59:59',
-      idioma: 'pt-BR',
-      id_indice: 7112,
-      id_usuario: 83713,
-      pagination_client: 1,
-    }
+  useEffect(() => {
 
-    api.post('/relatorio/Rota/gerar/', form).then((response) => {
-      return response.data;
-    }).then((data) => {
-      let posicoesTratadas = data.map((row) => {
-        return [row.lst_localizacao[1], row.lst_localizacao[0]]
-      })
-
-      for (var i in data) {
-        data[i].lst_localizacao = [data[i].lst_localizacao[1], data[i].lst_localizacao[0]];
-      }
-
-      setDados(data)
-      setPosicoes(posicoesTratadas)
-
-    })
   }, [])
 
   useEffect(() => {
     let map = mapContainer.current.state.map;
     if (!map) return
 
-    let geojson = formatPolilyneColor(dados)
+    console.log(cercaConsolidado);
+
+    if (map.getSource('rota')) {
+      map.removeLayer('rota');
+      map.removeSource('rota');
+    }
+
+    // let geojson = formatLineInMap.resume(dados);
+    // map.addSource('rota', {
+    //   'type': 'geojson',
+    //   'data': geojson,
+    // });
+
+
+    let rota = {
+      features: [],
+      type: "FeatureCollection"
+    }
 
     map.addSource('rota', {
       'type': 'geojson',
-      'data': geojson,
+      'data': rota,
     });
 
     map.addLayer({
@@ -99,23 +95,75 @@ function MapaGeral(props) {
       },
       'paint': {
         'line-color': ['get', 'color'],
-        'line-width': 5,
+        'line-width': 3,
       }
     });
+
+    formatLineInMap.animacao(dados, map, function (posAtual) {
+      console.log("animação " + posAtual);
+    });
+
+
+    // // SETINHA NAS LINHAS
+
+    // map.addLayer({
+    //   id: 'routearrows',
+    //   type: 'symbol',
+    //   source: 'rota',
+    //   layout: {
+    //     'symbol-placement': 'line',
+    //     'text-field': '▶',
+    //     'text-size': [
+    //       "interpolate",
+    //       ["linear"],
+    //       ["zoom"],
+    //       12, 24,
+    //       22, 60
+    //     ],
+    //     'symbol-spacing': [
+    //       "interpolate",
+    //       ["linear"],
+    //       ["zoom"],
+    //       12, 30,
+    //       22, 160
+    //     ],
+    //     'text-keep-upright': false
+    //   },
+    //   paint: {
+    //     'text-color': '#3887be',
+    //     'text-halo-color': 'yellow',
+    //     'text-halo-width': 1
+    //   }
+    // }, 'rota');
+
 
 
   }, [posicoes])
 
-  async function onLoadMap(map) {
+  // function consolidarDados(index) {
+  //   posAtual = turf.point(dados[indexInterval].lst_localizacao);
+  //   if (turf.inside(posAtual, cercaConsolidado)) {
 
-    map.on('click', 'rota', (e) => onClickRota(e, map))
-    map.on('mousemove', (e) => onMouseOverFeature(e, map));
+  //   }
+  // }
 
-    let retorno = await fetch("https://fulltrackstatic.s3.amazonaws.com/anuncio/Ce3jaao765n5Rry37CeeCsf99o99euufyyar951ssa57j749-pt-br.json");
-    let geojson = await retorno.json();
+  function buscarDados(form) {
+    api.post('/relatorio/Rota/gerar/', form).then((response) => {
+      return response.data;
+    }).then((data) => {
+      let posicoesTratadas = data.map((row) => {
+        return [row.lst_localizacao[1], row.lst_localizacao[0]]
+      })
 
+      for (var i in data) {
+        data[i].lst_localizacao = [data[i].lst_localizacao[1], data[i].lst_localizacao[0]];
+      }
+      setDados(data);
+      setPosicoes(posicoesTratadas);
+    })
+  }
 
-    // ADD CAMADA DOM MAPA
+  function addCamadasMapbox(map) {
     map.addControl(new StylesControl({
       styles: [
         {
@@ -138,17 +186,11 @@ function MapaGeral(props) {
       onChange: (style) => {
       },
     }), 'top-left');
+  }
 
-
-
-    // map.addSource('mapbox-dem', {
-    //   'type': 'raster-dem',
-    //   'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
-    //   'tileSize': 512,
-    //   'maxzoom': 14
-    // });
-    // // add the DEM source as a terrain layer with exaggerated height
-    // map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+  async function getlayerFazenda(map) {
+    let retorno = await fetch("https://fulltrackstatic.s3.amazonaws.com/anuncio/Ce3jaao765n5Rry37CeeCsf99o99euufyyar951ssa57j749-pt-br.json");
+    let geojson = await retorno.json();
 
 
     // ADD LAYERS DA FAZENDA (MAPA)
@@ -170,7 +212,47 @@ function MapaGeral(props) {
         'line-width': 1,
       }
     });
+  }
 
+  async function onLoadMap(map) {
+
+    map.on('click', 'rota', (e) => onClickRota(e, map))
+    map.on('mousemove', (e) => onMouseOverFeature(e, map));
+
+    // ADD CAMADA DOM MAPA
+    addCamadasMapbox(map);
+    addMapBoxDraw(map);
+    // getlayerFazenda(map)
+
+  }
+  function updateArea(e) {
+    var data = draw.getAll();
+    debugger
+    setCercaConsolidado(turf.polygon(data.features[0].geometry.coordinates))
+    if (data.features.length > 0) {
+      var area = turf.area(data);
+
+      // restrict to area to 2 decimal points
+      var rounded_area = Math.round(area * 100) / 100;
+      console.log(rounded_area + " metros quadrados");
+    }
+  }
+
+  function addMapBoxDraw(map) {
+    draw = new MapboxDraw({
+      displayControlsDefault: false,
+      controls: {
+        polygon: true,
+        trash: true
+      }
+    })
+
+    map.addControl(draw, 'top-left');
+
+
+    map.on('draw.create', updateArea);
+    map.on('draw.delete', updateArea);
+    map.on('draw.update', updateArea);
   }
 
   function onMouseOverFeature(e, map) {
@@ -214,66 +296,6 @@ function MapaGeral(props) {
     }
   }
 
-  function onHoverRow(latlon) {
-    // setCenter(latlon);
-    // setMarkerTabela(latlon);
-  }
-
-  function calcColorSpeed(speed) {
-    var i,
-      speedThresholds = [10, 20, 30, 45, 50, 55, 60, 65];
-
-    for (i = 0; i < speedThresholds.length; ++i) {
-      if (speed <= speedThresholds[i]) {
-        return { index: i, velocidade: speed };
-      }
-    }
-    return { index: speedThresholds.length, velocidade: speed };
-  }
-
-  function formatPolilyneColor(dados) {
-
-    var i, len = dados.length,
-      prevOptionIdx, optionIdx,
-      segmentLatlngs;
-
-    let geojson = {
-      'type': 'FeatureCollection',
-      'features': []
-    };
-
-    for (i = 1; i < len; ++i) {
-      optionIdx = calcColorSpeed(dados[i].vl_velocidade);
-
-      if (i === 1) {
-        segmentLatlngs = [dados[0].lst_localizacao];
-        prevOptionIdx = calcColorSpeed(dados[0].vl_velocidade);
-      }
-
-      segmentLatlngs.push(dados[i].lst_localizacao);
-
-      if (prevOptionIdx.index !== optionIdx.index || i === len - 1) {
-        geojson.features.push({
-          'type': 'Feature',
-          'properties': {
-            'color': colorsSpeed[optionIdx.index].color,
-            'velocidade': optionIdx.velocidade,
-            'dt_gps': dados[i].dt_gps,
-            'desc_ativo': dados[i].desc_ativo
-          },
-          'geometry': {
-            'type': 'LineString',
-            'coordinates': segmentLatlngs
-          }
-        })
-
-        prevOptionIdx.index = optionIdx.index;
-        segmentLatlngs = [dados[i].lst_localizacao];
-      }
-    }
-    return geojson
-  }
-
   function onClickRota(e, map) {
     new mapboxgl.Popup()
       .setLngLat(e.lngLat)
@@ -291,9 +313,22 @@ function MapaGeral(props) {
             </div>`
   }
 
+  function onclickButtonGerar(data) {
+    if (data.dt_inicial && data.dt_final) {
+      buscarDados({
+        dt_final: data.dt_final.toLocaleString("pt-BR"),
+        dt_inicial: data.dt_inicial.toLocaleString("pt-BR"),
+        id_ativo: 241354,
+        id_motorista: 0,
+        timezone: 'America/Sao_Paulo',
+        idioma: 'pt-BR',
+        id_indice: 5554,
+      })
+    }
+  }
+
   function onStyleData(map, Ct) {
     if (Ct && Ct.style.stylesheet && Ct.style.stylesheet.owner == "mapbox-map-design" && !map.getSource('mapbox-dem')) {
-      console.log('terrar');
       map.addSource('mapbox-dem', {
         'type': 'raster-dem',
         'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
@@ -310,7 +345,7 @@ function MapaGeral(props) {
       {/* <Mapa geojson={geojson} dados={dados} polyline={posicoes} makers={markerTabela} centerMap={center} /> */}
       <MapBox ref={mapContainer} posicoes={posicoes} onStyleData={onStyleData} onStyleLoad={onLoadMap} {...mapOptions} />
       {/* <Mapa2 /> */}
-      {/* <Tabela onHoverRow={onHoverRow} dados={dados} /> */}
+      <Filtro onclickButtonGerar={onclickButtonGerar} />
       {/* <Carrosel /> */}
     </>
   );

@@ -1,0 +1,11 @@
+.filtro {
+    background-color: #fff;
+    background-clip: border-box;
+    border: 0 solid transparent;
+    border-radius: .25rem;
+    box-shadow: 0 0 0.875rem 0 rgb(41 48 66 / 5%);
+    position: absolute;
+    right: 0;
+    top: 81px;
+    z-index: 9999;
+}
