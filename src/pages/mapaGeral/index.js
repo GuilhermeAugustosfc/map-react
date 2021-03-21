@@ -10,6 +10,7 @@ import { consolidado, formatLineInMap } from "../../helpers/mapHelper"
 import MapBox from './mapbox';
 import Tabela from './tabela';
 import Filtro from './filtro';
+import PainelConsolidado from './painelConsolidado';
 
 import 'mapbox-gl-controls/theme.css'
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
@@ -24,19 +25,24 @@ function MapaGeral(props) {
   const [center, setCenter] = useState([-22.21537, -49.653947]);
   const [dados, setDados] = useState([]);
   const [geojson, setGeoJson] = useState([]);
-  const [cercaConsolidado, setCercaConsolidado] = useState([]);
+  const [cercaConsolidado, setCercaConsolidado] = useState(null);
+
+  const [dadosConsolidado, setDadosConsolidado] = useState({
+    tempoTrabalho: "00:00:00",
+    deslocamento: "00:00:00",
+    tempoDentroCerca: "00:00:00",
+    tempoDentroCercaDesligado: "00:00:00",
+    tempoDentroCercaOcioso: "00:00:00",
+    tempoDentroCercaTrabalhando: "00:00:00",
+    porcDentroCerca: 0,
+    porcForaCerca: 0,
+    porcDentroCercaOcioso: 0,
+    porcDentroCercaDesligado: 0,
+    porcDentroCercaTrabalhando: 0
+  });
 
   var popups = [];
   var draw = null;
-
-  const colorsSpeed = [
-    { color: 'yellow' }, { color: '#0040FF' }, { color: 'red' },
-    // { color: '#0000FF' }, { color: '#0040FF' }, { color: '#0080FF' },
-    { color: '#00FFB0' }, { color: '#00E000' }, { color: '#80FF00' },
-    { color: '#FFFF00' }, { color: '#FFC000' }, { color: '#FF0000' }
-  ]
-
-  // onStyleData.bind(this)
 
   const mapContainer = useRef(null);
 
@@ -61,47 +67,51 @@ function MapaGeral(props) {
     let map = mapContainer.current.state.map;
     if (!map) return
 
-    console.log(cercaConsolidado);
-
     if (map.getSource('rota')) {
       map.removeLayer('rota');
       map.removeSource('rota');
     }
+    consolidado.resetConsolidado();
 
-    // let geojson = formatLineInMap.resume(dados);
-    // map.addSource('rota', {
-    //   'type': 'geojson',
-    //   'data': geojson,
-    // });
+    if (true) {
+      let conso = consolidado.consolidarTodosDados(dados, cercaConsolidado);
+      if (conso) {
+        setDadosConsolidado(conso);
+      }
+      let geojson = formatLineInMap.resume(dados);
+      map.addSource('rota', {
+        'type': 'geojson',
+        'data': geojson,
+      });
 
+      map.addLayer({
+        'id': 'rota',
+        'type': 'line',
+        'source': 'rota',
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round',
+        },
+        'paint': {
+          'line-color': ['get', 'color'],
+          'line-width': 3,
+        }
+      });
 
-    let rota = {
-      features: [],
-      type: "FeatureCollection"
+    } else {
+      formatLineInMap.animacao(dados, map, function (eventoAtual) {
+        let conso = consolidado.consolidarRealTime({ cercaConsolidado, eventoAtual });
+        console.log(conso);
+
+        if (conso) {
+          setDadosConsolidado(conso);
+        }
+
+      });
+
     }
 
-    map.addSource('rota', {
-      'type': 'geojson',
-      'data': rota,
-    });
 
-    map.addLayer({
-      'id': 'rota',
-      'type': 'line',
-      'source': 'rota',
-      'layout': {
-        'line-join': 'round',
-        'line-cap': 'round',
-      },
-      'paint': {
-        'line-color': ['get', 'color'],
-        'line-width': 3,
-      }
-    });
-
-    formatLineInMap.animacao(dados, map, function (posAtual) {
-      consolidado.consolidarRealTime(cercaConsolidado, posAtual)
-    });
 
 
     // // SETINHA NAS LINHAS
@@ -227,9 +237,8 @@ function MapaGeral(props) {
   }
   function updateArea(e) {
     var data = draw.getAll();
-    debugger
-    setCercaConsolidado(turf.polygon(data.features[0].geometry.coordinates))
     if (data.features.length > 0) {
+      setCercaConsolidado(turf.polygon(data.features[0].geometry.coordinates));
       var area = turf.area(data);
 
       // restrict to area to 2 decimal points
@@ -345,6 +354,7 @@ function MapaGeral(props) {
       {/* <Mapa geojson={geojson} dados={dados} polyline={posicoes} makers={markerTabela} centerMap={center} /> */}
       <MapBox ref={mapContainer} posicoes={posicoes} onStyleData={onStyleData} onStyleLoad={onLoadMap} {...mapOptions} />
       {/* <Mapa2 /> */}
+      <PainelConsolidado dados={dadosConsolidado} />
       <Filtro onclickButtonGerar={onclickButtonGerar} />
       {/* <Carrosel /> */}
     </>

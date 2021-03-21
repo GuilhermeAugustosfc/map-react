@@ -1,0 +1,13 @@
+.painelConsolidado {
+    position: absolute;
+    top: 4px;
+    left: 25%;
+    width: 56%;
+    display: flex;
+    margin: auto;
+    background: white;  
+}
+
+.painelConsolidado > div {
+    flex: 1;
+}
