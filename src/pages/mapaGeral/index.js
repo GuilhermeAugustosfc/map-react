@@ -38,7 +38,8 @@ function MapaGeral(props) {
     porcForaCerca: 0,
     porcDentroCercaOcioso: 0,
     porcDentroCercaDesligado: 0,
-    porcDentroCercaTrabalhando: 0
+    porcDentroCercaTrabalhando: 0,
+    porcTerrenoFeito:""
   });
 
   var popups = [];
@@ -79,10 +80,45 @@ function MapaGeral(props) {
         setDadosConsolidado(conso);
       }
       let geojson = formatLineInMap.resume(dados);
+      let cercaRotaAtual = {
+        'type': 'FeatureCollection',
+        'features': [
+          {
+            'type': 'Feature',
+            'geometry': {
+              'type': 'Polygon',
+              'coordinates': [posicoes]
+            }
+          },
+        ]
+      }
+      console.log(Math.round(turf.area(cercaRotaAtual) * 100) / 100 + " Area percorrida");
+      if (cercaConsolidado) {
+        console.log(Math.round(turf.area(cercaConsolidado) * 100) / 100 + " Area Total");
+      }
+
+      // map.addSource('rota', {
+      //   'type': 'geojson',
+      //   'data': data,
+      // });
+
       map.addSource('rota', {
         'type': 'geojson',
         'data': geojson,
       });
+
+      // map.addLayer({
+      //   'id': 'rota',
+      //   'type': 'fill',
+      //   'source': 'rota',
+      //   'layout': {},
+      //   'paint': {
+      //     'fill-color': 'red',
+      //     // 'fill-opacity':0.7,
+      //     'fill-antialias' : true,
+
+      //   }
+      // });
 
       map.addLayer({
         'id': 'rota',
@@ -239,11 +275,10 @@ function MapaGeral(props) {
     var data = draw.getAll();
     if (data.features.length > 0) {
       setCercaConsolidado(turf.polygon(data.features[0].geometry.coordinates));
-      var area = turf.area(data);
+      // var area = turf.area(data);
 
-      // restrict to area to 2 decimal points
-      var rounded_area = Math.round(area * 100) / 100;
-      console.log(rounded_area + " metros quadrados");
+      // // restrict to area to 2 decimal points
+      // var rounded_area = Math.round(area * 100) / 100;
     }
   }
 
@@ -265,6 +300,7 @@ function MapaGeral(props) {
   }
 
   function onMouseOverFeature(e, map) {
+    return
     var features = map.queryRenderedFeatures(e.point);
     var displayProperties = [
       'id',
@@ -308,7 +344,7 @@ function MapaGeral(props) {
   function onClickRota(e, map) {
     new mapboxgl.Popup()
       .setLngLat(e.lngLat)
-      .setHTML(templatePopup(e.features[0].properties.velocidade, e.features[0].properties.color))
+      .setHTML(templatePopup(e.features[0].properties))
       .addTo(map);
   }
 

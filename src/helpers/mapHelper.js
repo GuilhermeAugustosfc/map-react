@@ -27,7 +27,8 @@ export const consolidado = {
     ultimoEventoDentroCercaTrabalhando: 0, // Velocidade > 0
     ultimoEventoDentroCercaOcioso: 0,
     ultimoEventoDentroCercaDesligado: 0,
-
+    posicoesDesligadas: [],
+    posicoesOciosas: [],
     resetConsolidado: function () {
         this.tempoTrabalho = 0;
         this.tempoDentroCerca = 0;
@@ -42,6 +43,36 @@ export const consolidado = {
         this.ultimoEventoDentroCerca = 0;
         this.ultimoEventoDentroCercaOcioso = 0;
         this.ultimoEventoDentroCercaDesligado = 0;
+        this.posicoesDesligadas = [];
+        this.posicoesOciosas = [];
+    },
+    calcularTempo: function (tempos, dt_atual) {
+        let config = {
+            ocioso: {
+                evento: 'ultimoEventoDentroCercaOcioso',
+                tempo: 'tempoDentroCercaOcioso'
+            },
+            trabalhando: {
+                evento: 'ultimoEventoDentroCercaTrabalhando',
+                tempo: 'tempoDentroCercaTrabalhando'
+            },
+            desligado: {
+                evento: 'ultimoEventoDentroCercaDesligado',
+                tempo: 'tempoDentroCercaDesligado'
+            },
+            deslocamento: {
+                evento: 'ultimoEventoDeslocamento',
+                tempo: 'deslocamento'
+            }
+        }
+
+        for (var i in tempos) {
+
+            if (this[config[tempos[i]].evento]) {
+                this[config[tempos[i]].tempo] += ((dt_atual - this[config[tempos[i]].evento]) / 1000);
+                this[config[tempos[i]].evento] = 0;
+            }
+        }
     },
     consolidarRealTime: function (obj) { // RETORNAR O CONSOLIDADO A CADA MOMENTO
 
@@ -60,10 +91,8 @@ export const consolidado = {
         this.dtGpsAtualDateTime = new Date(moment(obj.eventoAtual.dt_gps, "DD/MM/YYYY HH:m:ss").format("YYYY-MM-DD HH:m:ss"));
 
         if (turf.inside(turf.point(obj.eventoAtual.lst_localizacao), obj.cercaConsolidado)) { // DENTRO DA CERCA
-            if (this.ultimoEventoDeslocamento) {
-                this.descolamento += ((this.dtGpsAtualDateTime - this.ultimoEventoDeslocamento) / 1000);
-                this.ultimoEventoDeslocamento = 0;
-            }
+
+            this.calcularTempo(['deslocamento'], this.dtGpsAtualDateTime);
 
             if (!this.ultimoEventoDentroCerca) {
                 this.ultimoEventoDentroCerca = this.dtGpsAtualDateTime;
@@ -83,17 +112,10 @@ export const consolidado = {
                         this.ultimoEventoDentroCercaTrabalhando = this.dtGpsAtualDateTime;
                     }
 
-                    if (this.ultimoEventoDentroCercaOcioso) {
-                        this.tempoDentroCercaOcioso += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCercaOcioso) / 1000);
-                        this.ultimoEventoDentroCercaOcioso = 0;
-                    }
-
-                    if (this.ultimoEventoDentroCercaDesligado) {
-                        this.tempoDentroCercaDesligado += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCercaDesligado) / 1000);
-                        this.ultimoEventoDentroCercaDesligado = 0;
-                    }
-
+                    this.calcularTempo(['ocioso', 'desligado'], this.dtGpsAtualDateTime);
                 } else {
+                    this.posicoesDesligadas.push(obj.eventoAtual.lst_localizacao);
+
                     if (!this.ultimoEventoDentroCercaOcioso) {
                         this.ultimoEventoDentroCercaOcioso = this.dtGpsAtualDateTime;
                     } else {
@@ -101,15 +123,7 @@ export const consolidado = {
                         this.ultimoEventoDentroCercaOcioso = this.dtGpsAtualDateTime;
                     }
 
-                    if (this.ultimoEventoDentroCercaTrabalhando) {
-                        this.tempoDentroCercaTrabalhando += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCercaTrabalhando) / 1000);
-                        this.ultimoEventoDentroCercaTrabalhando = 0;
-                    }
-
-                    if (this.ultimoEventoDentroCercaDesligado) {
-                        this.tempoDentroCercaDesligado += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCercaDesligado) / 1000);
-                        this.ultimoEventoDentroCercaDesligado = 0;
-                    }
+                    this.calcularTempo(['trabalhando', 'desligado'], this.dtGpsAtualDateTime);
                 }
             } else {
                 if (!this.ultimoEventoDentroCercaDesligado) {
@@ -119,18 +133,13 @@ export const consolidado = {
                     this.ultimoEventoDentroCercaDesligado = this.dtGpsAtualDateTime;
                 }
 
-                if (this.ultimoEventoDentroCercaTrabalhando) {
-                    this.tempoDentroCercaTrabalhando += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCercaTrabalhando) / 1000);
-                    this.ultimoEventoDentroCercaTrabalhando = 0;
-                }
-
-                if (this.ultimoEventoDentroCercaOcioso) {
-                    this.tempoDentroCercaOcioso += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCercaOcioso) / 1000);
-                    this.ultimoEventoDentroCercaOcioso = 0;
-                }
+                this.calcularTempo(['trabalhando', 'ocioso'], this.dtGpsAtualDateTime);
             }
 
         } else { //  FORA DA CERCA
+
+            this.posicoesDesligadas.push(obj.eventoAtual.lst_localizacao);
+
             if (!this.ultimoEventoDeslocamento) {
                 this.ultimoEventoDeslocamento = this.dtGpsAtualDateTime;
             } else {
@@ -138,27 +147,13 @@ export const consolidado = {
                 this.ultimoEventoDeslocamento = this.dtGpsAtualDateTime;
             }
 
+            this.calcularTempo(['trabalhando', 'ocioso', 'desligado'], this.dtGpsAtualDateTime);
+
             if (this.ultimoEventoDentroCerca) {
                 this.tempoDentroCerca += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCerca) / 1000);
                 this.ultimoEventoDentroCerca = 0;
             }
-
-            if (this.ultimoEventoDentroCercaTrabalhando) {
-                this.tempoDentroCercaTrabalhando += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCercaTrabalhando) / 1000);
-                this.ultimoEventoDentroCercaTrabalhando = 0;
-            }
-
-            if (this.ultimoEventoDentroCercaOcioso) {
-                this.tempoDentroCercaOcioso += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCercaOcioso) / 1000);
-                this.ultimoEventoDentroCercaOcioso = 0;
-            }
-
-            if (this.ultimoEventoDentroCercaDesligado) {
-                this.tempoDentroCercaDesligado += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCercaDesligado) / 1000);
-                this.ultimoEventoDentroCercaDesligado = 0;
-            }
         }
-
 
         this.dtFinalSeg = new Date(moment(this.dtGpsAtualDateTime, "DD/MM/YYYY HH:m:ss").format("YYYY-MM-DD HH:m:ss"));
         this.dtInicialSeg = new Date(moment(this.dataInicioViagem, "DD/MM/YYYY HH:m:ss").format("YYYY-MM-DD HH:m:ss"));
@@ -175,11 +170,12 @@ export const consolidado = {
             porcForaCerca: parseFloat((100 * this.descolamento) / this.tempoTrabalhoAtual),
             porcDentroCercaOcioso: parseFloat((100 * this.tempoDentroCercaOcioso) / this.tempoTrabalhoAtual),
             porcDentroCercaDesligado: parseFloat((100 * this.tempoDentroCercaDesligado) / this.tempoTrabalhoAtual),
-            porcDentroCercaTrabalhando: parseFloat((100 * this.tempoDentroCercaTrabalhando) / this.tempoTrabalhoAtual)
+            porcDentroCercaTrabalhando: parseFloat((100 * this.tempoDentroCercaTrabalhando) / this.tempoTrabalhoAtual),
+            posicoesDesligadas: this.posicoesDesligadas,
+            posicoesOciosas: this.posicoesOciosas
         }
 
         return this.consolidado;
-
 
     },
     consolidarTodosDados: function (dados, cercaConsolidado) {
@@ -205,10 +201,8 @@ export const consolidado = {
             this.dtGpsAtualDateTime = new Date(moment(dados[i].dt_gps, "DD/MM/YYYY HH:m:ss").format("YYYY-MM-DD HH:m:ss"));
 
             if (turf.inside(turf.point(dados[i].lst_localizacao), cercaConsolidado)) { // DENTRO DA CERCA
-                if (this.ultimoEventoDeslocamento) {
-                    this.descolamento += ((this.dtGpsAtualDateTime - this.ultimoEventoDeslocamento) / 1000);
-                    this.ultimoEventoDeslocamento = 0;
-                }
+
+                this.calcularTempo(['deslocamento'], this.dtGpsAtualDateTime);
 
                 if (!this.ultimoEventoDentroCerca) {
                     this.ultimoEventoDentroCerca = this.dtGpsAtualDateTime;
@@ -222,45 +216,28 @@ export const consolidado = {
                             this.ultimoEventoDentroCercaTrabalhando = this.dtGpsAtualDateTime;
                         }
 
-                        if (this.ultimoEventoDentroCercaOcioso) {
-                            this.tempoDentroCercaOcioso += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCercaOcioso) / 1000);
-                            this.ultimoEventoDentroCercaOcioso = 0;
-                        }
-
-                        if (this.ultimoEventoDentroCercaDesligado) {
-                            this.tempoDentroCercaDesligado += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCercaDesligado) / 1000);
-                            this.ultimoEventoDentroCercaDesligado = 0;
-                        }
+                        this.calcularTempo(['ocioso', 'desligado'], this.dtGpsAtualDateTime);
 
                     } else {
+
+                        this.posicoesOciosas.push(dados[i].lst_localizacao);
+
                         if (!this.ultimoEventoDentroCercaOcioso) {
                             this.ultimoEventoDentroCercaOcioso = this.dtGpsAtualDateTime;
                         }
 
-                        if (this.ultimoEventoDentroCercaTrabalhando) {
-                            this.tempoDentroCercaTrabalhando += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCercaTrabalhando) / 1000);
-                            this.ultimoEventoDentroCercaTrabalhando = 0;
-                        }
+                        this.calcularTempo(['trabalhando', 'desligado'], this.dtGpsAtualDateTime);
 
-                        if (this.ultimoEventoDentroCercaDesligado) {
-                            this.tempoDentroCercaDesligado += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCercaDesligado) / 1000);
-                            this.ultimoEventoDentroCercaDesligado = 0;
-                        }
                     }
                 } else {
+
+                    this.posicoesDesligadas.push(dados[i].lst_localizacao);
+
                     if (!this.ultimoEventoDentroCercaDesligado) {
                         this.ultimoEventoDentroCercaDesligado = this.dtGpsAtualDateTime;
                     }
 
-                    if (this.ultimoEventoDentroCercaOcioso) {
-                        this.tempoDentroCercaOcioso += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCercaOcioso) / 1000);
-                        this.ultimoEventoDentroCercaOcioso = 0;
-                    }
-
-                    if (this.ultimoEventoDentroCercaTrabalhando) {
-                        this.tempoDentroCercaTrabalhando += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCercaTrabalhando) / 1000);
-                        this.ultimoEventoDentroCercaTrabalhando = 0;
-                    }
+                    this.calcularTempo(['ocioso', 'trabalhando'], this.dtGpsAtualDateTime);
 
                 }
 
@@ -274,36 +251,9 @@ export const consolidado = {
                     this.ultimoEventoDentroCerca = 0;
                 }
 
-                if (this.ultimoEventoDentroCercaTrabalhando) {
-                    this.tempoDentroCercaTrabalhando += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCercaTrabalhando) / 1000);
-                    this.ultimoEventoDentroCercaTrabalhando = 0;
-                }
+                this.calcularTempo(['ocioso', 'desligado', 'trabalhando'], this.dtGpsAtualDateTime);
 
-                if (this.ultimoEventoDentroCercaOcioso) {
-                    this.tempoDentroCercaOcioso += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCercaOcioso) / 1000);
-                    this.ultimoEventoDentroCercaOcioso = 0;
-                }
-
-                if (this.ultimoEventoDentroCercaDesligado) {
-                    this.tempoDentroCercaDesligado += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCercaDesligado) / 1000);
-                    this.ultimoEventoDentroCercaDesligado = 0;
-                }
             }
-        }
-
-        if (this.ultimoEventoDentroCercaOcioso) {
-            this.tempoDentroCercaOcioso += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCercaOcioso) / 1000);
-            this.ultimoEventoDentroCercaOcioso = 0;
-        }
-
-        if (this.ultimoEventoDentroCercaDesligado) {
-            this.tempoDentroCercaDesligado += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCercaDesligado) / 1000);
-            this.ultimoEventoDentroCercaDesligado = 0;
-        }
-
-        if (this.ultimoEventoDentroCercaTrabalhando) {
-            this.tempoDentroCercaTrabalhando += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCercaTrabalhando) / 1000);
-            this.ultimoEventoDentroCercaTrabalhando = 0;
         }
 
         if (this.ultimoEventoDentroCerca) {
@@ -311,10 +261,8 @@ export const consolidado = {
             this.ultimoEventoDentroCerca = 0;
         }
 
-        if (this.ultimoEventoDeslocamento) {
-            this.descolamento += ((this.dtGpsAtualDateTime - this.ultimoEventoDeslocamento) / 1000);
-            this.ultimoEventoDeslocamento = 0;
-        }
+        this.calcularTempo(['ocioso', 'desligado', 'deslocamento', 'trabalhando'], this.dtGpsAtualDateTime);
+
 
         this.dtFinalSeg = new Date(moment(dados[(dados.length - 1)].dt_gps, "DD/MM/YYYY HH:m:ss").format("YYYY-MM-DD HH:m:ss"));
         this.dtInicialSeg = new Date(moment(dados[0].dt_gps, "DD/MM/YYYY HH:m:ss").format("YYYY-MM-DD HH:m:ss"));
@@ -332,7 +280,9 @@ export const consolidado = {
             porcForaCerca: parseFloat((100 * this.descolamento) / this.tempoTrabalhoAtual),
             porcDentroCercaOcioso: parseFloat((100 * this.tempoDentroCercaOcioso) / this.tempoTrabalhoAtual),
             porcDentroCercaDesligado: parseFloat((100 * this.tempoDentroCercaDesligado) / this.tempoTrabalhoAtual),
-            porcDentroCercaTrabalhando: parseFloat((100 * this.tempoDentroCercaTrabalhando) / this.tempoTrabalhoAtual)
+            porcDentroCercaTrabalhando: parseFloat((100 * this.tempoDentroCercaTrabalhando) / this.tempoTrabalhoAtual),
+            posicoesDesligadas: this.posicoesDesligadas,
+            posicoesOciosas: this.posicoesOciosas
         }
     }
 }
@@ -349,7 +299,7 @@ export const formatLineInMap = {
     segmentLatlngs: null,
     timer: null,
     colorsSpeed: [
-        { color: 'yellow' }, { color: '#0040FF' }, { color: 'red' },
+        { color: '#868b00' }, { color: '#00008b' }, { color: 'darkred' }, { color: 'black' }
     ],
 
     animacao: function (dados, map, callback) {
@@ -447,8 +397,6 @@ export const formatLineInMap = {
             }
 
             this.segmentLatlngs.push(this.dados[i].lst_localizacao);
-
-            // if (this.prevOptionIdx.index !== this.optionIdx.index || i === this.dados.length - 1) {
             geojson.features.push({
                 'type': 'Feature',
                 'properties': {
@@ -465,7 +413,6 @@ export const formatLineInMap = {
 
             this.prevOptionIdx.index = this.optionIdx.index;
             this.segmentLatlngs = [this.dados[i].lst_localizacao];
-            // }
         }
 
         return geojson;
