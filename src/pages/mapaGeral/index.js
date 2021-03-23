@@ -1,21 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react'
+
+import MapBox from '../../Componentes/MapBox/mapbox';
+import Filtro from '../../Componentes/FiltroMapa/filtro';
+import Carrosel from '../../Componentes/Carrosel/carrosel';
+import InfoConsolidadoMapa from '../../Componentes/InfoConsolidadoMapa/InfoConsolidadoMapa';
+
+import 'mapbox-gl-controls/theme.css'
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
+import '../../Componentes/MapBox/mapbox.css'
+
+import { consolidado, formatLineInMap } from "../../helpers/mapHelper"
 import mapboxgl from 'mapbox-gl';
 import StylesControl from 'mapbox-gl-controls/lib/styles';
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import * as turf from "@turf/turf"
 import api from '../../services/api';
-
-import { consolidado, formatLineInMap } from "../../helpers/mapHelper"
-
-import MapBox from './mapbox';
-import Tabela from './tabela';
-import Filtro from './filtro';
-import PainelConsolidado from './painelConsolidado';
-
-import 'mapbox-gl-controls/theme.css'
-import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
-import './mapbox.css'
-
+import airfield from 'maki/icons/aerialway-11.svg'
 
 function MapaGeral(props) {
 
@@ -39,7 +39,7 @@ function MapaGeral(props) {
     porcDentroCercaOcioso: 0,
     porcDentroCercaDesligado: 0,
     porcDentroCercaTrabalhando: 0,
-    porcTerrenoFeito:""
+    porcTerrenoFeito: ""
   });
 
   var popups = [];
@@ -65,7 +65,8 @@ function MapaGeral(props) {
   }, [])
 
   useEffect(() => {
-    let map = mapContainer.current.state.map;
+    let { map } = mapContainer.current.state;
+
     if (!map) return
 
     if (map.getSource('rota')) {
@@ -74,11 +75,14 @@ function MapaGeral(props) {
     }
     consolidado.resetConsolidado();
 
-    if (true) {
+    if (false) {
+
       let conso = consolidado.consolidarTodosDados(dados, cercaConsolidado);
+
       if (conso) {
         setDadosConsolidado(conso);
       }
+
       let geojson = formatLineInMap.resume(dados);
       let cercaRotaAtual = {
         'type': 'FeatureCollection',
@@ -97,28 +101,11 @@ function MapaGeral(props) {
         console.log(Math.round(turf.area(cercaConsolidado) * 100) / 100 + " Area Total");
       }
 
-      // map.addSource('rota', {
-      //   'type': 'geojson',
-      //   'data': data,
-      // });
 
       map.addSource('rota', {
         'type': 'geojson',
         'data': geojson,
       });
-
-      // map.addLayer({
-      //   'id': 'rota',
-      //   'type': 'fill',
-      //   'source': 'rota',
-      //   'layout': {},
-      //   'paint': {
-      //     'fill-color': 'red',
-      //     // 'fill-opacity':0.7,
-      //     'fill-antialias' : true,
-
-      //   }
-      // });
 
       map.addLayer({
         'id': 'rota',
@@ -134,10 +121,31 @@ function MapaGeral(props) {
         }
       });
 
+
+      // CASO FOR MONTAR A LINHA COMO POLYGON (VER O TANTO QUE FOI FEITO NO TALHAO)
+
+      // map.addSource('rota', {
+      //   'type': 'geojson',
+      //   'data': data,
+      // });
+
+      // map.addLayer({
+      //   'id': 'rota',
+      //   'type': 'fill',
+      //   'source': 'rota',
+      //   'layout': {},
+      //   'paint': {
+      //     'fill-color': 'red',
+      //     // 'fill-opacity':0.7,
+      //     'fill-antialias' : true,
+
+      //   }
+      // });
+
+
     } else {
       formatLineInMap.animacao(dados, map, function (eventoAtual) {
         let conso = consolidado.consolidarRealTime({ cercaConsolidado, eventoAtual });
-        console.log(conso);
 
         if (conso) {
           setDadosConsolidado(conso);
@@ -186,13 +194,6 @@ function MapaGeral(props) {
 
   }, [posicoes])
 
-  // function consolidarDados(index) {
-  //   posAtual = turf.point(dados[indexInterval].lst_localizacao);
-  //   if (turf.inside(posAtual, cercaConsolidado)) {
-
-  //   }
-  // }
-
   function buscarDados(form) {
     api.post('/relatorio/Rota/gerar/', form).then((response) => {
       return response.data;
@@ -209,7 +210,7 @@ function MapaGeral(props) {
     })
   }
 
-  function addCamadasMapbox(map) {
+  function addCamadasMapboxControl(map) {
     map.addControl(new StylesControl({
       styles: [
         {
@@ -266,9 +267,8 @@ function MapaGeral(props) {
     map.on('mousemove', (e) => onMouseOverFeature(e, map));
 
     // ADD CAMADA DOM MAPA
-    addCamadasMapbox(map);
+    addCamadasMapboxControl(map);
     addMapBoxDraw(map);
-    // getlayerFazenda(map)
 
   }
   function updateArea(e) {
@@ -372,6 +372,70 @@ function MapaGeral(props) {
     }
   }
 
+  function onClickConsolidado(stringConsolidado, dados) {
+    let { map } = mapContainer.current.state;
+    if (map.getLayer('rota')) {
+      map.removeLayer('rota');
+    }
+
+    switch (stringConsolidado) {
+      case 'tempoTrabalho':
+        break;
+      case 'tempDeslocamneto':
+        break;
+      case 'tempoDentroCerca':
+        break;
+      case 'tempoEfetivo':
+        break;
+      case 'tempoOcioso':
+
+        let a = airfield;
+        if (map.getSource('markersOciosos')) {
+          return
+        }
+
+        let markersOciosos = {
+          'type': 'FeatureCollection',
+          'features': []
+        }
+
+        let { posicoesOciosas } = dados;
+
+        for (var i in posicoesOciosas) {
+          markersOciosos.features.push(turf.point(posicoesOciosas[i], { title: 'Ociosos' }))
+        }
+
+        map.addSource('markersOciosos', {
+          type: 'geojson',
+          data: markersOciosos
+        })
+
+        map.addLayer({
+          'id': 'markersOciosos',
+          'type': 'symbol',
+          'source': 'markersOciosos',
+          'layout': {
+            // 'icon-image': 'custom-marker',
+            // get the title name from the source's "title" property
+            'text-field': ['get', 'title'],
+            'text-font': [
+              'Open Sans Semibold',
+              'Arial Unicode MS Bold'
+            ],
+            'text-offset': [0, 1.25],
+            'text-anchor': 'top'
+          }
+        });
+
+
+        break;
+      case 'tempoDesligado':
+        break;
+      default:
+        break
+    }
+  }
+
   function onStyleData(map, Ct) {
     if (Ct && Ct.style.stylesheet && Ct.style.stylesheet.owner == "mapbox-map-design" && !map.getSource('mapbox-dem')) {
       map.addSource('mapbox-dem', {
@@ -390,9 +454,9 @@ function MapaGeral(props) {
       {/* <Mapa geojson={geojson} dados={dados} polyline={posicoes} makers={markerTabela} centerMap={center} /> */}
       <MapBox ref={mapContainer} posicoes={posicoes} onStyleData={onStyleData} onStyleLoad={onLoadMap} {...mapOptions} />
       {/* <Mapa2 /> */}
-      <PainelConsolidado dados={dadosConsolidado} />
+      <InfoConsolidadoMapa dados={dadosConsolidado} onClickConsolidado={onClickConsolidado} />
       <Filtro onclickButtonGerar={onclickButtonGerar} />
-      {/* <Carrosel /> */}
+      <Carrosel />
     </>
   );
 }

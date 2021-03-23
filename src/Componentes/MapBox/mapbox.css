@@ -1,0 +1,22 @@
+
+/* .map-container {
+    position:absolute; 
+    top:0; 
+    bottom:0; 
+    width:100%;
+    height: 100%;
+} */
+
+#popup {
+    padding: 1px 25px;
+}
+
+.mapboxgl-ctrl {
+    display: flex;
+    flex-direction: column;
+}
+
+.mapboxgl-ctrl > button {
+    width: auto;
+    padding: 0 8px;
+}

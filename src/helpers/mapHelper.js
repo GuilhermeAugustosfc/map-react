@@ -29,6 +29,8 @@ export const consolidado = {
     ultimoEventoDentroCercaDesligado: 0,
     posicoesDesligadas: [],
     posicoesOciosas: [],
+    posicoesDeslocamento: [],
+    posicoesTrabalhando: [],
     resetConsolidado: function () {
         this.tempoTrabalho = 0;
         this.tempoDentroCerca = 0;
@@ -45,6 +47,8 @@ export const consolidado = {
         this.ultimoEventoDentroCercaDesligado = 0;
         this.posicoesDesligadas = [];
         this.posicoesOciosas = [];
+        this.posicoesDeslocamento = [];
+        this.posicoesTrabalhando = [];
     },
     calcularTempo: function (tempos, dt_atual) {
         let config = {
@@ -105,6 +109,8 @@ export const consolidado = {
 
                 if (obj.eventoAtual.vl_velocidade > 0) {
 
+                    this.posicoesTrabalhando.push(obj.eventoAtual.lst_localizacao)
+
                     if (!this.ultimoEventoDentroCercaTrabalhando) {
                         this.ultimoEventoDentroCercaTrabalhando = this.dtGpsAtualDateTime;
                     } else {
@@ -114,7 +120,7 @@ export const consolidado = {
 
                     this.calcularTempo(['ocioso', 'desligado'], this.dtGpsAtualDateTime);
                 } else {
-                    this.posicoesDesligadas.push(obj.eventoAtual.lst_localizacao);
+                    this.posicoesOciosas.push(obj.eventoAtual.lst_localizacao);
 
                     if (!this.ultimoEventoDentroCercaOcioso) {
                         this.ultimoEventoDentroCercaOcioso = this.dtGpsAtualDateTime;
@@ -126,6 +132,8 @@ export const consolidado = {
                     this.calcularTempo(['trabalhando', 'desligado'], this.dtGpsAtualDateTime);
                 }
             } else {
+                this.posicoesDesligadas.push(obj.eventoAtual.lst_localizacao);
+
                 if (!this.ultimoEventoDentroCercaDesligado) {
                     this.ultimoEventoDentroCercaDesligado = this.dtGpsAtualDateTime;
                 } else {
@@ -138,7 +146,7 @@ export const consolidado = {
 
         } else { //  FORA DA CERCA
 
-            this.posicoesDesligadas.push(obj.eventoAtual.lst_localizacao);
+            this.posicoesDeslocamento.push(obj.eventoAtual.lst_localizacao);
 
             if (!this.ultimoEventoDeslocamento) {
                 this.ultimoEventoDeslocamento = this.dtGpsAtualDateTime;
@@ -172,7 +180,9 @@ export const consolidado = {
             porcDentroCercaDesligado: parseFloat((100 * this.tempoDentroCercaDesligado) / this.tempoTrabalhoAtual),
             porcDentroCercaTrabalhando: parseFloat((100 * this.tempoDentroCercaTrabalhando) / this.tempoTrabalhoAtual),
             posicoesDesligadas: this.posicoesDesligadas,
-            posicoesOciosas: this.posicoesOciosas
+            posicoesOciosas: this.posicoesOciosas,
+            posicoesDeslocamento: this.posicoesDeslocamento,
+            posicoesTrabalhando: this.posicoesTrabalhando,
         }
 
         return this.consolidado;
@@ -216,6 +226,8 @@ export const consolidado = {
                             this.ultimoEventoDentroCercaTrabalhando = this.dtGpsAtualDateTime;
                         }
 
+                        this.posicoesTrabalhando.push(dados[i].lst_localizacao)
+
                         this.calcularTempo(['ocioso', 'desligado'], this.dtGpsAtualDateTime);
 
                     } else {
@@ -242,6 +254,9 @@ export const consolidado = {
                 }
 
             } else { //  FORA DA CERCA
+
+                this.posicoesDeslocamento.push(dados[i].lst_localizacao)
+                
                 if (!this.ultimoEventoDeslocamento) {
                     this.ultimoEventoDeslocamento = this.dtGpsAtualDateTime;
                 }
@@ -250,6 +265,7 @@ export const consolidado = {
                     this.tempoDentroCerca += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCerca) / 1000);
                     this.ultimoEventoDentroCerca = 0;
                 }
+
 
                 this.calcularTempo(['ocioso', 'desligado', 'trabalhando'], this.dtGpsAtualDateTime);
 
@@ -282,7 +298,9 @@ export const consolidado = {
             porcDentroCercaDesligado: parseFloat((100 * this.tempoDentroCercaDesligado) / this.tempoTrabalhoAtual),
             porcDentroCercaTrabalhando: parseFloat((100 * this.tempoDentroCercaTrabalhando) / this.tempoTrabalhoAtual),
             posicoesDesligadas: this.posicoesDesligadas,
-            posicoesOciosas: this.posicoesOciosas
+            posicoesOciosas: this.posicoesOciosas,
+            posicoesDeslocamento:this.posicoesDeslocamento,
+            posicoesTrabalhando:this.posicoesTrabalhando
         }
     }
 }
