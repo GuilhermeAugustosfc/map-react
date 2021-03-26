@@ -1,40 +1,40 @@
 .painelConsolidado {
     position: absolute;
     top: 4px;
-    left: 30%;
-    width: 40%;
+    left: 16%;
+    width: auto;
     margin: auto;
     background: #f3f6f9;
     border-radius: .42rem;
     display: flex;
-}
-
-.painel-body{
-    flex: 1;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
     font-weight: 700;
-    font-size: 13px;
+    text-align: center;
     cursor: pointer;
 }
-
 
 .card-info {
     line-height: 1.5;
     box-shadow: 0 0 30px 0 rgb(82 63 105 / 5%);
     display: flex;
     flex: 1 1;
-    justify-content: space-around;
+    justify-content: space-between;
     border: 1px solid #ccccccb8;
-    align-items: center ;
-    padding: 10px;
+    padding: 7px 38px;
 }
 
+.porcValor {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: column;
+    font-size: 17px;
+    white-space: nowrap;
+}
 
 .tempoTrabalho {
     background-color: #90ee905c;
 }
+
 .tempoTrabalho span {
     font-size: 15px;
 }
@@ -42,7 +42,6 @@
 .tempDeslocamneto {
     background-color: #0000000d;
 }
-
 
 .tempoEfetivo {
     background-color: #e1f0ff;
@@ -56,13 +55,7 @@
     background-color: #ffe1e8;
 }
 
-.porcValor {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    flex-direction: column;
-    font-size: 17px;
-}
+
 
 
 

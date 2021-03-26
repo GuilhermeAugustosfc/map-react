@@ -1,11 +1,11 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 // import Carousel, { slidesToShowPlugin, centeredPlugin } from '@brainhubeu/react-carousel';
 // import '@brainhubeu/react-carousel/lib/style.css';
 import OwlCarousel from 'react-owl-carousel2';
 import 'react-owl-carousel2/lib/styles.css'; //Allows for server-side rendering.
 import './carrosel.css';
 
-function Carrosel() {
+function Carrosel(props) {
 
     const options = {
         items: 3,
@@ -18,6 +18,9 @@ function Carrosel() {
         onDragged: function(event) {},
         onChanged: function(event) {}
     };
+
+    useEffect(() => {
+    }, [])
 
     return (
         <OwlCarousel options={options} events={events} >

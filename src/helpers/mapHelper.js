@@ -88,7 +88,7 @@ export const consolidado = {
             return this.consolidado;
         }
 
-        if (this.dataInicioViagem == null) {
+        if (!this.dataInicioViagem) {
             this.dataInicioViagem = obj.eventoAtual.dt_gps;
         }
 
@@ -132,6 +132,7 @@ export const consolidado = {
                     this.calcularTempo(['trabalhando', 'desligado'], this.dtGpsAtualDateTime);
                 }
             } else {
+
                 this.posicoesDesligadas.push(obj.eventoAtual.lst_localizacao);
 
                 if (!this.ultimoEventoDentroCercaDesligado) {
@@ -204,7 +205,9 @@ export const consolidado = {
         }
 
         for (var i in dados) {
-            if (this.dataInicioViagem == null) {
+
+            if (!this.dataInicioViagem) {
+
                 this.dataInicioViagem = dados[i].dt_gps;
             }
 
@@ -256,7 +259,7 @@ export const consolidado = {
             } else { //  FORA DA CERCA
 
                 this.posicoesDeslocamento.push(dados[i].lst_localizacao)
-                
+
                 if (!this.ultimoEventoDeslocamento) {
                     this.ultimoEventoDeslocamento = this.dtGpsAtualDateTime;
                 }
@@ -270,6 +273,9 @@ export const consolidado = {
                 this.calcularTempo(['ocioso', 'desligado', 'trabalhando'], this.dtGpsAtualDateTime);
 
             }
+
+
+
         }
 
         if (this.ultimoEventoDentroCerca) {
@@ -299,8 +305,8 @@ export const consolidado = {
             porcDentroCercaTrabalhando: parseFloat((100 * this.tempoDentroCercaTrabalhando) / this.tempoTrabalhoAtual),
             posicoesDesligadas: this.posicoesDesligadas,
             posicoesOciosas: this.posicoesOciosas,
-            posicoesDeslocamento:this.posicoesDeslocamento,
-            posicoesTrabalhando:this.posicoesTrabalhando
+            posicoesDeslocamento: this.posicoesDeslocamento,
+            posicoesTrabalhando: this.posicoesTrabalhando
         }
     }
 }

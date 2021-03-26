@@ -1,0 +1,14 @@
+.ContainerDatagrid {
+    display: block;
+    position: relative;
+    height: 100vh;
+}
+
+.DataGrid {
+    width: 100%;
+}
+
+.MuiDataGrid-root, .MuiTypography-body2, .MuiMenuItem-root, .MuiDataGrid-colCellTitle {
+    font-size: 14px !important;
+}
+

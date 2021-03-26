@@ -31,6 +31,7 @@ const Routes = () => (
             <PrivateRoute exact path="/tabela" component={(props) => <Menu><VendedorForm {...props} /></Menu>} /> */}
 
             <PrivateRoute exact path="/mapa" component={(props) => <Mapa {...props} />} />
+            <PrivateRoute exact path="/mapa/:id" component={(props) => <Mapa {...props} />} />
             <PrivateRoute exact path="/tabela" component={(props) => <Tabela {...props} />} />
             
             <PrivateRoute path="*" component={() => <h1>Pagina não encontrada</h1>} />

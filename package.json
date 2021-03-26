@@ -5,8 +5,9 @@
   "dependencies": {
     "@brainhubeu/react-carousel": "^1.19.26",
     "@mapbox/mapbox-gl-draw": "^1.2.2",
+    "@material-ui/data-grid": "^4.0.0-alpha.23",
     "@syncfusion/ej2-react-navigations": "^18.3.51",
-    "@testing-libra ry/react": "^11.1.1",
+    "@testing-library/react": "^11.1.1",
     "@testing-library/jest-dom": "^5.11.5",
     "@testing-library/user-event": "^12.2.0",
     "@turf/turf": "^6.3.0",
@@ -17,7 +18,6 @@
     "mapbox-gl": "^2.1.1",
     "mapbox-gl-controls": "^1.8.0",
     "moment": "^2.29.1",
-    "primereact": "^6.2.1",
     "react": "^17.0.1",
     "react-bootstrap-daterangepicker": "^7.0.0",
     "react-dom": "^17.0.1",

@@ -15,16 +15,14 @@ import StylesControl from 'mapbox-gl-controls/lib/styles';
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import * as turf from "@turf/turf"
 import api from '../../services/api';
-import airfield from 'maki/icons/aerialway-11.svg'
+
+import MarkerSvg from 'maki/icons/marker-15.svg'
 
 function MapaGeral(props) {
 
   const [posicoes, setPosicoes] = useState([]);
 
-  const [markerTabela, setMarkerTabela] = useState([]);
-  const [center, setCenter] = useState([-22.21537, -49.653947]);
   const [dados, setDados] = useState([]);
-  const [geojson, setGeoJson] = useState([]);
   const [cercaConsolidado, setCercaConsolidado] = useState(null);
 
   const [dadosConsolidado, setDadosConsolidado] = useState({
@@ -47,7 +45,7 @@ function MapaGeral(props) {
 
   const mapContainer = useRef(null);
 
-  const [mapOptions, setMapOptions] = useState({
+  const mapOptions = {
     center: [-49.654063, -22.215288],
     style: "mapbox://styles/mapbox/satellite-v9",
     containerStyle: {
@@ -58,11 +56,26 @@ function MapaGeral(props) {
     // bearing: [80],
     // style: 'mapbox://styles/mapbox-map-design/ckhqrf2tz0dt119ny6azh975y',
     // style: "mapbox://styles/mapbox/satellite-v9",
-  })
+  }
 
   useEffect(() => {
+    let { id } = props.match.params;
 
-  }, [])
+    if (id) {
+
+      let dados = props.location.state;
+
+      buscarDados({
+        dt_inicial: dados.data_f + " 00:00:00",
+        dt_final: dados.data_f + " 23:59:59",
+        id_ativo: id,
+        id_motorista: 0,
+        timezone: 'America/Sao_Paulo',
+        idioma: 'pt-BR',
+        id_indice: 5554,
+      })
+    }
+  }, [props.location.state, props.match.params])
 
   useEffect(() => {
     let { map } = mapContainer.current.state;
@@ -192,9 +205,15 @@ function MapaGeral(props) {
 
 
 
-  }, [posicoes])
+  }, [posicoes, cercaConsolidado, dados])
 
   function buscarDados(form) {
+    let { map } = mapContainer.current;
+
+    if (map && map.getSource('rota')) {
+      map.removeSource('rota')
+    }
+
     api.post('/relatorio/Rota/gerar/', form).then((response) => {
       return response.data;
     }).then((data) => {
@@ -269,6 +288,7 @@ function MapaGeral(props) {
     // ADD CAMADA DOM MAPA
     addCamadasMapboxControl(map);
     addMapBoxDraw(map);
+    getlayerFazenda(map);
 
   }
   function updateArea(e) {
@@ -300,7 +320,6 @@ function MapaGeral(props) {
   }
 
   function onMouseOverFeature(e, map) {
-    return
     var features = map.queryRenderedFeatures(e.point);
     var displayProperties = [
       'id',
@@ -320,8 +339,6 @@ function MapaGeral(props) {
         displayFeat[prop] = feat[prop];
       });
       return displayFeat;
-
-
     });
 
     if (displayFeatures.length && ['rota'].includes(displayFeatures[0].source)) {
@@ -389,7 +406,6 @@ function MapaGeral(props) {
         break;
       case 'tempoOcioso':
 
-        let a = airfield;
         if (map.getSource('markersOciosos')) {
           return
         }
@@ -402,7 +418,7 @@ function MapaGeral(props) {
         let { posicoesOciosas } = dados;
 
         for (var i in posicoesOciosas) {
-          markersOciosos.features.push(turf.point(posicoesOciosas[i], { title: 'Ociosos' }))
+          markersOciosos.features.push(turf.point(posicoesOciosas[i], { title: 'Ociosos', 'marker-symbol': 'airfield' }))
         }
 
         map.addSource('markersOciosos', {
@@ -410,20 +426,35 @@ function MapaGeral(props) {
           data: markersOciosos
         })
 
+        let img = new Image(20, 20)
+        img.onload = () => map.addImage('ocioso', img)
+        img.src = MarkerSvg
+
         map.addLayer({
           'id': 'markersOciosos',
           'type': 'symbol',
           'source': 'markersOciosos',
           'layout': {
-            // 'icon-image': 'custom-marker',
+            'icon-size': 1,
+            'icon-image': 'ocioso',
+            'icon-allow-overlap': true,
             // get the title name from the source's "title" property
             'text-field': ['get', 'title'],
             'text-font': [
               'Open Sans Semibold',
               'Arial Unicode MS Bold'
             ],
-            'text-offset': [0, 1.25],
-            'text-anchor': 'top'
+            // 'text-offset': [0, 1.25],
+            'text-anchor': 'top',
+            'text-transform': 'uppercase',
+            'text-letter-spacing': 0.05,
+            'text-offset': [0, 1.5]
+          },
+          'paint': {
+            'icon-color': 'red',
+            'text-color': '#202',
+            'text-halo-color': '#fff',
+            'text-halo-width': 2
           }
         });
 
@@ -437,7 +468,7 @@ function MapaGeral(props) {
   }
 
   function onStyleData(map, Ct) {
-    if (Ct && Ct.style.stylesheet && Ct.style.stylesheet.owner == "mapbox-map-design" && !map.getSource('mapbox-dem')) {
+    if (Ct && Ct.style.stylesheet && Ct.style.stylesheet.owner === "mapbox-map-design" && !map.getSource('mapbox-dem')) {
       map.addSource('mapbox-dem', {
         'type': 'raster-dem',
         'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
@@ -451,9 +482,7 @@ function MapaGeral(props) {
 
   return (
     <>
-      {/* <Mapa geojson={geojson} dados={dados} polyline={posicoes} makers={markerTabela} centerMap={center} /> */}
       <MapBox ref={mapContainer} posicoes={posicoes} onStyleData={onStyleData} onStyleLoad={onLoadMap} {...mapOptions} />
-      {/* <Mapa2 /> */}
       <InfoConsolidadoMapa dados={dadosConsolidado} onClickConsolidado={onClickConsolidado} />
       <Filtro onclickButtonGerar={onclickButtonGerar} />
       <Carrosel />
