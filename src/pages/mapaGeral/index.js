@@ -12,11 +12,15 @@ import '../../Componentes/MapBox/mapbox.css'
 import { consolidado, formatLineInMap } from "../../helpers/mapHelper"
 import mapboxgl from 'mapbox-gl';
 import StylesControl from 'mapbox-gl-controls/lib/styles';
+import ZoomControl from 'mapbox-gl-controls/lib/zoom';
+
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import * as turf from "@turf/turf"
 import api from '../../services/api';
 
 import MarkerSvg from 'maki/icons/marker-15.svg'
+
+import SocketFulltrack from '../../services/socket'
 
 function MapaGeral(props) {
 
@@ -42,21 +46,18 @@ function MapaGeral(props) {
 
   var popups = [];
   var draw = null;
+  var markersOciosos = [];
 
   const mapContainer = useRef(null);
 
-  const mapOptions = {
+  const [mapOptions, setMapOptions] = useState({
     center: [-49.654063, -22.215288],
     style: "mapbox://styles/mapbox/satellite-v9",
     containerStyle: {
       height: '100vh',
       width: '100vw'
     }
-    // pitch: [85],
-    // bearing: [80],
-    // style: 'mapbox://styles/mapbox-map-design/ckhqrf2tz0dt119ny6azh975y',
-    // style: "mapbox://styles/mapbox/satellite-v9",
-  }
+  })
 
   useEffect(() => {
     let { id } = props.match.params;
@@ -75,6 +76,12 @@ function MapaGeral(props) {
         id_indice: 5554,
       })
     }
+
+
+    SocketFulltrack.init((data) => {
+      console.log(data);
+    })
+
   }, [props.location.state, props.match.params])
 
   useEffect(() => {
@@ -88,15 +95,25 @@ function MapaGeral(props) {
     }
     consolidado.resetConsolidado();
 
-    if (false) {
+    if (true) {
 
       let conso = consolidado.consolidarTodosDados(dados, cercaConsolidado);
 
       if (conso) {
         setDadosConsolidado(conso);
+        markersOciosos = [];
+        if (conso.posicoesOciosas.length) {
+          for (var i in conso.posicoesOciosas) {
+            markersOciosos.push(
+              new mapboxgl.Marker({ color: 'orange' })
+                .setLngLat(conso.posicoesOciosas[i])
+                .addTo(map)
+            )
+          }
+        }
       }
 
-      let geojson = formatLineInMap.resume(dados);
+      let geojson = formatLineInMap.resume(dados, map);
       let cercaRotaAtual = {
         'type': 'FeatureCollection',
         'features': [
@@ -109,6 +126,7 @@ function MapaGeral(props) {
           },
         ]
       }
+
       console.log(Math.round(turf.area(cercaRotaAtual) * 100) / 100 + " Area percorrida");
       if (cercaConsolidado) {
         console.log(Math.round(turf.area(cercaConsolidado) * 100) / 100 + " Area Total");
@@ -161,15 +179,22 @@ function MapaGeral(props) {
         let conso = consolidado.consolidarRealTime({ cercaConsolidado, eventoAtual });
 
         if (conso) {
+
           setDadosConsolidado(conso);
+
+          markersOciosos = [];
+          if (conso.posicoesOciosas.length) {
+            markersOciosos.push(
+              new mapboxgl.Marker({ color: 'orange' })
+                .setLngLat(conso.posicoesOciosas)
+                .addTo(map)
+            )
+          }
         }
 
       });
 
     }
-
-
-
 
     // // SETINHA NAS LINHAS
 
@@ -205,7 +230,7 @@ function MapaGeral(props) {
 
 
 
-  }, [posicoes, cercaConsolidado, dados])
+  }, [posicoes, dados])
 
   function buscarDados(form) {
     let { map } = mapContainer.current;
@@ -227,31 +252,6 @@ function MapaGeral(props) {
       setDados(data);
       setPosicoes(posicoesTratadas);
     })
-  }
-
-  function addCamadasMapboxControl(map) {
-    map.addControl(new StylesControl({
-      styles: [
-        {
-          label: 'Streets',
-          styleName: 'Mapbox Streets',
-          styleUrl: 'mapbox://styles/mapbox/streets-v9',
-        },
-        {
-          label: 'Satellite',
-          styleName: 'Satellite',
-          styleUrl: 'mapbox://styles/mapbox/satellite-v9',
-
-        },
-        {
-          label: 'Terreno',
-          styleName: 'Terreno',
-          styleUrl: 'mapbox://styles/mapbox-map-design/ckhqrf2tz0dt119ny6azh975y',
-        },
-      ],
-      onChange: (style) => {
-      },
-    }), 'top-left');
   }
 
   async function getlayerFazenda(map) {
@@ -286,15 +286,15 @@ function MapaGeral(props) {
     map.on('mousemove', (e) => onMouseOverFeature(e, map));
 
     // ADD CAMADA DOM MAPA
-    addCamadasMapboxControl(map);
-    addMapBoxDraw(map);
-    getlayerFazenda(map);
+    addMapBoxControll(map);
+    // getlayerFazenda(map);
 
   }
   function updateArea(e) {
     var data = draw.getAll();
     if (data.features.length > 0) {
       setCercaConsolidado(turf.polygon(data.features[0].geometry.coordinates));
+      // draw.remove();
       // var area = turf.area(data);
 
       // // restrict to area to 2 decimal points
@@ -302,16 +302,38 @@ function MapaGeral(props) {
     }
   }
 
-  function addMapBoxDraw(map) {
+  function addMapBoxControll(map) {
+    map.addControl(new StylesControl({
+      styles: [
+        {
+          label: 'Streets',
+          styleName: 'Mapbox Streets',
+          styleUrl: 'mapbox://styles/mapbox/streets-v9',
+        },
+        {
+          label: 'Satellite',
+          styleName: 'Satellite',
+          styleUrl: 'mapbox://styles/mapbox/satellite-v9',
+
+        },
+        {
+          label: 'Terreno',
+          styleName: 'Terreno',
+          styleUrl: 'mapbox://styles/mapbox-map-design/ckhqrf2tz0dt119ny6azh975y',
+        },
+      ],
+    }), 'top-left');
+
     draw = new MapboxDraw({
       displayControlsDefault: false,
       controls: {
         polygon: true,
         trash: true
-      }
+      },
     })
 
     map.addControl(draw, 'top-left');
+    map.addControl(new ZoomControl(), 'top-left');
 
 
     map.on('draw.create', updateArea);
@@ -320,6 +342,8 @@ function MapaGeral(props) {
   }
 
   function onMouseOverFeature(e, map) {
+    return
+
     var features = map.queryRenderedFeatures(e.point);
     var displayProperties = [
       'id',

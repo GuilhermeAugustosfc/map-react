@@ -120,7 +120,7 @@ export const consolidado = {
 
                     this.calcularTempo(['ocioso', 'desligado'], this.dtGpsAtualDateTime);
                 } else {
-                    this.posicoesOciosas.push(obj.eventoAtual.lst_localizacao);
+                    this.posicoesOciosas = obj.eventoAtual.lst_localizacao;
 
                     if (!this.ultimoEventoDentroCercaOcioso) {
                         this.ultimoEventoDentroCercaOcioso = this.dtGpsAtualDateTime;
