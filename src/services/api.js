@@ -3,7 +3,7 @@ import axios from 'axios'
 export default axios.create({
     baseURL: 'http://api-fulltrack4.ftdata.com.br/',
     headers: {
-        'Authorization': 'Bearer b374fa22c4243d87c1aa1d4517b3893f962fb0b6',
+        'Authorization': 'Bearer 159d02e68abb4292d7ea7a4197ea1339405670c8',
         'Content-Type':'application/json'
     }
 })

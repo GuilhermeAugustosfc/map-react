@@ -1,16 +1,16 @@
 import * as moment from 'moment'
 import * as turf from "@turf/turf"
 
-function calcColorSpeed(speed) {
+export function calcColorSpeed(speed) {
     var i,
         speedThresholds = [6, 9, 13];
 
     for (i = 0; i < speedThresholds.length; ++i) {
         if (speed <= speedThresholds[i]) {
-            return { index: i, velocidade: speed };
+            return i;
         }
     }
-    return { index: speedThresholds.length, velocidade: speed };
+    return speedThresholds.length;
 }
 
 export const consolidado = {
@@ -354,7 +354,6 @@ export const formatLineInMap = {
         this.map = map;
         this.dados = dados;
         this.indexInterval = 1;
-        this.indexFeature = 0;
 
         window.clearInterval(this.timer);
 
@@ -368,7 +367,6 @@ export const formatLineInMap = {
                 this.optionIdx = calcColorSpeed(this.dados[this.indexInterval].vl_velocidade);
 
                 if (this.indexInterval === 1) {
-                    this.prevOptionIdx = calcColorSpeed(this.dados[0].vl_velocidade);
                     this.segmentLatlngs = [this.dados[0].lst_localizacao];
                     callback(this.dados[0]);
                 }
@@ -379,8 +377,8 @@ export const formatLineInMap = {
                 rotaAtual.features.push({
                     'type': 'Feature',
                     'properties': {
-                        'color': this.colorsSpeed[this.optionIdx.index].color,
-                        'velocidade': this.optionIdx.velocidade,
+                        'color': this.colorsSpeed[this.optionIdx].color,
+                        'velocidade': this.dados[this.indexInterval].vl_velocidade,
                         'dt_gps': this.dados[this.indexInterval].dt_gps,
                         'desc_ativo': this.dados[this.indexInterval].desc_ativo
                     },
@@ -392,7 +390,6 @@ export const formatLineInMap = {
 
                 this.map.getSource('rota').setData(rotaAtual)
 
-                this.prevOptionIdx.index = this.optionIdx.index;
                 this.segmentLatlngs = [this.dados[this.indexInterval].lst_localizacao]
                 this.indexInterval++;
 
@@ -417,15 +414,14 @@ export const formatLineInMap = {
 
             if (i === 1) {
                 this.segmentLatlngs = [this.dados[0].lst_localizacao];
-                this.prevOptionIdx = calcColorSpeed(this.dados[0].vl_velocidade);
             }
 
             this.segmentLatlngs.push(this.dados[i].lst_localizacao);
             geojson.features.push({
                 'type': 'Feature',
                 'properties': {
-                    'color': this.colorsSpeed[this.optionIdx.index].color,
-                    'velocidade': this.optionIdx.velocidade,
+                    'color': this.colorsSpeed[this.optionIdx].color,
+                    'velocidade': this.dados[i].vl_velocidade,
                     'dt_gps': this.dados[i].dt_gps,
                     'desc_ativo': this.dados[i].desc_ativo
                 },
@@ -435,7 +431,6 @@ export const formatLineInMap = {
                 }
             })
 
-            this.prevOptionIdx.index = this.optionIdx.index;
             this.segmentLatlngs = [this.dados[i].lst_localizacao];
         }
 
