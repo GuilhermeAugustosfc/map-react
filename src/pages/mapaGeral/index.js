@@ -299,9 +299,7 @@ function MapaGeral(props) {
       map.removeSource('rota')
     }
 
-    api.post('/relatorio/Rota/gerar/', form).then((response) => {
-      return response.data;
-    }).then((data) => {
+    api.post('http://api-fulltrack4.ftdata.com.br/relatorio/Rota/gerar/', form, (data) => {
       let posicoesTratadas = data.map((row) => {
         return [row.lst_localizacao[1], row.lst_localizacao[0]]
       })

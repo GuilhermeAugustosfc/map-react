@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { DataGrid } from '@material-ui/data-grid';
 
-import axios from 'axios'
+import api from '../../services/api'
 import { useHistory } from "react-router";
 
 import { GoBook } from 'react-icons/go'
@@ -207,43 +207,22 @@ const Tabela = () => {
     ];
 
     useEffect(() => {
-        axios({
-            method: "get",
-            url: "http://f-agro-api.fulltrackapp.com/eficiencia?data_ini=2021-03-01&data_fim=2021-03-20",
-            headers: { "Authorization": "Bearer 08deaf2eacf29799dd6dbfb0b74f506e12f3125f" },
-        })
-        .then(function (response) {
-            let { data } = response.data;
+        api.get('http://f-agro-api.fulltrackapp.com/eficiencia?data_ini=2021-03-01&data_fim=2021-03-20', {}, ({ data }) => {
 
             data = data.map((row, index) => {
                 return { ...row, ...{ id: index } }
             })
             setConsolidadoGeral(data);
-
         })
-        .catch(function (response) {
-            console.log(response);
-        });
 
-
-        axios({
-            method: "get",
-            url: "http://f-agro-api.fulltrackapp.com/eficiencia/detalhe?data_ini=2021-03-01&data_fim=2021-03-30&vei_id=47407",
-            headers: { "Authorization": "Bearer 08deaf2eacf29799dd6dbfb0b74f506e12f3125f" },
-        })
-        .then(function (response) {
-            let { data } = response.data;
+        api.get('http://f-agro-api.fulltrackapp.com/eficiencia/detalhe?data_ini=2021-03-01&data_fim=2021-03-30&vei_id=47407', {}, ({ data }) => {
 
             data = data.map((row, index) => {
                 return { ...row, ...{ id: index } }
             })
-            console.log(data);
-            setConsolidadoDetalhes(data);
 
+            setConsolidadoDetalhes(data);
         })
-        .catch(function (response) {
-            console.log(response);
-        });
 
     }, []);
 
