@@ -380,7 +380,8 @@ export const formatLineInMap = {
                         'color': this.colorsSpeed[this.optionIdx].color,
                         'velocidade': this.dados[this.indexInterval].vl_velocidade,
                         'dt_gps': this.dados[this.indexInterval].dt_gps,
-                        'desc_ativo': this.dados[this.indexInterval].desc_ativo
+                        'desc_ativo': this.dados[this.indexInterval].desc_ativo,
+                        'ignicao': this.dados[this.indexInterval].flg_ignicao,
                     },
                     'geometry': {
                         'type': 'LineString',
@@ -422,6 +423,7 @@ export const formatLineInMap = {
                 'properties': {
                     'color': this.colorsSpeed[this.optionIdx].color,
                     'velocidade': this.dados[i].vl_velocidade,
+                    'ignicao': this.dados[i].flg_ignicao,
                     'dt_gps': this.dados[i].dt_gps,
                     'desc_ativo': this.dados[i].desc_ativo
                 },

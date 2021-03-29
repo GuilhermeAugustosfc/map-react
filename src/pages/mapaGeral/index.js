@@ -65,11 +65,11 @@ function MapaGeral(props) {
   var sourceMarker = {};
   var sourceMarkerIndex = {};
 
-  useEffect(() => {
-
-
-
-  }, [props.location.state, props.match.params])
+  var imagesMarkers = {
+    desligado: 'https://fulltrackstatic.s3.amazonaws.com/anuncio/Dm4aomaD9om6gr4D42kr0Pgn4Dlnml0l73o52p7D499p4png63-pt-br.png',
+    movimento: 'https://fulltrackstatic.s3.amazonaws.com/anuncio/Dm4aomaD9om6gr4D42kr0Pgn4Dlnml0l73o52p7D499p4png63-es-es.png',
+    ligado: 'https://fulltrackstatic.s3.amazonaws.com/anuncio/Dm4aomaD9om6gr4D42kr0Pgn4Dlnml0l73o52p7D499p4png63-en-us.png'
+  };
 
   useEffect(() => {
     let { map } = mapContainer.current.state;
@@ -148,7 +148,22 @@ function MapaGeral(props) {
 
     }
 
-  }, [posicoes, dados])
+  }, [dados])
+
+  useEffect(() => {
+    let { map } = mapContainer.current.state;
+
+    if (!map) return
+
+    var bounds = posicoes.reduce(function (bounds, coord) {
+      return bounds.extend(coord);
+    }, new mapboxgl.LngLatBounds(posicoes[0], posicoes[0]));
+
+    map.fitBounds(bounds, {
+      padding: 20
+    });
+
+  }, [posicoes])
 
   function atualizarMarkerMapa(data, map, aux) {
 
@@ -247,6 +262,7 @@ function MapaGeral(props) {
       aux.featureMarkerAtual = aux.allFeaturesMarkers.features[sourceMarkerIndex[data.ras_vei_id]];
 
       aux.featureMarkerAtual.geometry.coordinates = aux.coordenadas;
+      aux.featureMarkerAtual.properties.image_marker = parseInt(data.ras_eve_ignicao) ? (parseInt(data.ras_eve_velocidade) > 0 ? 'marker-movimento' : 'marker-ligado') : 'marker-desligado';
       aux.featureMarkerAtual.properties.velocidade = data.ras_eve_velocidade;
       aux.featureMarkerAtual.properties.dt_gps = data.ras_eve_data_gps;
       aux.featureMarkerAtual.properties.desc_ativo = data.ras_vei_veiculo;
@@ -260,6 +276,7 @@ function MapaGeral(props) {
 
       sourceMarkerIndex[data.ras_vei_id] = sourceMarker.features.length;
       sourceMarker.features.push(turf.point(aux.coordenadas, {
+        image_marker: parseInt(data.ras_eve_ignicao) ? (parseInt(data.ras_eve_velocidade) > 0 ? 'marker-movimento' : 'marker-ligado') : 'marker-desligado',
         velocidade: data.ras_eve_velocidade,
         dt_gps: data.ras_eve_data_gps,
         desc_ativo: data.ras_vei_veiculo,
@@ -344,66 +361,69 @@ function MapaGeral(props) {
     }
 
     map.on('click', 'rota', (e) => onClickRota(e, map))
-    map.on('mousemove', (e) => onMouseOverFeature(e, map));
+    // map.on('mousemove', 'rota', (e) => onMouseOverFeature(e, map));
 
     // ADD CAMADA DOM MAPA
     addMapBoxControll(map);
     // getlayerFazenda(map);
 
-    map.loadImage('https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png',
-      (error, image) => {
-        if (error) throw error;
-        map.addImage('custom-marker', image);
 
-        var aux = {
-          rotaAtual: [],
-          indexCor: null,
-          coordenadas: [],
-          allFeaturesMarkers: [],
-          featureMarkerAtual: []
+    loadImages(map, imagesMarkers, (images) => {
+      map.addImage('marker-desligado', images['desligado']);
+      map.addImage('marker-ligado', images['ligado']);
+      map.addImage('marker-movimento', images['movimento']);
+
+      var aux = {
+        rotaAtual: [],
+        indexCor: null,
+        coordenadas: [],
+        allFeaturesMarkers: [],
+        featureMarkerAtual: []
+      }
+
+      sourceMarker = {
+        'type': 'FeatureCollection',
+        'features': []
+      }
+
+      map.addSource('markersSymbol', {
+        'type': 'geojson',
+        'data': sourceMarker
+      });
+
+      // SocketFulltrack.init((data) => {
+      //   console.log(data);
+      //   atualizarMarkerMapa(data, map, aux);
+      // })
+
+      map.addLayer({
+        'id': 'markersSymbol',
+        'type': 'symbol',
+        'source': 'markersSymbol',
+        'layout': {
+          'icon-size': 1,
+          'icon-image': ['get', 'image_marker'],
+          'icon-allow-overlap': true,
+          // get the title name from the source's "title" property
+          'text-field': ['get', 'desc_ativo'],
+          'text-font': [
+            'Open Sans Semibold',
+            'Arial Unicode MS Bold'
+          ],
+          // 'text-offset': [0, 1.25],
+          'text-anchor': 'bottom',
+          'text-transform': 'uppercase',
+          'text-letter-spacing': 0.05,
+          'text-offset': [0, 1.5],
+          'icon-offset': [0, -18]
+        },
+        'paint': {
+          'text-color': '#202',
+          'text-halo-color': '#fff',
+          'text-halo-width': 2
         }
-
-        sourceMarker = {
-          'type': 'FeatureCollection',
-          'features': []
-        }
-
-        map.addSource('markersSymbol', {
-          'type': 'geojson',
-          'data': sourceMarker
-        });
-
-        SocketFulltrack.init((data) => {
-          atualizarMarkerMapa(data, map, aux);
-        })
-
-        map.addLayer({
-          'id': 'markersSymbol',
-          'type': 'symbol',
-          'source': 'markersSymbol',
-          'layout': {
-            'icon-size': 1,
-            'icon-image': 'custom-marker',
-            'icon-allow-overlap': true,
-            // get the title name from the source's "title" property
-            'text-field': ['get', 'desc_ativo'],
-            'text-font': [
-              'Open Sans Semibold',
-              'Arial Unicode MS Bold'
-            ],
-            'text-offset': [0, 1.25],
-            'text-anchor': 'top',
-            'text-transform': 'uppercase',
-            'text-letter-spacing': 0.05,
-            'text-offset': [0, 1.5]
-          },
-          'paint': {
-            'text-color': '#202',
-            'text-halo-color': '#fff',
-            'text-halo-width': 2
-          }
-        });
-      })
+      });
+    })
 
     var popup = new mapboxgl.Popup({
       closeButton: false,
@@ -437,15 +457,35 @@ function MapaGeral(props) {
 
   }
 
+  function loadImages(map, urls, callback) {
+    var results = {};
+    for (var name in urls) {
+      map.loadImage(urls[name], makeCallback(name));
+    }
+
+    function makeCallback(name) {
+      return function (err, image) {
+        results[name] = err ? null : image;
+
+        // if all images are loaded, call the callback
+        if (Object.keys(results).length === Object.keys(urls).length) {
+          callback(results);
+        }
+      };
+    }
+  }
+
   function updateArea(e) {
     var data = draw.getAll();
     if (data.features.length > 0) {
+      console.log(JSON.stringify(data.features[0].geometry.coordinates));
       setCercaConsolidado(turf.polygon(data.features[0].geometry.coordinates));
       // draw.remove();
-      // var area = turf.area(data);
+      var area = turf.area(data);
 
-      // // restrict to area to 2 decimal points
-      // var rounded_area = Math.round(area * 100) / 100;
+      // restrict to area to 2 decimal points
+      var rounded_area = Math.round(area * 100) / 100;
+      console.log(rounded_area + ' area autil');
     }
   }
 
@@ -536,7 +576,6 @@ function MapaGeral(props) {
   }
 
   function templatePopup(obj) {
-
     let color = parseInt(obj.ignicao) ? (parseInt(obj.velocidade) > 0 ? '#3972EE' : '#0A6249') : '#F5F5F5';
     let backgroud = parseInt(obj.ignicao) ? (parseInt(obj.velocidade) > 0 ? '#E6EEFF' : '#90ee9080') : '#8E969B';
     return `<div id="popup">
