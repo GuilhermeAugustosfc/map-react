@@ -124,9 +124,15 @@ function TalhaoForm(props) {
             tal_image: img
         }
 
-        api.post('http://f-agro-api.fulltrackapp.com/talhao/', form, (res) => {
+        // api.post('http://f-agro-api.fulltrackapp.com/talhao/', form, (res) => {
+        //     console.log(res);
+        // })
+
+        api.post('http://[::1]/f_agro_api/talhao/', form, (res) => {
             console.log(res);
         })
+
+        
 
         // api.post('http://f-agro-api.fulltrackapp.com/implemento/', { imp_descricao: "implemento novo" }, (res) => {
         //     console.log(res);

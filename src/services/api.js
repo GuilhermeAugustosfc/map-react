@@ -30,7 +30,7 @@ const REQUEST = {
                 callback(response.data);
             }
         }).catch(() => {
-            this.post(url, dados, callback);
+            // this.post(url, dados, callback);
         })
     },
     get: function (url, dados, callback) {

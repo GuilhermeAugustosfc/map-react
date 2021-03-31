@@ -1,0 +1,28 @@
+.container-talhao {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100vw;
+}
+
+.card-talhao {
+    background-color: #ccc0;
+    padding: 10px;
+    margin: 9px;
+    border-radius: 4px;
+    box-shadow: 0 0 8px 0px #ccc;
+    width: 23%;
+}
+
+.legenda-imagem {
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    margin: auto;
+    width: 411px;
+    height: 205px;
+    transition: all .1s ease-out;
+}
+
+.legenda-imagem:hover{
+    transform: scale(1.1);
+}
