@@ -8,9 +8,14 @@ import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 
 // import Dashboard from "./Telas/Dashboard/dashboard"
 
-import Tabela from "./pages/Tabela"
+import Tabela from "./pages/Tabela";
 
-import Mapa from "./pages/mapaGeral"
+import TalhaoTabela from "./pages/Cadastros/Talhao/tabela";
+import TalhaoForm from "./pages/Cadastros/Talhao/form";
+
+import Mapa from "./pages/MapaGeral";
+
+import Dashboard from "./pages/Dashboard";
 
 import isLogged from "./validacao/routerValidacao"
 
@@ -26,10 +31,13 @@ const PrivateRoute = ({component: Component, ...rest}) => (
 const Routes = () => (
     <BrowserRouter>
         <Switch>
-            {/* <Route exact path="/" component={Login} /> */}
-            {/* <PrivateRoute exact path="/mapa" component={(props) => <Menu><VendedorTabela {...props} /></Menu>} />
-            <PrivateRoute exact path="/tabela" component={(props) => <Menu><VendedorForm {...props} /></Menu>} /> */}
+            {/* <PrivateRoute exact path="/" component={(props) => <Menu><VendedorTabela {...props} /></Menu>} /> */}
+            <PrivateRoute exact path="/" component={(props) => <Dashboard {...props} />} />
+            {/* <Route exact path="/login" component={Login} /> */}
 
+            <PrivateRoute exact path="/cadastros/talhao" component={(props) => <TalhaoTabela {...props} />} />
+            <PrivateRoute exact path="/cadastros/talhao/form" component={(props) => <TalhaoForm {...props} />} />
+            <PrivateRoute exact path="/cadastros/talhao/form/:id" component={(props) => <TalhaoForm {...props} />} />
             <PrivateRoute exact path="/mapa" component={(props) => <Mapa {...props} />} />
             <PrivateRoute exact path="/mapa/:id" component={(props) => <Mapa {...props} />} />
             <PrivateRoute exact path="/tabela" component={(props) => <Tabela {...props} />} />
