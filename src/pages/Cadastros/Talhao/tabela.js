@@ -8,7 +8,9 @@ import { GoBook } from 'react-icons/go'
 
 import './tabela.css'
 
+
 const TalhaoTabela = () => {
+    var history = useHistory();
 
     const [dadosTalhao, setDadosTalhao] = useState([]);
 
@@ -25,7 +27,7 @@ const TalhaoTabela = () => {
 
             var form = new FormData();
             form.append('tal_id', JSON.stringify(idsTalhao));
-            api.post('http://[::1]/f_agro_api/talhao/imagem/', form, ({ data }) => {
+            api.post('http://f-agro-api.fulltrackapp.com/talhao/imagem', form, ({ data }) => {
 
                 for (var i in data) {
                     dados[data[i].tal_id].tal_imagem = data[i].tal_imagem
@@ -40,10 +42,14 @@ const TalhaoTabela = () => {
     }, []);
 
 
+    function onClickTalhao(id) {
+        history.push(`/cadastros/talhao/form/${id}`);
+    }
+
     return (
         <div className="container-talhao">
             {dadosTalhao.length && dadosTalhao.map((row) => (
-                <div className="card-talhao" key={row.tal_id}>
+                <div className="card-talhao" key={row.tal_id} onClick={() => onClickTalhao(row.tal_id)}>
                     <div >
                         {row.hasOwnProperty('tal_imagem') && row.tal_imagem.includes('base64') ? (
                             <img className="legenda-imagem" width={100} height={100} src={row.tal_imagem} />
