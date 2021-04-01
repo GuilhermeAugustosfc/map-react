@@ -1,52 +1,35 @@
 import React, { useState, useEffect } from "react";
-import { DataGrid } from '@material-ui/data-grid';
 import api from '../../../services/api'
 import { useHistory } from "react-router";
 
 import { GoBook } from 'react-icons/go'
 
-
 import './tabela.css'
 
 
-const TalhaoTabela = () => {
+const OrdemServicoTabela = () => {
     var history = useHistory();
 
-    const [dadosTalhao, setDadosTalhao] = useState([]);
+    const [dadosOrdemServico, setDadosOrdemServico] = useState([]);
 
     useEffect(() => {
-        api.get('http://f-agro-api.fulltrackapp.com/talhao/', {}, ({ data }) => {
+        api.get('http://f-agro-api.fulltrackapp.com/ordemservico/', {}, ({ data }) => {
 
-            var idsTalhao = [];
-            var dados = [];
-            for (var i in data) {
-                data[i].id = i;
-                dados[data[i].tal_id] = data[i];
-                idsTalhao.push(data[i].tal_id);
-            }
-
+           
             var form = new FormData();
-            form.append('tal_id', JSON.stringify(idsTalhao));
-            api.post('http://f-agro-api.fulltrackapp.com/talhao/imagem', form , ({ data }) => {
-
-                for (var i in data) {
-                    dados[data[i].tal_id].tal_imagem = data[i].tal_imagem
-                }
-
-                setDadosTalhao(dados);
-            })
+            setDadosOrdemServico(dados);
         })
     }, []);
 
 
-    function onClickTalhao(id) {
-        history.push(`/cadastros/talhao/form/${id}`);
+    function onClickOrdemServico(id) {
+        history.push(`/cadastros/ordemservico/form/${id}`);
     }
 
     return (
-        <div className="container-talhao">
-            {dadosTalhao.length && dadosTalhao.map((row) => (
-                <div className="card-talhao" key={row.tal_id} onClick={() => onClickTalhao(row.tal_id)}>
+        <div className="container-ordemservico">
+            {dadosOrdemServico.length && dadosOrdemServico.map((row) => (
+                <div className="card-ordemservico" key={row.tal_id} onClick={() => onClickOrdemServico(row.tal_id)}>
                     <div style={{display:'flex'}}>
                         {row.hasOwnProperty('tal_imagem') && row.tal_imagem.includes('base64') ? (
                             <img className="legenda-imagem" width={100} height={100} src={row.tal_imagem} />
@@ -68,4 +51,4 @@ const TalhaoTabela = () => {
 
 }
 
-export default TalhaoTabela;
+export default OrdemServicoTabela;

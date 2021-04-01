@@ -18,7 +18,8 @@
     display: flex;
     justify-content: center;
     margin: auto;
-    width: 411px;
+    flex: 1;
+    width: 308px;
     height: 205px;
     transition: all .1s ease-out;
 }
