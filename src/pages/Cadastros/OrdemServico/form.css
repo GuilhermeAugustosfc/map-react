@@ -1,0 +1,17 @@
+
+.container-ordem-servico h3 {
+    padding-right: 15px;
+    padding-left: 15px;
+    text-align: center;
+    font-size: 28px;
+}   
+.label-form {
+    display: block;
+} 
+
+.select-form {
+    width: 526px;
+    padding: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+}

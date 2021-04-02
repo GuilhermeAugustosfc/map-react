@@ -11,10 +11,6 @@ import { useHistory } from "react-router";
 
 import api from '../../../services/api'
 
-import 'mapbox-gl-controls/theme.css'
-import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
-import '../../../Componentes/MapBox/mapbox.css'
-
 import './form.css'
 
 function TalhaoForm(props) {
@@ -46,34 +42,34 @@ function TalhaoForm(props) {
         setCodigo(talhao.tal_codigo || 0)
         setDescricao(talhao.tal_descricao)
 
-        setCoordenadasTalhao(talhao.tal_coordenada);
-        let coordinates = JSON.parse(talhao.tal_coordenada);
+        if (talhao.tal_coordenada) {
+            setCoordenadasTalhao(talhao.tal_coordenada);
+            let coordinates = JSON.parse(talhao.tal_coordenada);
 
-        let { map } = mapContainer.current.state;
+            let { map } = mapContainer.current.state;
 
-        let feature = {
-            'type': 'Feature',
-            'geometry': {
-                'type': 'Polygon',
-                'coordinates': coordinates
-            },
-            'properties': {
-                'talhao': talhao.tal_descricao,
-                'area': talhao.tal_area_util
+            let feature = {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Polygon',
+                    'coordinates': coordinates
+                },
+                'properties': {
+                    'talhao': talhao.tal_descricao,
+                    'area': talhao.tal_area_util
+                }
             }
+            draw.add(feature);
+
+            var bounds = coordinates[0].reduce(function (bounds, coord) {
+                return bounds.extend(coord);
+            }, new mapboxgl.LngLatBounds(coordinates[0][0], coordinates[0][0]));
+
+            map.fitBounds(bounds, {
+                padding: 20,
+                offset: [5, 5]
+            });
         }
-        draw.add(feature);
-
-        var bounds = coordinates[0].reduce(function (bounds, coord) {
-            return bounds.extend(coord);
-        }, new mapboxgl.LngLatBounds(coordinates[0][0], coordinates[0][0]));
-
-
-        map.fitBounds(bounds, {
-            padding: 20,
-            offset: [5, 5]
-
-        });
     }
 
     function onLoadMap(map) {
@@ -134,8 +130,8 @@ function TalhaoForm(props) {
     function updateTalhao(map) {
         var data = draw.getAll();
         if (data.features.length > 0) {
+            setCoordenadasTalhao(JSON.stringify(data.features[0].geometry.coordinates));
             var talhaoLatLon = data.features[0].geometry.coordinates[0];
-            setCoordenadasTalhao(JSON.stringify(talhaoLatLon));
 
             var bounds = talhaoLatLon.reduce(function (bounds, coord) {
                 return bounds.extend(coord);
@@ -163,7 +159,7 @@ function TalhaoForm(props) {
         // tal_image: img
 
         if (id_talhao > 0) {
-            api.put(`http://f-agro-api.fulltrackapp.com/talhao/${id_talhao}`, form, (res) => {
+            api.put(`http://f-agro-api.fulltrackapp.com/talhao/${id_talhao}/`, form, (res) => {
                 history.push(`/cadastros/talhao`);
             })
         } else {

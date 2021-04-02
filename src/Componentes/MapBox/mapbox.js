@@ -2,6 +2,9 @@ import React, { forwardRef } from 'react'
 
 import ReactMapboxGl from 'react-mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import 'mapbox-gl-controls/theme.css'
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
+import './mapbox.css'
 
 const Map = ReactMapboxGl({
     accessToken: process.env.REACT_APP_MAPBOX_TOKEN,

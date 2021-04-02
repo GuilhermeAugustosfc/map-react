@@ -1,7 +1,6 @@
 .container-talhao {
     display: flex;
     flex-wrap: wrap;
-    width: 100vw;
 }
 
 .card-talhao {
@@ -11,6 +10,7 @@
     border-radius: 4px;
     box-shadow: 0 0 8px 0px #ccc;
     width: 23%;
+    position: relative;
 }
 
 .legenda-imagem {
@@ -22,8 +22,25 @@
     width: 308px;
     height: 205px;
     transition: all .1s ease-out;
+    cursor: pointer;
 }
 
-.legenda-imagem:hover{
+.legenda-imagem:hover {
     transform: scale(1.1);
+}
+
+.legenda-descricao {
+    text-align: center;
+    font-size: 22px;
+    margin-top: 20px;
+}
+
+.legenda-area-util {
+    position: absolute;
+    top: 11px;
+    right: 10px;
+    background: #0000009c;
+    color: white;
+    padding: 5px;
+    border-radius: 0px 6px 2px 6px;
 }

@@ -18,10 +18,6 @@ import api from '../../services/api';
 import MarkerSvg from 'maki/icons/marker-15.svg'
 import SocketFulltrack from '../../services/socket'
 
-import 'mapbox-gl-controls/theme.css'
-import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
-import '../../Componentes/MapBox/mapbox.css'
-
 function MapaGeral(props) {
 
   const [posicoes, setPosicoes] = useState([]);

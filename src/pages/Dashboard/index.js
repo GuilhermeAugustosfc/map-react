@@ -11,14 +11,8 @@ import * as turf from "@turf/turf"
 
 import SocketFulltrack from '../../services/socket'
 
-import 'mapbox-gl-controls/theme.css'
-import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
-import '../../Componentes/MapBox/mapbox.css'
-
 function Dashboard(props) {
     const mapContainer = useRef(null);
-
-    
 
     const [mapOptions, setMapOptions] = useState({
         center: [-49.654063, -22.215288],

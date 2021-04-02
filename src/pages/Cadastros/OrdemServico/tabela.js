@@ -14,10 +14,8 @@ const OrdemServicoTabela = () => {
 
     useEffect(() => {
         api.get('http://f-agro-api.fulltrackapp.com/ordemservico/', {}, ({ data }) => {
-
-           
             var form = new FormData();
-            setDadosOrdemServico(dados);
+            setDadosOrdemServico(data);
         })
     }, []);
 
