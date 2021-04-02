@@ -150,19 +150,29 @@ function TalhaoForm(props) {
 
         // let { map } = mapContainer.current.state;
         // var img = map.getCanvas().toDataURL();
-        let form = new FormData();
-
-        form.append('tal_codigo', codigo);
-        form.append('tal_descricao', descricao);
-        form.append('tal_area_util', areaUtil);
-        form.append('tal_coordenada', coordenadasTalhao);
+       
         // tal_image: img
 
         if (id_talhao > 0) {
-            api.put(`http://f-agro-api.fulltrackapp.com/talhao/${id_talhao}/`, form, (res) => {
+            // PUT REQUETS ONLY JSON DATA
+            api.put(`http://f-agro-api.fulltrackapp.com/talhao/${id_talhao}/`, {
+                tal_codigo: codigo,
+                tal_descricao: descricao,
+                tal_area_util: areaUtil,
+                tal_coordenada: coordenadasTalhao,
+            }, (res) => {
                 history.push(`/cadastros/talhao`);
             })
+           
         } else {
+            // POST REQUETS ONLY FORM DATA
+
+            let form = new FormData();
+            form.append('tal_codigo', codigo);
+            form.append('tal_descricao', descricao);
+            form.append('tal_area_util', areaUtil);
+            form.append('tal_coordenada', coordenadasTalhao);
+
             api.post('http://f-agro-api.fulltrackapp.com/talhao/', form, (res) => {
                 history.push(`/cadastros/talhao`);
             })
