@@ -16,3 +16,7 @@
     display: flex;
     justify-content: center;
 }
+
+#btn-cancelar {
+    margin-left: 3px;
+}

@@ -3,6 +3,10 @@
     flex-wrap: wrap;
 }
 
+.container-talhao h3 {
+    text-align: center;
+}
+
 .card-talhao {
     background-color: #ccc0;
     padding: 10px;
@@ -11,6 +15,19 @@
     box-shadow: 0 0 8px 0px #ccc;
     width: 23%;
     position: relative;
+}
+
+.card-novo-talhao {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.1s ease-in-out;
+}
+
+.card-novo-talhao:hover {
+    background-color: #f7f7f7;
 }
 
 .legenda-imagem {

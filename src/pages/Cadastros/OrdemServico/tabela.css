@@ -1,0 +1,61 @@
+.container-ordemservico {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.container-ordemservico h3 {
+    text-align: center;
+}
+
+.card-ordemservico {
+    background-color: #ccc0;
+    padding: 10px;
+    margin: 9px;
+    border-radius: 4px;
+    box-shadow: 0 0 8px 0px #ccc;
+    width: 23%;
+    position: relative;
+}
+
+.card-novo-ordemservico {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.1s ease-in-out;
+}
+
+.card-novo-ordemservico:hover {
+    background-color: #f7f7f7;
+}
+
+.status-ordem-servico {
+    color: black;
+    cursor: pointer;
+    padding: 4px;
+    text-align: center;
+    border-radius: 4px;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+    margin-top: 18px;
+}
+
+.status-ordem-servico:hover {
+    transform: scale(1.1);
+}
+
+.image-talhao-order-servico {
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    margin: auto;
+    flex: 1 1;
+    width: 308px;
+    height: 205px;
+    transition: all .1s ease-out;
+}
+
+.image-talhao-order-servico:hover {
+    border: 2px solid #ccc;
+}

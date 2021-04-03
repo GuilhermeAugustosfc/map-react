@@ -3,7 +3,7 @@ import { DataGrid } from '@material-ui/data-grid';
 import api from '../../../services/api'
 import { useHistory } from "react-router";
 
-import { GoTrashcan } from 'react-icons/go'
+import { GoTrashcan, GoPlus } from 'react-icons/go'
 
 
 import './tabela.css'
@@ -31,7 +31,7 @@ const TalhaoTabela = () => {
 
             var form = new FormData();
             form.append('tal_id', JSON.stringify(idsTalhao));
-            api.post('http://f-agro-api.fulltrackapp.com/talhao/imagem', form , ({ data }) => {
+            api.post('http://f-agro-api.fulltrackapp.com/talhao/imagem', form, ({ data }) => {
 
                 for (var i in data) {
                     dados[data[i].tal_id].tal_imagem = data[i].tal_imagem
@@ -47,17 +47,30 @@ const TalhaoTabela = () => {
         history.push(`/cadastros/talhao/form/${id}`);
     }
 
+    function onClickNovoTalhao() {
+        history.push(`/cadastros/talhao/form/`);
+
+    }
+
     function deleteTalhao(id) {
-        api.delete(`http://f-agro-api.fulltrackapp.com/talhao/${id}`, {} , ({ data }) => {
+        api.delete(`http://f-agro-api.fulltrackapp.com/talhao/${id}`, {}, ({ data }) => {
             getDados();
         })
     }
 
     return (
         <div className="container-talhao">
+            <div className="card-talhao card-novo-talhao" onClick={() => onClickNovoTalhao()}>
+                <GoPlus size={150} />
+                <div className="legenda">
+                    <div className="legenda-descricao">
+                        Novo Talhão
+                    </div>
+                </div>
+            </div>
             {dadosTalhao.length && dadosTalhao.map((row) => (
                 <div className="card-talhao" key={row.tal_id}>
-                    <div style={{display:'flex'}} onClick={() => onClickTalhao(row.tal_id)}>
+                    <div style={{ display: 'flex' }} onClick={() => onClickTalhao(row.tal_id)}>
                         {row.hasOwnProperty('tal_imagem') && row.tal_imagem.includes('base64') ? (
                             <img className="legenda-imagem" width={100} height={100} src={row.tal_imagem} />
                         ) :
@@ -70,7 +83,7 @@ const TalhaoTabela = () => {
                         <div className="legenda-area-util">
                             {row.tal_area_util}
                         </div>
-                        <div className="button-talhao" style={{float:"right"}}>
+                        <div className="button-talhao" style={{ float: "right" }}>
                             <button className="btn btn-danger" onClick={() => deleteTalhao(row.tal_id)}><GoTrashcan size={23} /></button>
                         </div>
                     </div>
@@ -78,7 +91,6 @@ const TalhaoTabela = () => {
             ))}
         </div>
     );
-
 }
 
 export default TalhaoTabela;

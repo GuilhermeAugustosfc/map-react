@@ -6,7 +6,6 @@ import mapboxgl from 'mapbox-gl';
 import StylesControl from 'mapbox-gl-controls/lib/styles';
 import ZoomControl from 'mapbox-gl-controls/lib/zoom';
 
-import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { useHistory } from "react-router";
 
 import api from '../../../services/api'
@@ -74,40 +73,9 @@ function OrderServicoForm(props) {
 
     const [marchaOrdemServico, setMarchaOrdemServico] = useState("");
 
-    const [draw, setDraw] = useState(null);
+    const selectVeiculoRef = useRef(null);
+    const selectMotoristaRef = useRef(null);
 
-    function atualizaDadosEdicao(talhao) {
-
-        if (talhao.tal_coordenada) {
-            // setCoordenadasTalhao(talhao.tal_coordenada);
-            // let coordinates = JSON.parse(talhao.tal_coordenada);
-
-            // let { map } = mapContainer.current.state;
-
-            // let feature = {
-            //     'type': 'Feature',
-            //     'geometry': {
-            //         'type': 'Polygon',
-            //         'coordinates': coordinates
-            //     },
-            //     'properties': {
-            //         'talhao': talhao.tal_descricao,
-            //         'area': talhao.tal_area_util
-            //     }
-            // }
-
-            // draw.add(feature);
-
-            // var bounds = coordinates[0].reduce(function (bounds, coord) {
-            //     return bounds.extend(coord);
-            // }, new mapboxgl.LngLatBounds(coordinates[0][0], coordinates[0][0]));
-
-            // map.fitBounds(bounds, {
-            //     padding: 20,
-            //     offset: [5, 5]
-            // });
-        }
-    }
 
     useEffect(() => {
         if (talhoes.length && mapContainer.current) {
@@ -162,8 +130,7 @@ function OrderServicoForm(props) {
 
     function onLoadMap(map) {
 
-        addMapBoxControll(map);
-
+        map.addControl(new ZoomControl());
 
         api.get(`http://f-agro-api.fulltrackapp.com/talhao`, {}, ({ data }) => {
             if (data.length) {
@@ -213,55 +180,92 @@ function OrderServicoForm(props) {
 
             api.get(`http://f-agro-api.fulltrackapp.com/ordemservico/${id}`, {}, ({ data }) => {
                 var ordemServico = data[0];
+                setIdOperacao(ordemServico.osr_id_operacao);
+                setCombustivel(ordemServico.osr_cons_combustivel);
+                setIdOrdemServico(ordemServico.osr_id);
+                setIdAno(ordemServico.osr_id_ano);
+                setIdCultura(ordemServico.osr_id_cultura);
+                setIdFazenda(ordemServico.osr_id_fazenda);
+                setIdTalhao(ordemServico.osr_id_talhao);
+                setIdImplemento(ordemServico.osr_id_implemento);
+                setIdMotorista(ordemServico.osr_id_motorista);
+                setIdOperacao(ordemServico.osr_id_operacao);
+                setIdSafra(ordemServico.osr_id_safra);
+                setIdVeiculo(ordemServico.osr_id_veiculo);
+                setMarchaOrdemServico(ordemServico.osr_marcha);
+                setInicioPeriodo(ordemServico.osr_periodo_fim);
+                setFimPeriodo(ordemServico.osr_periodo_ini);
+                setRpmOrdemServico(ordemServico.osr_rpm);
+                setTempoCinquentaMetro(ordemServico.osr_tmp_cinq_metros);
+                setVelocidadeOrdemServico(ordemServico.osr_velocidade);
             });
         }
     }
 
-    function addMapBoxControll(map) {
-        map.addControl(new StylesControl({
-            styles: [
-                {
-                    label: 'Streets',
-                    styleName: 'Mapbox Streets',
-                    styleUrl: 'mapbox://styles/mapbox/streets-v9',
-                },
-                {
-                    label: 'Satellite',
-                    styleName: 'Satellite',
-                    styleUrl: 'mapbox://styles/mapbox/satellite-v9',
-
-                },
-                {
-                    label: 'Terreno',
-                    styleName: 'Terreno',
-                    styleUrl: 'mapbox://styles/mapbox-map-design/ckhqrf2tz0dt119ny6azh975y',
-                },
-            ],
-        }), 'top-left');
-
-    }
-
-    function saveOrdemServico() {
+    function salvarOrdemServico() {
 
         // let { map } = mapContainer.current.state;
         // var img = map.getCanvas().toDataURL();
-        let form = new FormData();
 
-        // form.append('tal_codigo', codigo);
-        // form.append('tal_descricao', descricao);
-        // form.append('tal_area_util', areaUtil);
-        // form.append('tal_coordenada', coordenadasTalhao);
+        // var urlAmazomImagem = salvarImageS3(img);
+
         // tal_image: img
-
         if (idOrdemServico > 0) {
-            api.put(`http://f-agro-api.fulltrackapp.com/talhao/${idOrdemServico}`, form, (res) => {
-                history.push(`/cadastros/talhao`);
+            api.put(`http://f-agro-api.fulltrackapp.com/ordemservico/${idOrdemServico}`, {
+                osr_id_operacao: idOperacao,
+                osr_id_veiculo: idVeiculo,
+                osr_id_implemento: idImplemento,
+                osr_id_cultura: idCultura,
+                osr_id_fazenda: idFazenda,
+                osr_id_talhao: idTalhao,
+                osr_id_safra: idSafra,
+                osr_id_ano: idAno,
+                osr_id_motorista: idMotorista,
+                osr_periodo_ini: inicioPeriodo + " 00:00:00",
+                osr_periodo_fim: fimPeriodo + " 23:59:59",
+                osr_tmp_cinq_metros: tempoCinquentaMetro,
+                osr_velocidade: velocidadeOrdemServico,
+                osr_rpm: rpmOrdemServico,
+                osr_cons_combustivel: combustivel,
+                osr_marcha: marchaOrdemServico,
+                osr_motorista: selectMotoristaRef.current.options[selectMotoristaRef.current.selectedIndex].text,
+                osr_veiculo: selectVeiculoRef.current.options[selectVeiculoRef.current.selectedIndex].text
+            }, (res) => {
+                history.push(`/cadastros/ordemservico`);
             })
         } else {
-            api.post('http://f-agro-api.fulltrackapp.com/talhao/', form, (res) => {
-                history.push(`/cadastros/talhao`);
+
+            let form = new FormData();
+
+            form.append('osr_data_emissao', moment(new Date().toLocaleDateString(), "DD/MM/YY").format("YYYY-MM-DD"));
+            form.append('osr_id_operacao', idOperacao);
+            form.append('osr_id_veiculo', idVeiculo);
+            form.append('osr_id_implemento', idImplemento);
+            form.append('osr_id_cultura', idCultura);
+            form.append('osr_id_talhao', idTalhao);
+            form.append('osr_id_fazenda', idFazenda);
+            form.append('osr_id_safra', idSafra);
+            form.append('osr_id_ano', idAno);
+            form.append('osr_id_motorista', idMotorista);
+            form.append('osr_periodo_ini', inicioPeriodo + " 00:00:00");
+            form.append('osr_periodo_fim', fimPeriodo + " 23:59:59");
+            form.append('osr_tmp_cinq_metros', tempoCinquentaMetro);
+            form.append('osr_velocidade', velocidadeOrdemServico);
+            form.append('osr_rpm', rpmOrdemServico);
+            form.append('osr_cons_combustivel', combustivel);
+            form.append('osr_marcha', marchaOrdemServico);
+            form.append('osr_motorista', selectMotoristaRef.current.options[selectMotoristaRef.current.selectedIndex].text);
+            form.append('osr_veiculo', selectVeiculoRef.current.options[selectVeiculoRef.current.selectedIndex].text);
+
+
+            api.post('http://f-agro-api.fulltrackapp.com/ordemservico/', form, (res) => {
+                history.push(`/cadastros/ordemservico`);
             })
         }
+    }
+
+    function cancelarOrdemServico() {
+        history.push('/cadastros/ordemservico')
     }
 
     return (
@@ -276,6 +280,12 @@ function OrderServicoForm(props) {
                     value={idOperacao}
                     onChange={(e) => setIdOperacao(e.target.value)}
                 >
+                    <option
+                        key="0"
+                        value=""
+                    >
+                        Nenhum Selecionado
+                    </option>
                     {operacoes.length && operacoes.map((operacao) => (
                         <option
                             key={operacao.ope_id}
@@ -296,6 +306,12 @@ function OrderServicoForm(props) {
                     value={idImplemento}
                     onChange={(e) => setIdImplemento(e.target.value)}
                 >
+                    <option
+                        key="0"
+                        value=""
+                    >
+                        Nenhum Selecionado
+                    </option>
                     {implementos.length && implementos.map((imp) => (
                         <option
                             key={imp.imp_id}
@@ -313,9 +329,16 @@ function OrderServicoForm(props) {
                     htmlFor="labelMotorista"
                     id="selectMotorista"
                     className="select-form"
+                    ref={selectMotoristaRef}
                     value={idMotorista}
                     onChange={(e) => setIdMotorista(e.target.value)}
                 >
+                    <option
+                        key="0"
+                        value=""
+                    >
+                        Nenhum Selecionado
+                    </option>
                     {motoristas.length && motoristas.map((mot) => (
                         <option
                             key={mot.ras_mot_id}
@@ -336,6 +359,12 @@ function OrderServicoForm(props) {
                     value={idSafra}
                     onChange={(e) => setIdSafra(e.target.value)}
                 >
+                    <option
+                        key="0"
+                        value=""
+                    >
+                        Nenhum Selecionado
+                    </option>
                     {safras.length && safras.map((safra) => (
                         <option
                             key={safra.saf_id}
@@ -356,6 +385,12 @@ function OrderServicoForm(props) {
                     value={idCultura}
                     onChange={(e) => setIdCultura(e.target.value)}
                 >
+                    <option
+                        key="0"
+                        value=""
+                    >
+                        Nenhum Selecionado
+                    </option>
                     {culturas.length && culturas.map((cultura) => (
                         <option
                             key={cultura.cul_id}
@@ -373,9 +408,16 @@ function OrderServicoForm(props) {
                     htmlFor="labelVeiculos"
                     id="selectVeiculos"
                     className="select-form"
+                    ref={selectVeiculoRef}
                     value={idVeiculo}
                     onChange={(e) => setIdVeiculo(e.target.value)}
                 >
+                    <option
+                        key="0"
+                        value=""
+                    >
+                        Nenhum Selecionado
+                    </option>
                     {veiculos.length && veiculos.map((vei) => (
                         <option
                             key={vei.ras_vei_id}
@@ -396,6 +438,12 @@ function OrderServicoForm(props) {
                     value={idFazenda}
                     onChange={(e) => setIdFazenda(e.target.value)}
                 >
+                    <option
+                        key="0"
+                        value=""
+                    >
+                        Nenhum Selecionado
+                    </option>
                     {fazendas.length && fazendas.map((fazenda) => (
                         <option
                             key={fazenda.faz_id}
@@ -416,6 +464,12 @@ function OrderServicoForm(props) {
                     value={idAno}
                     onChange={(e) => setIdAno(e.target.value)}
                 >
+                    <option
+                        key="0"
+                        value=""
+                    >
+                        Nenhum Selecionado
+                    </option>
                     {anos.length && anos.map((anos) => (
                         <option
                             key={anos.ano_id}
@@ -448,6 +502,11 @@ function OrderServicoForm(props) {
 
                 <label className="label-form" id="labelMarchaExecucao">Marcha da execuçaõ da operação</label>
                 <input type="number" className="form-control" placeholder="Qual marcha a odem de serviço deverá ser executada" value={marchaOrdemServico} onChange={(e) => setMarchaOrdemServico(e.target.value)} />
+
+                <div className="input-button">
+                    <button className="btn btn-primary" id="btn-salvar-ordem-servico" onClick={() => salvarOrdemServico()}>Salvar</button>
+                    <button className="btn btn-warning" id="btn-cancelar-ordem-servico" onClick={() => cancelarOrdemServico()}>Cancelar</button>
+                </div>
             </div>
 
             <div className="col-md-6 form-group">

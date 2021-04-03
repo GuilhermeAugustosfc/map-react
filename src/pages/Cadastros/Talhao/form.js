@@ -179,6 +179,10 @@ function TalhaoForm(props) {
         }
     }
 
+    function voltarform() {
+        history.push(`/cadastros/talhao`);
+    }
+
     return (
         <div className="container-form">
             <div className="col-md-12 form">
@@ -195,7 +199,8 @@ function TalhaoForm(props) {
                     <input className="form-control" value={areaUtil} type="number" alt="digite A area util" placeholder="Digite a area util" onChange={(e) => setAreaUtil(e.target.value)} />
                 </div>
                 <div className="input-button">
-                    <button className="btn btn-primary" onClick={saveTalhao}>Salvar</button>
+                    <button className="btn btn-primary" id="btn-salvar" onClick={saveTalhao}>Salvar</button>
+                    <button className="btn btn-warning" id="btn-cancelar" onClick={voltarform}>Cancelar</button>
                 </div>
             </div>
 

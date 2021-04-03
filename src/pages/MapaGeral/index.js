@@ -332,6 +332,10 @@ function MapaGeral(props) {
 
   async function onLoadMap(map) {
 
+    map.on('click', 'rota', (e) => onClickRota(e, map))
+    map.on('mousemove', 'rota', (e) => onMouseOverFeature(e, map));
+
+
     let { id } = props.match.params;
 
     if (id) {
@@ -347,100 +351,102 @@ function MapaGeral(props) {
         idioma: 'pt-BR',
         id_indice: 5554,
       })
+
+
+      loadImages(map, imagesMarkers, (images) => {
+        map.addImage('marker-desligado', images['desligado']);
+        map.addImage('marker-ligado', images['ligado']);
+        map.addImage('marker-movimento', images['movimento']);
+
+        var aux = {
+          rotaAtual: [],
+          indexCor: null,
+          coordenadas: [],
+          allFeaturesMarkers: [],
+          featureMarkerAtual: []
+        }
+
+        sourceMarker = {
+          'type': 'FeatureCollection',
+          'features': []
+        }
+
+        map.addSource('markersSymbol', {
+          'type': 'geojson',
+          'data': sourceMarker
+        });
+
+        SocketFulltrack.init((data) => {
+          if(data.ras_eve_aut_id === id) {
+            atualizarMarkerMapa(data, map, aux);
+          }
+        })
+
+        map.addLayer({
+          'id': 'markersSymbol',
+          'type': 'symbol',
+          'source': 'markersSymbol',
+          'layout': {
+            'icon-size': 1,
+            'icon-image': ['get', 'image_marker'],
+            'icon-allow-overlap': true,
+            // get the title name from the source's "title" property
+            'text-field': ['get', 'desc_ativo'],
+            'text-font': [
+              'Open Sans Semibold',
+              'Arial Unicode MS Bold'
+            ],
+            // 'text-offset': [0, 1.25],
+            'text-anchor': 'bottom',
+            'text-transform': 'uppercase',
+            'text-letter-spacing': 0.05,
+            'text-offset': [0, 1.5],
+            'icon-offset': [0, -18]
+          },
+          'paint': {
+            'text-color': '#202',
+            'text-halo-color': '#fff',
+            'text-halo-width': 2
+          }
+        });
+      })
+
+      var popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false
+      });
+
+      map.on('click', 'markersSymbol', function (e) {
+        map.getCanvas().style.cursor = 'pointer';
+
+        var coordinates = e.features[0].geometry.coordinates.slice();
+
+        var dadosPopup = {
+          'velocidade': e.features[0].properties.velocidade,
+          'dt_gps': e.features[0].properties.dt_gps,
+          'desc_ativo': e.features[0].properties.desc_ativo,
+          'ignicao': e.features[0].properties.ignicao
+        }
+
+        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+          coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+        }
+
+        popup.setLngLat(coordinates).setHTML(templatePopup(dadosPopup)).addTo(map);
+      });
+
+      map.on('mouseleave', 'markersSymbol', function () {
+        map.getCanvas().style.cursor = '';
+        popup.remove();
+      });
+
+    } else {
+        // ADD CAMADA DOM MAPA
+        addMapBoxControll(map);
     }
 
-    map.on('click', 'rota', (e) => onClickRota(e, map))
-    map.on('mousemove', 'rota', (e) => onMouseOverFeature(e, map));
-
-    // ADD CAMADA DOM MAPA
-    addMapBoxControll(map);
-    // getlayerFazenda(map);
 
 
-    loadImages(map, imagesMarkers, (images) => {
-      map.addImage('marker-desligado', images['desligado']);
-      map.addImage('marker-ligado', images['ligado']);
-      map.addImage('marker-movimento', images['movimento']);
-
-      // var aux = {
-      //   rotaAtual: [],
-      //   indexCor: null,
-      //   coordenadas: [],
-      //   allFeaturesMarkers: [],
-      //   featureMarkerAtual: []
-      // }
-
-      // sourceMarker = {
-      //   'type': 'FeatureCollection',
-      //   'features': []
-      // }
-
-      // map.addSource('markersSymbol', {
-      //   'type': 'geojson',
-      //   'data': sourceMarker
-      // });
-
-      // SocketFulltrack.init((data) => {
-      //   atualizarMarkerMapa(data, map, aux);
-      // })
-
-      // map.addLayer({
-      //   'id': 'markersSymbol',
-      //   'type': 'symbol',
-      //   'source': 'markersSymbol',
-      //   'layout': {
-      //     'icon-size': 1,
-      //     'icon-image': ['get', 'image_marker'],
-      //     'icon-allow-overlap': true,
-      //     // get the title name from the source's "title" property
-      //     'text-field': ['get', 'desc_ativo'],
-      //     'text-font': [
-      //       'Open Sans Semibold',
-      //       'Arial Unicode MS Bold'
-      //     ],
-      //     // 'text-offset': [0, 1.25],
-      //     'text-anchor': 'bottom',
-      //     'text-transform': 'uppercase',
-      //     'text-letter-spacing': 0.05,
-      //     'text-offset': [0, 1.5],
-      //     'icon-offset': [0, -18]
-      //   },
-      //   'paint': {
-      //     'text-color': '#202',
-      //     'text-halo-color': '#fff',
-      //     'text-halo-width': 2
-      //   }
-      // });
-    })
-
-    // var popup = new mapboxgl.Popup({
-    //   closeButton: false,
-    //   closeOnClick: false
-    // });
-
-    // map.on('click', 'markersSymbol', function (e) {
-    //   map.getCanvas().style.cursor = 'pointer';
-
-    //   var coordinates = e.features[0].geometry.coordinates.slice();
-
-    //   var dadosPopup = {
-    //     'velocidade': e.features[0].properties.velocidade,
-    //     'dt_gps': e.features[0].properties.dt_gps,
-    //     'desc_ativo': e.features[0].properties.desc_ativo,
-    //     'ignicao': e.features[0].properties.ignicao
-    //   }
-
-    //   while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-    //     coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-    //   }
-
-    //   popup.setLngLat(coordinates).setHTML(templatePopup(dadosPopup)).addTo(map);
-    // });
-
-    // map.on('mouseleave', 'markersSymbol', function () {
-    //   map.getCanvas().style.cursor = '';
-    //   popup.remove();
-    // });
 
   }
 
