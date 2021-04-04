@@ -71,7 +71,7 @@ const OrdemServicoTabela = () => {
 
                     </div>
                     <div style={{ display: 'flex' }}>
-                        {row.hasOwnProperty('tal_imagem') && row.tal_imagem.includes('base64') ? (
+                        {row.tal_imagem ? (
                             <img className="image-talhao-order-servico" width={100} height={100} src={row.tal_imagem} />
                         ) :
                             <img className="image-talhao-order-servico" width={100} height={100} src={"https://adjditec.com/web/skin/img/noimage.jpg"} />

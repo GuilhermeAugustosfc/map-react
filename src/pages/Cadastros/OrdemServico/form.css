@@ -10,7 +10,8 @@
 } 
 
 .select-form {
-    width: 526px;
+    width: 100%;
+    display: block;
     padding: 5px;
     border-radius: 4px;
     cursor: pointer;

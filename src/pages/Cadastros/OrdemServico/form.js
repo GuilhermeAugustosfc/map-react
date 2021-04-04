@@ -3,7 +3,6 @@ import React, { useRef, useState, useEffect } from 'react'
 import MapBox from '../../../Componentes/MapBox/mapboxExport';
 
 import mapboxgl from 'mapbox-gl';
-import StylesControl from 'mapbox-gl-controls/lib/styles';
 import ZoomControl from 'mapbox-gl-controls/lib/zoom';
 
 import { useHistory } from "react-router";
@@ -26,7 +25,7 @@ function OrderServicoForm(props) {
         zoom: [12],
         containerStyle: {
             height: '40vh',
-            width: '526px',
+            width: '100%',
             marginTop: '5px',
             borderRadius: '4px'
         }
