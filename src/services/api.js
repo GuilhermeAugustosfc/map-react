@@ -25,12 +25,16 @@ const REQUEST = {
         await this.configAxios(url);
         this.axios.post(url, dados).then((response) => {
             if (response.status === 401) {
+                localStorage.removeItem('token-fulltrack4');
                 this.post(url, dados, callback);
             } else {
                 callback(response.data);
             }
-        }).catch(() => {
-            // this.post(url, dados, callback);
+        }).catch((error) => {
+            if (error.request.status === 401) {
+                localStorage.removeItem('token-fulltrack4');
+                this.post(url, dados, callback);
+            }
         })
     },
     get: function (url, dados, callback) {

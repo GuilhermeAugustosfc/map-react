@@ -338,13 +338,17 @@ function MapaGeral(props) {
 
     let { id } = props.match.params;
 
+    map.addControl(new ZoomControl(), 'top-left');
+
     if (id) {
 
       let dados = props.location.state;
+      addTalhaoOrdemServico(dados, map);
+      console.log(dados);
 
       buscarDados({
-        dt_inicial: dados.data_f + " 00:00:00",
-        dt_final: dados.data_f + " 23:59:59",
+        dt_inicial: dados.data_init,
+        dt_final: dados.data_fim,
         id_ativo: id,
         id_motorista: 0,
         timezone: 'America/Sao_Paulo',
@@ -377,7 +381,7 @@ function MapaGeral(props) {
         });
 
         SocketFulltrack.init((data) => {
-          if(data.ras_eve_aut_id === id) {
+          if (data.ras_eve_aut_id === id) {
             atualizarMarkerMapa(data, map, aux);
           }
         })
@@ -440,14 +444,54 @@ function MapaGeral(props) {
         popup.remove();
       });
 
-    } else {
-        // ADD CAMADA DOM MAPA
-        addMapBoxControll(map);
+    }
+  }
+
+  function addTalhaoOrdemServico(orderServico, map) {
+    var coordenadasTalhao = JSON.parse(orderServico.tal_coordenada);
+    setCercaConsolidado(turf.polygon(coordenadasTalhao));
+
+    let feature = {
+      'type': 'Feature',
+      'geometry': {
+        'type': 'Polygon',
+        'coordinates': coordenadasTalhao
+      },
+      'properties': {
+        'talhao': orderServico.tal_descricao,
+        'cultura':orderServico.cul_descricao
+      }
     }
 
+    if (map.getSource('talhao')) {
+      map.getSource('talhao').setData(feature)
+    } else {
+      map.addSource('talhao', {
+        'type': 'geojson',
+        'data': feature
+      })
+    }
 
+    !map.getLayer('talhao') && map.addLayer({
+      'id': 'talhao',
+      'type': 'fill',
+      'source': 'talhao',
+      'layout': {},
+      'paint': {
+        'fill-color': '#088',
+        'fill-opacity': 0.8
+      }
+    });
 
+    // DAR ZOOM NO TALHAO DA ORDEM DE SERVICO
+    // var bounds = coordenadasTalhao[0].reduce(function (bounds, coord) {
+    //   return bounds.extend(coord);
+    // }, new mapboxgl.LngLatBounds(coordenadasTalhao[0][0], coordenadasTalhao[0][0]));
 
+    // map.fitBounds(bounds, {
+    //   padding: 20,
+    //   offset: [5, 5]
+    // });
   }
 
   function loadImages(map, urls, callback) {
@@ -467,60 +511,6 @@ function MapaGeral(props) {
       };
     }
   }
-
-  function updateArea(e) {
-    var data = draw.getAll();
-    if (data.features.length > 0) {
-      console.log(JSON.stringify(data.features[0].geometry.coordinates));
-      setCercaConsolidado(turf.polygon(data.features[0].geometry.coordinates));
-      // draw.remove();
-      var area = turf.area(data);
-
-      // restrict to area to 2 decimal points
-      var rounded_area = Math.round(area * 100) / 100;
-      console.log(rounded_area + ' area autil');
-    }
-  }
-
-  function addMapBoxControll(map) {
-    map.addControl(new StylesControl({
-      styles: [
-        {
-          label: 'Streets',
-          styleName: 'Mapbox Streets',
-          styleUrl: 'mapbox://styles/mapbox/streets-v9',
-        },
-        {
-          label: 'Satellite',
-          styleName: 'Satellite',
-          styleUrl: 'mapbox://styles/mapbox/satellite-v9',
-
-        },
-        {
-          label: 'Terreno',
-          styleName: 'Terreno',
-          styleUrl: 'mapbox://styles/mapbox-map-design/ckhqrf2tz0dt119ny6azh975y',
-        },
-      ],
-    }), 'top-left');
-
-    draw = new MapboxDraw({
-      displayControlsDefault: false,
-      controls: {
-        polygon: true,
-        trash: true
-      },
-    })
-
-    map.addControl(draw, 'top-left');
-    map.addControl(new ZoomControl(), 'top-left');
-
-
-    map.on('draw.create', updateArea);
-    map.on('draw.delete', updateArea);
-    map.on('draw.update', updateArea);
-  }
-
   function onMouseOverFeature(e, map) {
 
     var features = map.queryRenderedFeatures(e.point);

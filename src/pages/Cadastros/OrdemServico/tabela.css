@@ -15,6 +15,7 @@
     box-shadow: 0 0 8px 0px #ccc;
     width: 23%;
     position: relative;
+    cursor: pointer;
 }
 
 .card-novo-ordemservico {
@@ -32,7 +33,6 @@
 
 .status-ordem-servico {
     color: black;
-    cursor: pointer;
     padding: 4px;
     text-align: center;
     border-radius: 4px;
@@ -51,11 +51,28 @@
     justify-content: center;
     margin: auto;
     flex: 1 1;
-    width: 308px;
+    width: 100%;
     height: 205px;
     transition: all .1s ease-out;
 }
 
 .image-talhao-order-servico:hover {
     border: 2px solid #ccc;
+}
+
+.legenda-talhao-order-servico {
+    position: absolute;
+    top: 11px;
+    right: 10px;
+    background: #0000009c;
+    color: white;
+    padding: 5px;
+    border-radius: 0px 6px 2px 6px;
+}
+
+.legenda-status-order-servico {
+    position: absolute;
+    top: 11px;
+    left: 10px;
+    padding: 5px;
 }

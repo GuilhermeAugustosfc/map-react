@@ -232,10 +232,11 @@ const Tabela = () => {
 
     
     function onClickDetalhesToMap(rowDataGrid) {
+        rowDataGrid.data_init = rowDataGrid.data_f;
+        rowDataGrid.data_fim = rowDataGrid.data_f;
+        delete rowDataGrid.data_f;
         history.push(`/mapa/${rowDataGrid.id_veiculo}`, rowDataGrid)
     }
-
-
 
 
     return (

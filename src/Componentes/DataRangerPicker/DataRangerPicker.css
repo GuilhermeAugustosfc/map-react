@@ -1,0 +1,9 @@
+.btn-show-daterangepicker {
+    padding: 10px;
+    font-weight: 600;
+    background-color: rgb(0 0 0 / 3%);
+    border: 0;
+    width: 100%;
+    box-shadow: 0px 1px 3px 0px #80808085;
+    margin-bottom: 9px;
+}

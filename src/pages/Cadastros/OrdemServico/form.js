@@ -1,16 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react'
-
 import MapBox from '../../../Componentes/MapBox/mapboxExport';
-
 import mapboxgl from 'mapbox-gl';
 import ZoomControl from 'mapbox-gl-controls/lib/zoom';
-
 import { useHistory } from "react-router";
-
 import api from '../../../services/api'
-
+import DateRangePicker from "../../../Componentes/DataRangerPicker/DataRangerPicker"
 import moment from 'moment'
-
 import './form.css'
 
 function OrderServicoForm(props) {
@@ -30,6 +25,8 @@ function OrderServicoForm(props) {
             borderRadius: '4px'
         }
     })
+
+
     const [idOrdemServico, setIdOrdemServico] = useState(0);
 
     const [idTalhao, setIdTalhao] = useState(0);
@@ -59,17 +56,13 @@ function OrderServicoForm(props) {
     const [idAno, setIdAno] = useState(0);
     const [anos, setAnos] = useState([]);
 
-    const [inicioPeriodo, setInicioPeriodo] = useState(moment(new Date().toLocaleDateString(), "DD/MM/YY").format("YYYY-MM-DD"));
-    const [fimPeriodo, setFimPeriodo] = useState(moment(new Date().toLocaleDateString(), "DD/MM/YY").format("YYYY-MM-DD"));
+    const [inicioPeriodo, setInicioPeriodo] = useState(moment().startOf('date').format('DD/MM/YYYY HH:mm:ss'));
+    const [fimPeriodo, setFimPeriodo] = useState(moment().endOf('date').format('DD/MM/YYYY HH:mm:ss'));
 
     const [tempoCinquentaMetro, setTempoCinquentaMetro] = useState("01:00");
-
     const [velocidadeOrdemServico, setVelocidadeOrdemServico] = useState("01:00");
-
     const [rpmOrdemServico, setRpmOrdemServico] = useState("");
-
     const [combustivel, setCombustivel] = useState("");
-
     const [marchaOrdemServico, setMarchaOrdemServico] = useState("");
 
     const selectVeiculoRef = useRef(null);
@@ -169,8 +162,6 @@ function OrderServicoForm(props) {
             setAnos(data);
         });
 
-
-
         let { id } = props.match.params;
 
         if (id) {
@@ -192,8 +183,8 @@ function OrderServicoForm(props) {
                 setIdSafra(ordemServico.osr_id_safra);
                 setIdVeiculo(ordemServico.osr_id_veiculo);
                 setMarchaOrdemServico(ordemServico.osr_marcha);
-                setInicioPeriodo(ordemServico.osr_periodo_fim);
-                setFimPeriodo(ordemServico.osr_periodo_ini);
+                setInicioPeriodo(moment(ordemServico.osr_periodo_fim, "YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY HH:mm:ss"));
+                setFimPeriodo(moment(ordemServico.osr_periodo_ini, "YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY HH:mm:ss"));
                 setRpmOrdemServico(ordemServico.osr_rpm);
                 setTempoCinquentaMetro(ordemServico.osr_tmp_cinq_metros);
                 setVelocidadeOrdemServico(ordemServico.osr_velocidade);
@@ -203,12 +194,6 @@ function OrderServicoForm(props) {
 
     function salvarOrdemServico() {
 
-        // let { map } = mapContainer.current.state;
-        // var img = map.getCanvas().toDataURL();
-
-        // var urlAmazomImagem = salvarImageS3(img);
-
-        // tal_image: img
         if (idOrdemServico > 0) {
             api.put(`http://f-agro-api.fulltrackapp.com/ordemservico/${idOrdemServico}`, {
                 osr_id_operacao: idOperacao,
@@ -220,8 +205,8 @@ function OrderServicoForm(props) {
                 osr_id_safra: idSafra,
                 osr_id_ano: idAno,
                 osr_id_motorista: idMotorista,
-                osr_periodo_ini: inicioPeriodo + " 00:00:00",
-                osr_periodo_fim: fimPeriodo + " 23:59:59",
+                osr_periodo_ini: moment(inicioPeriodo, "DD/MM/YYYY HH:mm:ss").format("YYYY-MM-DD HH:mm:ss"),
+                osr_periodo_fim: moment(fimPeriodo, "DD/MM/YYYY HH:mm:ss").format("YYYY-MM-DD HH:mm:ss"),
                 osr_tmp_cinq_metros: tempoCinquentaMetro,
                 osr_velocidade: velocidadeOrdemServico,
                 osr_rpm: rpmOrdemServico,
@@ -246,8 +231,8 @@ function OrderServicoForm(props) {
             form.append('osr_id_safra', idSafra);
             form.append('osr_id_ano', idAno);
             form.append('osr_id_motorista', idMotorista);
-            form.append('osr_periodo_ini', inicioPeriodo + " 00:00:00");
-            form.append('osr_periodo_fim', fimPeriodo + " 23:59:59");
+            form.append('osr_periodo_ini', moment(inicioPeriodo, "DD/MM/YYYY HH:mm:ss").format("YYYY-MM-DD HH:mm:ss"));
+            form.append('osr_periodo_fim', moment(fimPeriodo, "DD/MM/YYYY HH:mm:ss").format("YYYY-MM-DD HH:mm:ss"));
             form.append('osr_tmp_cinq_metros', tempoCinquentaMetro);
             form.append('osr_velocidade', velocidadeOrdemServico);
             form.append('osr_rpm', rpmOrdemServico);
@@ -261,6 +246,11 @@ function OrderServicoForm(props) {
                 history.push(`/cadastros/ordemservico`);
             })
         }
+    }
+
+    function onChangeData(ev, picker) {
+        setInicioPeriodo(picker.startDate.format('DD/MM/YYYY HH:mm:ss')) 
+        setFimPeriodo(picker.endDate.format('DD/MM/YYYY HH:mm:ss'))
     }
 
     function cancelarOrdemServico() {
@@ -481,11 +471,12 @@ function OrderServicoForm(props) {
             </div>
 
             <div className="col-md-6 form-group">
-                <label className="label-form" id="labelInicioPeriodo">Inicio periodo da operação</label>
-                <input type="date" className="form-control" placeholder="Inicio do periodo da operação" value={inicioPeriodo} onChange={(e) => setInicioPeriodo(e.target.value)} />
-
-                <label className="label-form" id="labelFimPeriodo">Fim periodo da operação</label>
-                <input type="date" className="form-control" placeholder="Fim do periodo da operação" value={fimPeriodo} onChange={(e) => setFimPeriodo(e.target.value)} />
+                <label className="label-periodo-ordemservico">Periodo da ordem de serviço</label>
+                <DateRangePicker 
+                    onChangeData={onChangeData}
+                    startDate={inicioPeriodo}
+                    endDate={fimPeriodo}
+                />
 
                 <label className="label-form" id="labelTEmpoCinquentaMetro">Tempo cinquenta metros</label>
                 <input type="time" className="form-control" placeholder="Quantos segundos o veículo percorreu em 50 metros" value={tempoCinquentaMetro} onChange={(e) => setTempoCinquentaMetro(e.target.value)} />

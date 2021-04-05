@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
-import { DateRangePicker } from 'react-bootstrap-daterangepicker';
 
+import React, { useState } from 'react'
 import * as moment from 'moment'
-import 'bootstrap-daterangepicker/daterangepicker.css';
 import './filtro.css'
+
+import DateRangePicker from "../DataRangerPicker/DataRangerPicker"
 
 function Filtro(props) {
     const [startDate, setStartDate] = useState(moment().startOf('date').format('DD/MM/YYYY HH:mm:ss'));
@@ -17,23 +17,12 @@ function Filtro(props) {
 
     return (
         <div className="filtro">
-            <DateRangePicker
-                initialSettings={{
-                    startDate: startDate, 
-                    endDate: endDate,
-                    timePicker: true,
-                    timePicker24Hour: true,
-                    linkedCalendars: false,
-                    showCustomRangeLabel: false,
-                    timePickerSeconds: true,
-                    locale:{
-                        format: 'DD/MM/YYYY HH:mm:ss',
-                    }
-                }}
-                onApply={onChangeData}
-            >
-                <button>Click Me To Open Picker!</button>
-            </DateRangePicker>
+            <DateRangePicker 
+                onChangeData={onChangeData}
+                startDate={startDate}
+                endDate={endDate}
+            />
+
             <button onClick={() => props.onclickButtonGerar({ dt_inicial: startDate, dt_final: endDate })}>Gerar Relatorio</button>
         </div>
     )

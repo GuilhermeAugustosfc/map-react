@@ -16,3 +16,7 @@
     border-radius: 4px;
     cursor: pointer;
 }
+
+.label-periodo-ordemservico {
+    display: block;
+}

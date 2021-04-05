@@ -392,10 +392,10 @@ export const formatLineInMap = {
                 this.map.getSource('rota').setData(rotaAtual)
 
                 this.segmentLatlngs = [this.dados[this.indexInterval].lst_localizacao]
-                this.indexInterval++;
-
+                
                 // this.map.panTo(this.segmentLatlngs);
                 callback(this.dados[this.indexInterval])
+                this.indexInterval++;
 
             } else {
                 window.clearInterval(this.timer);
