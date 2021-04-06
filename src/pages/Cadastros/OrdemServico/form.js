@@ -12,7 +12,7 @@ function OrderServicoForm(props) {
 
     var history = useHistory();
 
-    const mapContainer = useRef(null);
+    const [map, setMap] = useState(null);
 
     const [mapOptions, setMapOptions] = useState({
         center: [-49.654063, -22.215288],
@@ -70,8 +70,7 @@ function OrderServicoForm(props) {
 
 
     useEffect(() => {
-        if (talhoes.length && mapContainer.current) {
-            let { map } = mapContainer.current.state;
+        if (talhoes.length && map) {
 
             let talhaoSelecionado = parseInt(idTalhao) > 0 ? talhoes.filter((talhao) => idTalhao === talhao.tal_id)[0] : talhoes[0];
             let coordenadasTalhao = JSON.parse(talhaoSelecionado.tal_coordenada);
@@ -519,7 +518,7 @@ function OrderServicoForm(props) {
                     ))}
                 </select>
                 <div className="mapa">
-                    <MapBox ref={mapContainer} onStyleLoad={onLoadMap} {...mapOptions} />
+                    <MapBox onStyleLoad={onLoadMap} {...mapOptions} />
                 </div>
             </div>
 

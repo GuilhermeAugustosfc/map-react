@@ -12,7 +12,7 @@ import * as turf from "@turf/turf"
 import SocketFulltrack from '../../services/socket'
 
 function Dashboard(props) {
-    const mapContainer = useRef(null);
+    const [map, setMap] = useState(null);
 
     const [mapOptions, setMapOptions] = useState({
         center: [-49.654063, -22.215288],
@@ -243,7 +243,7 @@ function Dashboard(props) {
 
     return (
         <>
-            <MapBox ref={mapContainer} onStyleData={onStyleData} onStyleLoad={onLoadMap} {...mapOptions} />
+            <MapBox onStyleData={onStyleData} onStyleLoad={onLoadMap} {...mapOptions} />
         </>
     );
 }

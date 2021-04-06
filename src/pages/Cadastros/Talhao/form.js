@@ -12,6 +12,7 @@ import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { useHistory } from "react-router";
 
 import api from '../../../services/api'
+import shp from 'shpjs'
 
 import './form.css'
 
@@ -28,7 +29,10 @@ function TalhaoForm(props) {
 
 
 
-    const mapContainer = useRef(null);
+    const [map, setMap] = useState(null);
+    const selecionarFileRef = useRef(null);
+    const [draw, setDraw] = useState(null);
+
 
     const [mapOptions, setMapOptions] = useState({
         center: [-49.654063, -22.215288],
@@ -40,7 +44,6 @@ function TalhaoForm(props) {
         }
     })
 
-    var draw = null;
 
     function atualizaDadosEdicao(talhao) {
         setAreaUtil(talhao.tal_area_util);
@@ -51,8 +54,6 @@ function TalhaoForm(props) {
         if (talhao.tal_coordenada) {
             setCoordenadasTalhao(talhao.tal_coordenada);
             let coordinates = JSON.parse(talhao.tal_coordenada);
-
-            let { map } = mapContainer.current.state;
 
             let feature = {
                 'type': 'Feature',
@@ -79,6 +80,8 @@ function TalhaoForm(props) {
     }
 
     function onLoadMap(map) {
+
+        setMap(map);
 
         addMapBoxControll(map);
 
@@ -118,7 +121,7 @@ function TalhaoForm(props) {
             ],
         }), 'top-left');
 
-        draw = new MapboxDraw({
+        var newDraw = new MapboxDraw({
             displayControlsDefault: false,
             userProperties: true,
             controls: {
@@ -163,21 +166,24 @@ function TalhaoForm(props) {
                         'fill-opacity': 0.7
                     }
                 },
-                
+
             ]
         })
 
-        map.addControl(draw, 'top-left');
+        map.addControl(newDraw, 'top-left');
+
+        setDraw(newDraw);
+
         map.addControl(new ZoomControl(), 'top-left');
 
-        map.on('draw.create', () => updateTalhao(map));
-        map.on('draw.update', () => updateTalhao(map));
+        map.on('draw.create', () => updateTalhao(map, newDraw));
+        map.on('draw.update', () => updateTalhao(map, newDraw));
     }
 
-    function updateTalhao(map) {
+    function updateTalhao(map, draw) {
         var data = draw.getAll();
         if (data.features.length > 0) {
-            draw.setFeatureProperty(data.features[0].id, 'fill-color', "black")
+            // draw.setFeatureProperty(data.features[0].id, 'fill-color', "black")
             setCoordenadasTalhao(JSON.stringify(data.features[0].geometry.coordinates));
             var talhaoLatLon = data.features[0].geometry.coordinates[0];
 
@@ -221,7 +227,6 @@ function TalhaoForm(props) {
 
     function saveTalhao() {
 
-        let { map } = mapContainer.current.state;
         var img = map.getCanvas().toDataURL();
         var Data = new Date();
         var filename = fileNameTalhaoEdicao ? fileNameTalhaoEdicao : generateHash(`${descricao}_talhao.png` + Data.getHours.toString()
@@ -269,12 +274,57 @@ function TalhaoForm(props) {
             console.log('errro upload s3');
             console.log(error);
         });
-
-
     }
 
     function voltarform() {
         history.push(`/cadastros/talhao`);
+    }
+
+    function importarShapeFile() {
+        const [file] = selecionarFileRef.current.files;
+
+        // if (file.name.slice(-3) === 'zip') {
+        return readFile(file);
+        // } else {
+        //     alert("Apenas arquivos zip");
+        // }
+    }
+
+    function readFile(file) {
+        var reader = new FileReader();
+        reader.onload = readerLoad;
+        reader.readAsArrayBuffer(file);
+    }
+
+    function readerLoad() {
+        if (this.readyState === 2 && !this.error) {
+            var geojson = shp.parseZip(this.result);
+            var coordenadasShapefile = geojson.features[0].geometry.coordinates;
+            debugger
+
+            if (coordenadasShapefile.length > 0) {
+                coordenadasShapefile = coordenadasShapefile.length == 1 ? coordenadasShapefile : [coordenadasShapefile];
+            }
+
+            geojson.features[0].geometry.coordinates = coordenadasShapefile;
+            geojson.features[0].geometry.type = "Polygon";
+
+            draw.add(geojson);
+
+            setCoordenadasTalhao(JSON.stringify(coordenadasShapefile));
+
+            var bounds = coordenadasShapefile[0].reduce(function (bounds, coord) {
+                return bounds.extend(coord);
+            }, new mapboxgl.LngLatBounds(coordenadasShapefile[0][0], coordenadasShapefile[0][0]));
+
+            map.fitBounds(bounds, {
+                padding: 20,
+                maxZoom: 15,
+            });
+        }
+        else {
+            alert('error read zip file')
+        }
     }
 
     return (
@@ -300,10 +350,16 @@ function TalhaoForm(props) {
 
             <input type="hidden" value={id_talhao} />
 
+            <div className="import-group">
+                <input ref={selecionarFileRef} className="btn" id="btn-selecionar-shape" type="file" />
+                <button className="btn" id="btn-importar-shape" onClick={() => importarShapeFile()}>Importar</button>
+
+            </div>
+
             <div className="col-md-12 container-mapa">
                 <h3>Desenhe a area do talhão</h3>
                 <div className="mapa">
-                    <MapBox ref={mapContainer} onStyleLoad={onLoadMap} {...mapOptions} />
+                    <MapBox onStyleLoad={onLoadMap} {...mapOptions} />
                 </div>
             </div>
         </div>

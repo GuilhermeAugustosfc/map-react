@@ -39,7 +39,7 @@ function MapaGeral(props) {
     porcTerrenoFeito: ""
   });
 
-  const mapContainer = useRef(null);
+  const [map, setMap] = useState(null);
   const colorsSpeed = [{ color: '#868b00' }, { color: '#00008b' }, { color: 'darkred' }, { color: 'black' }]
 
   const [mapOptions, setMapOptions] = useState({
@@ -68,7 +68,6 @@ function MapaGeral(props) {
   };
 
   useEffect(() => {
-    let { map } = mapContainer.current.state;
 
     if (!map) return
 
@@ -145,7 +144,6 @@ function MapaGeral(props) {
   }, [dados])
 
   useEffect(() => {
-    let { map } = mapContainer.current.state;
 
     if (!map) return
 
@@ -284,7 +282,6 @@ function MapaGeral(props) {
   }
 
   function buscarDados(form) {
-    let { map } = mapContainer.current;
 
     if (map && map.getSource('rota')) {
       map.removeSource('rota')
@@ -332,9 +329,10 @@ function MapaGeral(props) {
 
   async function onLoadMap(map) {
 
+    setMap(map);
+
     map.on('click', 'rota', (e) => onClickRota(e, map))
     map.on('mousemove', 'rota', (e) => onMouseOverFeature(e, map));
-
 
     let { id } = props.match.params;
 
@@ -589,7 +587,6 @@ function MapaGeral(props) {
   }
 
   function onClickConsolidado(stringConsolidado, dados) {
-    let { map } = mapContainer.current.state;
     if (map.getLayer('rota')) {
       map.removeLayer('rota');
     }
@@ -681,7 +678,7 @@ function MapaGeral(props) {
 
   return (
     <>
-      <MapBox ref={mapContainer} onStyleData={onStyleData} onStyleLoad={onLoadMap} {...mapOptions} />
+      <MapBox onStyleData={onStyleData} onStyleLoad={onLoadMap} {...mapOptions} />
       <InfoConsolidadoMapa dados={dadosConsolidado} onClickConsolidado={onClickConsolidado} />
       <Filtro onclickButtonGerar={onclickButtonGerar} />
       <Carrosel />

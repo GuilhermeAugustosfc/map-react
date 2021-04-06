@@ -20,3 +20,18 @@
 #btn-cancelar {
     margin-left: 3px;
 }
+
+#btn-selecionar-shape {
+    background-color: #cccc;
+    color: black;
+    margin-right: 5px;
+}
+
+#btn-importar-shape {
+    background-color: #000000ab;
+    color: white;
+}
+
+.import-group {
+    display: flex;
+}
