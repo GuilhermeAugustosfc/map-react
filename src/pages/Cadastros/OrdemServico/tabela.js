@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from '../../../services/api'
 import { useHistory } from "react-router";
 
-import { GoPlay, GoPlus, GoTasklist, GoClock } from 'react-icons/go'
+import { GoPlay, GoPlus, GoChecklist, GoClock } from 'react-icons/go'
 
 
 import './tabela.css'
@@ -43,7 +43,7 @@ const OrdemServicoTabela = () => {
         } else if (status === "andamento") {
             return <GoPlay size={30} color={'#13f417'} />
         } else {
-            return <GoTasklist size={30} color={'#d8d8d8'} />
+            return <GoChecklist size={30} color={'#ececec'} />
         }
     }
 

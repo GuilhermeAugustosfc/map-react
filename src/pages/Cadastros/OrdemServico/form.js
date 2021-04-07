@@ -6,6 +6,11 @@ import { useHistory } from "react-router";
 import api from '../../../services/api';
 import DateRangePicker from "../../../Componentes/DataRangerPicker/DataRangerPicker";
 import moment from 'moment';
+
+import { GoCheck, GoArrowLeft } from 'react-icons/go'
+
+
+import Button from '@material-ui/core/Button';
 import './form.css';
 
 function OrderServicoForm(props) {
@@ -250,7 +255,7 @@ function OrderServicoForm(props) {
     }
 
     function onChangeData(ev, picker) {
-        setInicioPeriodo(picker.startDate.format('DD/MM/YYYY HH:mm:ss')) 
+        setInicioPeriodo(picker.startDate.format('DD/MM/YYYY HH:mm:ss'))
         setFimPeriodo(picker.endDate.format('DD/MM/YYYY HH:mm:ss'))
     }
 
@@ -473,7 +478,7 @@ function OrderServicoForm(props) {
 
             <div className="col-md-6 form-group">
                 <label className="label-periodo-ordemservico">Periodo da ordem de serviço</label>
-                <DateRangePicker 
+                <DateRangePicker
                     onChangeData={onChangeData}
                     startDate={inicioPeriodo}
                     endDate={fimPeriodo}
@@ -495,8 +500,24 @@ function OrderServicoForm(props) {
                 <input type="number" className="form-control" placeholder="Qual marcha a odem de serviço deverá ser executada" value={marchaOrdemServico} onChange={(e) => setMarchaOrdemServico(e.target.value)} />
 
                 <div className="input-button">
-                    <button className="btn btn-primary" id="btn-salvar-ordem-servico" onClick={() => salvarOrdemServico()}>Salvar</button>
-                    <button className="btn btn-warning" id="btn-cancelar-ordem-servico" onClick={() => cancelarOrdemServico()}>Cancelar</button>
+                    <Button
+                        variant="contained"
+                        size="large"
+                        id="btn-cancelar-ordem-servico"
+                        onClick={() => cancelarOrdemServico()}
+                        startIcon={<GoArrowLeft />}
+                    >
+                        Cancelar
+                    </Button>
+                    <Button
+                        variant="contained"
+                        size="large"
+                        id="btn-salvar-ordem-servico"
+                        onClick={() => salvarOrdemServico()}
+                        startIcon={<GoCheck />}
+                    >
+                        Salvar
+                    </Button>
                 </div>
             </div>
 

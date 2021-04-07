@@ -470,14 +470,26 @@ function MapaGeral(props) {
       })
     }
 
-    !map.getLayer('talhao') && map.addLayer({
-      'id': 'talhao',
+    !map.getLayer('talhao_fill') && map.addLayer({
+      'id': 'talhao_fill',
       'type': 'fill',
       'source': 'talhao',
       'layout': {},
       'paint': {
-        'fill-color': '#088',
-        'fill-opacity': 0.8
+        'fill-color': 'white',
+        'fill-opacity': 0.1,
+        'fill-outline-color' : 'black'
+      }
+    });
+
+    !map.getLayer('talhao_line') && map.addLayer({
+      'id': 'talhao_line',
+      'type': 'line',
+      'source': 'talhao',
+      'layout': {},
+      'paint': {
+        'line-color': 'black',
+        'line-width': 4
       }
     });
 
@@ -586,82 +598,82 @@ function MapaGeral(props) {
     }
   }
 
-  function onClickConsolidado(stringConsolidado, dados) {
-    if (map.getLayer('rota')) {
-      map.removeLayer('rota');
-    }
+  // function onClickConsolidado(stringConsolidado, dados) {
+  //   if (map.getLayer('rota')) {
+  //     map.removeLayer('rota');
+  //   }
 
-    switch (stringConsolidado) {
-      case 'tempoTrabalho':
-        break;
-      case 'tempDeslocamneto':
-        break;
-      case 'tempoDentroCerca':
-        break;
-      case 'tempoEfetivo':
-        break;
-      case 'tempoOcioso':
+  //   switch (stringConsolidado) {
+  //     case 'tempoTrabalho':
+  //       break;
+  //     case 'tempDeslocamneto':
+  //       break;
+  //     case 'tempoDentroCerca':
+  //       break;
+  //     case 'tempoEfetivo':
+  //       break;
+  //     case 'tempoOcioso':
 
-        if (map.getSource('markersOciosos')) {
-          return
-        }
+  //       if (map.getSource('markersOciosos')) {
+  //         return
+  //       }
 
-        let markersOciosos = {
-          'type': 'FeatureCollection',
-          'features': []
-        }
+  //       let markersOciosos = {
+  //         'type': 'FeatureCollection',
+  //         'features': []
+  //       }
 
-        let { posicoesOciosas } = dados;
+  //       let { posicoesOciosas } = dados;
 
-        for (var i in posicoesOciosas) {
-          markersOciosos.features.push(turf.point(posicoesOciosas[i], { title: 'Ociosos', 'marker-symbol': 'airfield' }))
-        }
+  //       for (var i in posicoesOciosas) {
+  //         markersOciosos.features.push(turf.point(posicoesOciosas[i], { title: 'Ociosos', 'marker-symbol': 'airfield' }))
+  //       }
 
-        map.addSource('markersOciosos', {
-          type: 'geojson',
-          data: markersOciosos
-        })
+  //       map.addSource('markersOciosos', {
+  //         type: 'geojson',
+  //         data: markersOciosos
+  //       })
 
-        let img = new Image(20, 20)
-        img.onload = () => map.addImage('ocioso', img)
-        img.src = MarkerSvg
+  //       let img = new Image(20, 20)
+  //       img.onload = () => map.addImage('ocioso', img)
+  //       img.src = MarkerSvg
 
-        map.addLayer({
-          'id': 'markersOciosos',
-          'type': 'symbol',
-          'source': 'markersOciosos',
-          'layout': {
-            'icon-size': 1,
-            'icon-image': 'ocioso',
-            'icon-allow-overlap': true,
-            // get the title name from the source's "title" property
-            'text-field': ['get', 'title'],
-            'text-font': [
-              'Open Sans Semibold',
-              'Arial Unicode MS Bold'
-            ],
-            // 'text-offset': [0, 1.25],
-            'text-anchor': 'top',
-            'text-transform': 'uppercase',
-            'text-letter-spacing': 0.05,
-            'text-offset': [0, 1.5]
-          },
-          'paint': {
-            'icon-color': 'red',
-            'text-color': '#202',
-            'text-halo-color': '#fff',
-            'text-halo-width': 2
-          }
-        });
+  //       map.addLayer({
+  //         'id': 'markersOciosos',
+  //         'type': 'symbol',
+  //         'source': 'markersOciosos',
+  //         'layout': {
+  //           'icon-size': 1,
+  //           'icon-image': 'ocioso',
+  //           'icon-allow-overlap': true,
+  //           // get the title name from the source's "title" property
+  //           'text-field': ['get', 'title'],
+  //           'text-font': [
+  //             'Open Sans Semibold',
+  //             'Arial Unicode MS Bold'
+  //           ],
+  //           // 'text-offset': [0, 1.25],
+  //           'text-anchor': 'top',
+  //           'text-transform': 'uppercase',
+  //           'text-letter-spacing': 0.05,
+  //           'text-offset': [0, 1.5]
+  //         },
+  //         'paint': {
+  //           'icon-color': 'red',
+  //           'text-color': '#202',
+  //           'text-halo-color': '#fff',
+  //           'text-halo-width': 2
+  //         }
+  //       });
 
 
-        break;
-      case 'tempoDesligado':
-        break;
-      default:
-        break
-    }
-  }
+  //       break;
+  //     case 'tempoDesligado':
+  //       break;
+  //     default:
+  //       break
+  //   }
+  // }
 
   function onStyleData(map, Ct) {
     if (Ct && Ct.style.stylesheet && Ct.style.stylesheet.owner === "mapbox-map-design" && !map.getSource('mapbox-dem')) {
@@ -679,9 +691,9 @@ function MapaGeral(props) {
   return (
     <>
       <MapBox onStyleData={onStyleData} onStyleLoad={onLoadMap} {...mapOptions} />
-      <InfoConsolidadoMapa dados={dadosConsolidado} onClickConsolidado={onClickConsolidado} />
+      {/* <InfoConsolidadoMapa dados={dadosConsolidado} /> */}
       <Filtro onclickButtonGerar={onclickButtonGerar} />
-      <Carrosel />
+      <Carrosel consolidado={dadosConsolidado} />
     </>
   );
 }

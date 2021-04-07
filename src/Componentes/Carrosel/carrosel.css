@@ -6,9 +6,8 @@
   }
 
 .template-scrol-horizontal {
-    height: 200px;
-    padding: 9px 14px;
-    background-color: #282c34;
+    height: 242px;
+    background-color: #282c34b5;
     color: white;
     border-right: 2px solid #ccc;
 }

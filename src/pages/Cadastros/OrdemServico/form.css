@@ -5,6 +5,7 @@
     text-align: center;
     font-size: 28px;
 }   
+
 .label-form {
     display: block;
 } 
@@ -19,4 +20,23 @@
 
 .label-periodo-ordemservico {
     display: block;
+}
+
+.input-button {
+    display: flex;
+    margin-top: 14px;
+}
+
+#btn-cancelar-ordem-servico,
+#btn-salvar-ordem-servico {
+    flex: 1;
+}
+
+#btn-salvar-ordem-servico {
+    background-color: #16ff0026;
+}
+
+#btn-cancelar-ordem-servico {
+    background-color: #ffa50038;
+    margin-right: 10px;
 }
