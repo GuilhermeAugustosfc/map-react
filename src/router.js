@@ -4,9 +4,8 @@ import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 
 // import Login from "./Telas/Login/Login"
 
-// import Menu from "./Menu/menu"
+import Menu from "./Componentes/Menu/Menu"
 
-// import Dashboard from "./Telas/Dashboard/dashboard"
 
 import Tabela from "./pages/Tabela";
 
@@ -37,6 +36,8 @@ const Routes = () => (
             {/* <PrivateRoute exact path="/" component={(props) => <Menu><VendedorTabela {...props} /></Menu>} /> */}
             <PrivateRoute exact path="/" component={(props) => <Dashboard {...props} />} />
             {/* <Route exact path="/login" component={Login} /> */}
+
+            <PrivateRoute exact path="/menu" component={(props) => <Menu {...props} />} />
 
             <PrivateRoute exact path="/cadastros/talhao" component={(props) => <TalhaoTabela {...props} />} />
             <PrivateRoute exact path="/cadastros/talhao/form" component={(props) => <TalhaoForm {...props} />} />

@@ -3,10 +3,10 @@ import MapBox from '../../../Componentes/MapBox/mapboxExport';
 import mapboxgl from 'mapbox-gl';
 import ZoomControl from 'mapbox-gl-controls/lib/zoom';
 import { useHistory } from "react-router";
-import api from '../../../services/api'
-import DateRangePicker from "../../../Componentes/DataRangerPicker/DataRangerPicker"
-import moment from 'moment'
-import './form.css'
+import api from '../../../services/api';
+import DateRangePicker from "../../../Componentes/DataRangerPicker/DataRangerPicker";
+import moment from 'moment';
+import './form.css';
 
 function OrderServicoForm(props) {
 
@@ -120,6 +120,8 @@ function OrderServicoForm(props) {
     }, [talhoes, idTalhao])
 
     function onLoadMap(map) {
+
+        setMap(map)
 
         map.addControl(new ZoomControl());
 

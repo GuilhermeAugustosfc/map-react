@@ -1,6 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import 'fontsource-roboto';
 import './index.css';
+
+import ScopedCssBaseline from '@material-ui/core/ScopedCssBaseline';
 
 import Router from './router';
 import ReactNotification from 'react-notifications-component'
