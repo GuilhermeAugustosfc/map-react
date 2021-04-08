@@ -7,16 +7,6 @@
     text-align: center;
 }
 
-.card-talhao {
-    background-color: #ccc0;
-    padding: 10px;
-    margin: 9px;
-    border-radius: 4px;
-    box-shadow: 0 0 8px 0px #ccc;
-    width: 23%;
-    position: relative;
-}
-
 .card-novo-talhao {
     display: flex;
     flex-direction: column;
@@ -30,20 +20,30 @@
     background-color: #f7f7f7;
 }
 
+.card-talhao {
+    background-color: #ccc0;
+    padding: 10px;
+    margin: 9px;
+    border-radius: 4px;
+    box-shadow: 0 0 8px 0px #ccc;
+    width: 23%;
+    position: relative;
+    cursor: pointer;
+}
+
+
 .legenda-imagem {
     border-radius: 4px;
     display: flex;
     justify-content: center;
     margin: auto;
     flex: 1;
-    width: 308px;
     height: 205px;
     transition: all .1s ease-out;
-    cursor: pointer;
 }
 
 .legenda-imagem:hover {
-    transform: scale(1.1);
+    transform: scale(1.08);
 }
 
 .legenda-descricao {

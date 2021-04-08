@@ -10,6 +10,7 @@
     background-color: #282c34b5;
     color: white;
     border-right: 2px solid #ccc;
+    cursor: grab;
 }
 
 .template-scrol-horizontal > ul {

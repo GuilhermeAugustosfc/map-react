@@ -51,8 +51,8 @@ const TalhaoTabela = () => {
                 </div>
             </div>
             {dadosTalhao.length && dadosTalhao.map((row) => (
-                <div className="card-talhao" key={row.tal_id}>
-                    <div style={{ display: 'flex' }} onClick={() => onClickTalhao(row.tal_id)}>
+                <div className="card-talhao" key={row.tal_id} onClick={() => onClickTalhao(row.tal_id)}>
+                    <div style={{ display: 'flex' }}>
                         {row.tal_imagem ? (
                             <img className="legenda-imagem" width={100} height={100} src={row.tal_imagem} />
                         ) :

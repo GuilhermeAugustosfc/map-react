@@ -24,7 +24,9 @@ import isLogged from "./validacao/routerValidacao"
 const PrivateRoute = ({component: Component, ...rest}) => (
     <Route {...rest} render={(props) => (
         isLogged() ? (
-            <Component {...props} />
+            <Menu>
+                <Component {...props} />
+            </Menu>
         ) : 
             <Redirect to="/login" />
         )}/>
@@ -33,7 +35,6 @@ const PrivateRoute = ({component: Component, ...rest}) => (
 const Routes = () => (
     <BrowserRouter>
         <Switch>
-            {/* <PrivateRoute exact path="/" component={(props) => <Menu><VendedorTabela {...props} /></Menu>} /> */}
             <PrivateRoute exact path="/" component={(props) => <Dashboard {...props} />} />
             {/* <Route exact path="/login" component={Login} /> */}
 

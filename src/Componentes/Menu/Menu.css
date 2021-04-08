@@ -1,0 +1,28 @@
+.container-app {
+    margin-top: 4em;
+}
+
+.menu-lateral {
+    width: 15.625em;
+    font-weight: 600;
+}
+
+.title-nav {
+    flex-grow: 1;
+}
+
+#navbar {
+    background-color: green;
+    color: white;
+}
+
+#title-menu-lateral {
+    background-color: green;
+    color: white;
+    padding: 15px 14px;
+}
+
+.link-menu, .link-menu:hover {
+    color: #324351;
+    text-decoration: none;
+}

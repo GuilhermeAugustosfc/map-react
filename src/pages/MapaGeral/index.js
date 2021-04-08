@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import MapBox from '../../Componentes/MapBox/mapbox';
-import Filtro from '../../Componentes/FiltroMapa/filtro';
+import Filtro from '../../Componentes/FiltroMapa/FiltroMapa';
 import Carrosel from '../../Componentes/Carrosel/carrosel';
 import InfoConsolidadoMapa from '../../Componentes/InfoConsolidadoMapa/InfoConsolidadoMapa';
 
@@ -47,7 +47,7 @@ function MapaGeral(props) {
     style: "mapbox://styles/mapbox/satellite-v9",
     // style: "mapbox://styles/mapbox/streets-v9",
     containerStyle: {
-      height: '100vh',
+      height: '93vh',
       width: '100vw'
     }
   })
