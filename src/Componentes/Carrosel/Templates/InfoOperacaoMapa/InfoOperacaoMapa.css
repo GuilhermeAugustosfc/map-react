@@ -1,0 +1,33 @@
+#painel-operacao {
+    height: 100%;
+    padding: 9px;
+}
+
+.info-operacao {
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+}
+
+.info-operacao p {
+    flex: 1;
+    padding: 0 9px;
+    font-size: 15px;
+}
+
+.operacao {
+    text-align: center;
+    font-size: 17px;
+    background-color: #ffffff1f;
+    margin-bottom: 9px;
+}
+
+
+.bloco-operacao {
+    display: flex;
+}
+
+.bloco-operacao > div {
+    flex: 1;
+    
+}

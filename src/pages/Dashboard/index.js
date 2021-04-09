@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useState } from 'react'
 
 import MapBox from '../../Componentes/MapBox/mapbox';
 
@@ -21,7 +21,7 @@ function Dashboard(props) {
         // preserveDrawingBuffer: true,
         // style: "mapbox://styles/mapbox/streets-v9",
         containerStyle: {
-            height: '100vh',
+            height: '93vh',
             width: '100vw'
         }
     })
@@ -73,6 +73,8 @@ function Dashboard(props) {
     function onLoadMap(map) {
 
         // ADD CAMADA DOM MAPA
+        setMap(map);
+
         addMapBoxControll(map);
 
         loadImages(map, imagesMarkers, (images) => {
@@ -97,6 +99,7 @@ function Dashboard(props) {
             });
 
             SocketFulltrack.init((data) => {
+                console.log(data);
                 atualizarMarkerMapa(data, map, aux);
             })
 

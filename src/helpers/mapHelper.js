@@ -1,22 +1,28 @@
 import * as moment from 'moment'
 import * as turf from "@turf/turf"
 
-export function calcColorSpeed(speed) {
-    var i,
-        speedThresholds = [6, 9, 13];
+export function calcColorSpeed(speed, velocidadeCorreta) {
+    // var i,
+    //     speedThresholds = [6, 9, 13];
 
-    for (i = 0; i < speedThresholds.length; ++i) {
-        if (speed <= speedThresholds[i]) {
-            return i;
-        }
-    }
-    return speedThresholds.length;
+    // for (i = 0; i < speedThresholds.length; ++i) {
+    //     if (speed < speedThresholds[i]) {
+    //         return i;
+    //     }
+    // }
+    // return speedThresholds.length;
+
+    if (speed < velocidadeCorreta) {
+        return 0; // amarelo
+    } else if (speed > velocidadeCorreta) {
+        return 1; // vermelho
+    } else return 2 // verde
 }
 
 export const consolidado = {
     tempoTrabalho: 0,
     tempoDentroCerca: 0,
-    descolamento: 0, // Deslocamento
+    tempoDeslocamento: 0, // Deslocamento
     tempoDentroCercaOcioso: 0, // ignição = 1 Velocidade = 0
     tempoDentroCercaDesligado: 0, // ignição = 0
     tempoDentroCercaTrabalhando: 0,
@@ -34,7 +40,7 @@ export const consolidado = {
     resetConsolidado: function () {
         this.tempoTrabalho = 0;
         this.tempoDentroCerca = 0;
-        this.descolamento = 0; // Deslocamento
+        this.tempoDeslocamento = 0; // Deslocamento
         this.ultimoEventoDentroCercaTrabalhando = 0; // Velocidade > 0
         this.tempoDentroCercaOcioso = 0; // ignição = 1 Velocidade = 0
         this.tempoDentroCercaDesligado = 0; // ignição = 0
@@ -66,7 +72,11 @@ export const consolidado = {
             },
             deslocamento: {
                 evento: 'ultimoEventoDeslocamento',
-                tempo: 'deslocamento'
+                tempo: 'tempoDeslocamento'
+            },
+            dentro_cerca: {
+                evento: 'ultimoEventoDentroCerca',
+                tempo: 'tempoDentroCerca'
             }
         }
 
@@ -152,16 +162,11 @@ export const consolidado = {
             if (!this.ultimoEventoDeslocamento) {
                 this.ultimoEventoDeslocamento = this.dtGpsAtualDateTime;
             } else {
-                this.descolamento += ((this.dtGpsAtualDateTime - this.ultimoEventoDeslocamento) / 1000);
+                this.tempoDeslocamento += ((this.dtGpsAtualDateTime - this.ultimoEventoDeslocamento) / 1000);
                 this.ultimoEventoDeslocamento = this.dtGpsAtualDateTime;
             }
 
-            this.calcularTempo(['trabalhando', 'ocioso', 'desligado'], this.dtGpsAtualDateTime);
-
-            if (this.ultimoEventoDentroCerca) {
-                this.tempoDentroCerca += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCerca) / 1000);
-                this.ultimoEventoDentroCerca = 0;
-            }
+            this.calcularTempo(['trabalhando', 'ocioso', 'desligado', 'dentro_cerca'], this.dtGpsAtualDateTime);
         }
 
         this.dtFinalSeg = new Date(moment(this.dtGpsAtualDateTime, "DD/MM/YYYY HH:m:ss").format("YYYY-MM-DD HH:m:ss"));
@@ -170,13 +175,13 @@ export const consolidado = {
 
         this.consolidado = {
             tempoTrabalho: moment.utc(this.tempoTrabalhoAtual * 1000).format('HH:mm:ss'),
-            deslocamento: moment.utc(this.descolamento * 1000).format('HH:mm:ss'),
+            deslocamento: moment.utc(this.tempoDeslocamento * 1000).format('HH:mm:ss'),
             tempoDentroCerca: moment.utc(this.tempoDentroCerca * 1000).format('HH:mm:ss'),
             tempoDentroCercaDesligado: moment.utc(this.tempoDentroCercaDesligado * 1000).format('HH:mm:ss'),
             tempoDentroCercaOcioso: moment.utc(this.tempoDentroCercaOcioso * 1000).format('HH:mm:ss'),
             tempoDentroCercaTrabalhando: moment.utc(this.tempoDentroCercaTrabalhando * 1000).format('HH:mm:ss'),
             porcDentroCerca: parseFloat((100 * this.tempoDentroCerca) / this.tempoTrabalhoAtual),
-            porcForaCerca: parseFloat((100 * this.descolamento) / this.tempoTrabalhoAtual),
+            porcForaCerca: parseFloat((100 * this.tempoDeslocamento) / this.tempoTrabalhoAtual),
             porcDentroCercaOcioso: parseFloat((100 * this.tempoDentroCercaOcioso) / this.tempoTrabalhoAtual),
             porcDentroCercaDesligado: parseFloat((100 * this.tempoDentroCercaDesligado) / this.tempoTrabalhoAtual),
             porcDentroCercaTrabalhando: parseFloat((100 * this.tempoDentroCercaTrabalhando) / this.tempoTrabalhoAtual),
@@ -264,26 +269,11 @@ export const consolidado = {
                     this.ultimoEventoDeslocamento = this.dtGpsAtualDateTime;
                 }
 
-                if (this.ultimoEventoDentroCerca) {
-                    this.tempoDentroCerca += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCerca) / 1000);
-                    this.ultimoEventoDentroCerca = 0;
-                }
-
-
-                this.calcularTempo(['ocioso', 'desligado', 'trabalhando'], this.dtGpsAtualDateTime);
-
+                this.calcularTempo(['ocioso', 'desligado', 'trabalhando', 'dentro_cerca'], this.dtGpsAtualDateTime);
             }
-
-
-
         }
 
-        if (this.ultimoEventoDentroCerca) {
-            this.tempoDentroCerca += ((this.dtGpsAtualDateTime - this.ultimoEventoDentroCerca) / 1000);
-            this.ultimoEventoDentroCerca = 0;
-        }
-
-        this.calcularTempo(['ocioso', 'desligado', 'deslocamento', 'trabalhando'], this.dtGpsAtualDateTime);
+        this.calcularTempo(['ocioso', 'desligado', 'deslocamento', 'trabalhando', 'dentro_cerca'], this.dtGpsAtualDateTime);
 
 
         this.dtFinalSeg = new Date(moment(dados[(dados.length - 1)].dt_gps, "DD/MM/YYYY HH:m:ss").format("YYYY-MM-DD HH:m:ss"));
@@ -293,13 +283,13 @@ export const consolidado = {
 
         return {
             tempoTrabalho: moment.utc(this.tempoTrabalhoAtual * 1000).format('HH:mm:ss'),
-            deslocamento: moment.utc(this.descolamento * 1000).format('HH:mm:ss'),
+            deslocamento: moment.utc(this.tempoDeslocamento * 1000).format('HH:mm:ss'),
             tempoDentroCerca: moment.utc(this.tempoDentroCerca * 1000).format('HH:mm:ss'),
             tempoDentroCercaDesligado: moment.utc(this.tempoDentroCercaDesligado * 1000).format('HH:mm:ss'),
             tempoDentroCercaOcioso: moment.utc(this.tempoDentroCercaOcioso * 1000).format('HH:mm:ss'),
             tempoDentroCercaTrabalhando: moment.utc(this.tempoDentroCercaTrabalhando * 1000).format('HH:mm:ss'),
             porcDentroCerca: parseFloat((100 * this.tempoDentroCerca) / this.tempoTrabalhoAtual),
-            porcForaCerca: parseFloat((100 * this.descolamento) / this.tempoTrabalhoAtual),
+            porcForaCerca: parseFloat((100 * this.tempoDeslocamento) / this.tempoTrabalhoAtual),
             porcDentroCercaOcioso: parseFloat((100 * this.tempoDentroCercaOcioso) / this.tempoTrabalhoAtual),
             porcDentroCercaDesligado: parseFloat((100 * this.tempoDentroCercaDesligado) / this.tempoTrabalhoAtual),
             porcDentroCercaTrabalhando: parseFloat((100 * this.tempoDentroCercaTrabalhando) / this.tempoTrabalhoAtual),
@@ -323,10 +313,10 @@ export const formatLineInMap = {
     segmentLatlngs: null,
     timer: null,
     colorsSpeed: [
-        { color: '#868b00' }, { color: '#00008b' }, { color: 'darkred' }, { color: 'black' }
+        { color: 'yellow' }, { color: 'darkred' }, { color: 'green' }
     ],
 
-    animacao: function (dados, map, callback) {
+    animacao: function (dados, map, velocidadeCorreta , callback) {
         let rota = {
             features: [],
             type: "FeatureCollection"
@@ -364,7 +354,7 @@ export const formatLineInMap = {
         this.timer = window.setInterval(function () {
 
             if (this.indexInterval < this.dados.length) {
-                this.optionIdx = calcColorSpeed(this.dados[this.indexInterval].vl_velocidade);
+                this.optionIdx = calcColorSpeed(this.dados[this.indexInterval].vl_velocidade, velocidadeCorreta);
 
                 if (this.indexInterval === 1) {
                     this.segmentLatlngs = [this.dados[0].lst_localizacao];
@@ -392,7 +382,7 @@ export const formatLineInMap = {
                 this.map.getSource('rota').setData(rotaAtual)
 
                 this.segmentLatlngs = [this.dados[this.indexInterval].lst_localizacao]
-                
+
                 // this.map.panTo(this.segmentLatlngs);
                 callback(this.dados[this.indexInterval])
                 this.indexInterval++;
@@ -403,7 +393,7 @@ export const formatLineInMap = {
         }.bind(this), 10);
     },
 
-    resume: function (dados) {
+    resume: function (dados, velocidadeCorreta) {
         this.dados = dados;
 
         let geojson = {
@@ -411,7 +401,7 @@ export const formatLineInMap = {
             'features': []
         };
         for (let i = 1; i < this.dados.length; ++i) {
-            this.optionIdx = calcColorSpeed(this.dados[i].vl_velocidade);
+            this.optionIdx = calcColorSpeed(this.dados[i].vl_velocidade, velocidadeCorreta);
 
             if (i === 1) {
                 this.segmentLatlngs = [this.dados[0].lst_localizacao];

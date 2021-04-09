@@ -1,21 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import MapBox from '../../Componentes/MapBox/mapbox';
 import Filtro from '../../Componentes/FiltroMapa/FiltroMapa';
 import Carrosel from '../../Componentes/Carrosel/carrosel';
-import InfoConsolidadoMapa from '../../Componentes/InfoConsolidadoMapa/InfoConsolidadoMapa';
-
 
 import { consolidado, formatLineInMap, calcColorSpeed } from "../../helpers/mapHelper"
 import mapboxgl from 'mapbox-gl';
 import StylesControl from 'mapbox-gl-controls/lib/styles';
 import ZoomControl from 'mapbox-gl-controls/lib/zoom';
 
-import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import * as turf from "@turf/turf"
 import api from '../../services/api';
 
-import MarkerSvg from 'maki/icons/marker-15.svg'
 import SocketFulltrack from '../../services/socket'
 
 function MapaGeral(props) {
@@ -23,6 +19,9 @@ function MapaGeral(props) {
   const [posicoes, setPosicoes] = useState([]);
   const [dados, setDados] = useState([]);
   const [cercaConsolidado, setCercaConsolidado] = useState(null);
+
+  const [operacao, setOperacao] = useState({});
+  const [velocidadeOperacao, setVelocidadeOperacao] = useState({});
 
   const [dadosConsolidado, setDadosConsolidado] = useState({
     tempoTrabalho: "00:00:00",
@@ -68,6 +67,10 @@ function MapaGeral(props) {
   };
 
   useEffect(() => {
+    document.querySelector('body').style.overflow = "hidden";
+  }, []);
+
+  useEffect(() => {
 
     if (!map) return
 
@@ -77,8 +80,7 @@ function MapaGeral(props) {
     }
     consolidado.resetConsolidado();
 
-    if (false) {
-
+    if (true) {
       let conso = consolidado.consolidarTodosDados(dados, cercaConsolidado);
 
       if (conso) {
@@ -95,12 +97,11 @@ function MapaGeral(props) {
         }
       }
 
-      let geojson = formatLineInMap.resume(dados, map);
+      let geojson = formatLineInMap.resume(dados, velocidadeOperacao);
 
       if (cercaConsolidado) {
         console.log(Math.round(turf.area(cercaConsolidado) * 100) / 100 + " Area Total");
       }
-
 
       map.addSource('rota', {
         'type': 'geojson',
@@ -122,7 +123,7 @@ function MapaGeral(props) {
       });
 
     } else {
-      formatLineInMap.animacao(dados, map, function (eventoAtual) {
+      formatLineInMap.animacao(dados, map, velocidadeOperacao, function (eventoAtual) {
         let conso = consolidado.consolidarRealTime({ cercaConsolidado, eventoAtual });
 
         if (conso) {
@@ -340,13 +341,15 @@ function MapaGeral(props) {
 
     if (id) {
 
-      let dados = props.location.state;
-      addTalhaoOrdemServico(dados, map);
-      console.log(dados);
+      let operacaoAtual = props.location.state;
+      console.log(operacaoAtual);
+      setVelocidadeOperacao(parseInt(operacaoAtual.osr_velocidade));
+      setOperacao(operacaoAtual)
+      addTalhaoOrdemServico(operacaoAtual, map);
 
       buscarDados({
-        dt_inicial: dados.data_init,
-        dt_final: dados.data_fim,
+        dt_inicial: operacaoAtual.data_init,
+        dt_final: operacaoAtual.data_fim,
         id_ativo: id,
         id_motorista: 0,
         timezone: 'America/Sao_Paulo',
@@ -355,63 +358,65 @@ function MapaGeral(props) {
       })
 
 
-      loadImages(map, imagesMarkers, (images) => {
-        map.addImage('marker-desligado', images['desligado']);
-        map.addImage('marker-ligado', images['ligado']);
-        map.addImage('marker-movimento', images['movimento']);
+      if (operacaoAtual.status === 'andamento') {
+        loadImages(map, imagesMarkers, (images) => {
+          map.addImage('marker-desligado', images['desligado']);
+          map.addImage('marker-ligado', images['ligado']);
+          map.addImage('marker-movimento', images['movimento']);
 
-        var aux = {
-          rotaAtual: [],
-          indexCor: null,
-          coordenadas: [],
-          allFeaturesMarkers: [],
-          featureMarkerAtual: []
-        }
-
-        sourceMarker = {
-          'type': 'FeatureCollection',
-          'features': []
-        }
-
-        map.addSource('markersSymbol', {
-          'type': 'geojson',
-          'data': sourceMarker
-        });
-
-        SocketFulltrack.init((data) => {
-          if (data.ras_eve_aut_id === id) {
-            atualizarMarkerMapa(data, map, aux);
+          var aux = {
+            rotaAtual: [],
+            indexCor: null,
+            coordenadas: [],
+            allFeaturesMarkers: [],
+            featureMarkerAtual: []
           }
+
+          sourceMarker = {
+            'type': 'FeatureCollection',
+            'features': []
+          }
+
+          map.addSource('markersSymbol', {
+            'type': 'geojson',
+            'data': sourceMarker
+          });
+
+          SocketFulltrack.init((data) => {
+            if (data.ras_eve_aut_id === id) {
+              atualizarMarkerMapa(data, map, aux);
+            }
+          })
+
+          map.addLayer({
+            'id': 'markersSymbol',
+            'type': 'symbol',
+            'source': 'markersSymbol',
+            'layout': {
+              'icon-size': 1,
+              'icon-image': ['get', 'image_marker'],
+              'icon-allow-overlap': true,
+              // get the title name from the source's "title" property
+              'text-field': ['get', 'desc_ativo'],
+              'text-font': [
+                'Open Sans Semibold',
+                'Arial Unicode MS Bold'
+              ],
+              // 'text-offset': [0, 1.25],
+              'text-anchor': 'bottom',
+              'text-transform': 'uppercase',
+              'text-letter-spacing': 0.05,
+              'text-offset': [0, 1.5],
+              'icon-offset': [0, -18]
+            },
+            'paint': {
+              'text-color': '#202',
+              'text-halo-color': '#fff',
+              'text-halo-width': 2
+            }
+          });
         })
-
-        map.addLayer({
-          'id': 'markersSymbol',
-          'type': 'symbol',
-          'source': 'markersSymbol',
-          'layout': {
-            'icon-size': 1,
-            'icon-image': ['get', 'image_marker'],
-            'icon-allow-overlap': true,
-            // get the title name from the source's "title" property
-            'text-field': ['get', 'desc_ativo'],
-            'text-font': [
-              'Open Sans Semibold',
-              'Arial Unicode MS Bold'
-            ],
-            // 'text-offset': [0, 1.25],
-            'text-anchor': 'bottom',
-            'text-transform': 'uppercase',
-            'text-letter-spacing': 0.05,
-            'text-offset': [0, 1.5],
-            'icon-offset': [0, -18]
-          },
-          'paint': {
-            'text-color': '#202',
-            'text-halo-color': '#fff',
-            'text-halo-width': 2
-          }
-        });
-      })
+      }
 
       var popup = new mapboxgl.Popup({
         closeButton: false,
@@ -457,7 +462,7 @@ function MapaGeral(props) {
       },
       'properties': {
         'talhao': orderServico.tal_descricao,
-        'cultura':orderServico.cul_descricao
+        'cultura': orderServico.cul_descricao
       }
     }
 
@@ -478,7 +483,7 @@ function MapaGeral(props) {
       'paint': {
         'fill-color': 'white',
         'fill-opacity': 0.1,
-        'fill-outline-color' : 'black'
+        'fill-outline-color': 'black'
       }
     });
 
@@ -494,14 +499,14 @@ function MapaGeral(props) {
     });
 
     // DAR ZOOM NO TALHAO DA ORDEM DE SERVICO
-    // var bounds = coordenadasTalhao[0].reduce(function (bounds, coord) {
-    //   return bounds.extend(coord);
-    // }, new mapboxgl.LngLatBounds(coordenadasTalhao[0][0], coordenadasTalhao[0][0]));
+    var bounds = coordenadasTalhao[0].reduce(function (bounds, coord) {
+      return bounds.extend(coord);
+    }, new mapboxgl.LngLatBounds(coordenadasTalhao[0][0], coordenadasTalhao[0][0]));
 
-    // map.fitBounds(bounds, {
-    //   padding: 20,
-    //   offset: [5, 5]
-    // });
+    map.fitBounds(bounds, {
+      padding: 20,
+      offset: [5, 5]
+    });
   }
 
   function loadImages(map, urls, callback) {
@@ -693,7 +698,7 @@ function MapaGeral(props) {
       <MapBox onStyleData={onStyleData} onStyleLoad={onLoadMap} {...mapOptions} />
       {/* <InfoConsolidadoMapa dados={dadosConsolidado} /> */}
       <Filtro onclickButtonGerar={onclickButtonGerar} />
-      <Carrosel consolidado={dadosConsolidado} />
+      <Carrosel operacao={operacao} consolidado={dadosConsolidado} />
     </>
   );
 }

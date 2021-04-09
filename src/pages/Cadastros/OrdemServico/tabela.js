@@ -52,16 +52,13 @@ const OrdemServicoTabela = () => {
         if (operacao.status === "agendado") {
         history.push(`/cadastros/ordemservico/form/${operacao.osr_id}`);
            
-        } else if (operacao.status === "andamento") {
+        } else if (operacao.status === "andamento" || operacao.status === "finalizado") {
             operacao.data_init = moment(operacao.osr_periodo_ini , "YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY HH:ss:mm");
             operacao.data_fim = moment(operacao.osr_periodo_fim , "YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY HH:ss:mm");
-    
+            
             delete operacao.osr_periodo_ini;
             delete operacao.osr_periodo_fim;
             history.push(`/mapa/${operacao.osr_id_veiculo}`, operacao);
-        } else {
-        console.log('detalhes');
-            
         }
     }
 
