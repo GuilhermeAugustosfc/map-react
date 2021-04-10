@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { DataGrid } from '@material-ui/data-grid';
 import api from '../../../services/api'
 import { useHistory } from "react-router";
 
@@ -25,7 +24,7 @@ const TalhaoTabela = () => {
     }
 
 
-    function onClickTalhao(id) {
+    function onClickEditarTalhao(id) {
         history.push(`/cadastros/talhao/form/${id}`);
     }
 
@@ -44,29 +43,29 @@ const TalhaoTabela = () => {
         <div className="container-talhao">
             <div className="card-talhao card-novo-talhao" onClick={() => onClickNovoTalhao()}>
                 <GoPlus size={150} />
-                <div className="legenda">
-                    <div className="legenda-descricao">
+                <div className="legenda-talhao">
+                    <div className="legenda-talhao-descricao">
                         Novo Talhão
                     </div>
                 </div>
             </div>
             {dadosTalhao.length && dadosTalhao.map((row) => (
-                <div className="card-talhao" key={row.tal_id} onClick={() => onClickTalhao(row.tal_id)}>
-                    <div style={{ display: 'flex' }}>
+                <div className="card-talhao" key={row.tal_id} >
+                    <div style={{ display: 'flex' }} onClick={() => onClickEditarTalhao(row.tal_id)} >
                         {row.tal_imagem ? (
                             <img className="legenda-imagem" width={100} height={100} src={row.tal_imagem} />
                         ) :
                             <img className="legenda-imagem" width={100} height={100} src={"https://adjditec.com/web/skin/img/noimage.jpg"} />
                         }</div>
-                    <div className="legenda">
-                        <div className="legenda-descricao">
+                    <div className="legenda-talhao">
+                        <span className="legenda-talhao-descricao">
                             {row.tal_descricao}
-                        </div>
+                        </span>
                         <div className="legenda-area-util">
                             {row.tal_area_util}
                         </div>
                         <div className="button-talhao" style={{ float: "right" }}>
-                            <button className="btn btn-danger" onClick={() => deleteTalhao(row.tal_id)}><GoTrashcan size={23} /></button>
+                            <GoTrashcan color={'#900000'} onClick={() => deleteTalhao(row.tal_id)} size={23} />
                         </div>
                     </div>
                 </div>

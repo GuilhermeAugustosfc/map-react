@@ -46,10 +46,9 @@
     transform: scale(1.08);
 }
 
-.legenda-descricao {
+.legenda-talhao-descricao {
     text-align: center;
     font-size: 22px;
-    margin-top: 20px;
 }
 
 .legenda-area-util {
@@ -60,4 +59,11 @@
     color: white;
     padding: 5px;
     border-radius: 0px 6px 2px 6px;
+}
+
+.legenda-talhao {
+    margin-top: 19px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }

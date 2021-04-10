@@ -3,7 +3,7 @@ import React, { useRef, useState } from 'react'
 import MapBox from '../../../Componentes/MapBox/mapboxExport';
 
 import mapboxgl from 'mapbox-gl';
-import StylesControl from 'mapbox-gl-controls/lib/styles';
+// import StylesControl from 'mapbox-gl-controls/lib/styles';
 import ZoomControl from 'mapbox-gl-controls/lib/zoom';
 
 import S3 from 'react-aws-s3';
@@ -27,7 +27,10 @@ function TalhaoForm(props) {
     const [id_talhao, setIdTalhao] = useState(0);
     const [fileNameTalhaoEdicao, setFileNameTalhaoEdicao] = useState(null);
 
-
+    const [errorCodigo, setErrorCodigo] = useState("");
+    const [errorDescricao, setErrorDescricao] = useState("");
+    const [errorAreaUtil, setErrorAreaUtil] = useState("");
+    const [errorCoordenadasTalhao, setErrorCoordenadasTalhao] = useState("");
 
     const [map, setMap] = useState(null);
     const selecionarFileRef = useRef(null);
@@ -45,15 +48,16 @@ function TalhaoForm(props) {
     })
 
 
-    function atualizaDadosEdicao(talhao) {
+    function updateDataEdit(map, talhao, draw) {
         setAreaUtil(talhao.tal_area_util);
         setCodigo(talhao.tal_codigo || 0);
         setDescricao(talhao.tal_descricao);
         setFileNameTalhaoEdicao(talhao.tal_imagem ? talhao.tal_imagem.split("talhao/")[1] : null);
 
         if (talhao.tal_coordenada) {
-            setCoordenadasTalhao(talhao.tal_coordenada);
             let coordinates = JSON.parse(talhao.tal_coordenada);
+            coordinates = coordinates.length == 1 ? coordinates : [coordinates];
+            setCoordenadasTalhao(JSON.stringify(coordinates));
 
             let feature = {
                 'type': 'Feature',
@@ -66,6 +70,7 @@ function TalhaoForm(props) {
                     'area': talhao.tal_area_util
                 }
             }
+
             draw.add(feature);
 
             var bounds = coordinates[0].reduce(function (bounds, coord) {
@@ -83,7 +88,7 @@ function TalhaoForm(props) {
 
         setMap(map);
 
-        addMapBoxControll(map);
+        var newDraw = addMapBoxControll(map);
 
         let { id } = props.match.params;
 
@@ -93,33 +98,33 @@ function TalhaoForm(props) {
 
             api.get(`http://f-agro-api.fulltrackapp.com/talhao/${id}`, {}, ({ data }) => {
                 var talhao = data[0];
-                atualizaDadosEdicao(talhao)
+                updateDataEdit(map, talhao, newDraw)
 
             })
         }
     }
 
     function addMapBoxControll(map) {
-        map.addControl(new StylesControl({
-            styles: [
-                {
-                    label: 'Streets',
-                    styleName: 'Mapbox Streets',
-                    styleUrl: 'mapbox://styles/mapbox/streets-v9',
-                },
-                {
-                    label: 'Satellite',
-                    styleName: 'Satellite',
-                    styleUrl: 'mapbox://styles/mapbox/satellite-v9',
+        // map.addControl(new StylesControl({
+        //     styles: [
+        //         {
+        //             label: 'Streets',
+        //             styleName: 'Mapbox Streets',
+        //             styleUrl: 'mapbox://styles/mapbox/streets-v9',
+        //         },
+        //         {
+        //             label: 'Satellite',
+        //             styleName: 'Satellite',
+        //             styleUrl: 'mapbox://styles/mapbox/satellite-v9',
 
-                },
-                {
-                    label: 'Terreno',
-                    styleName: 'Terreno',
-                    styleUrl: 'mapbox://styles/mapbox-map-design/ckhqrf2tz0dt119ny6azh975y',
-                },
-            ],
-        }), 'top-left');
+        //         },
+        //         {
+        //             label: 'Terreno',
+        //             styleName: 'Terreno',
+        //             styleUrl: 'mapbox://styles/mapbox-map-design/ckhqrf2tz0dt119ny6azh975y',
+        //         },
+        //     ],
+        // }), 'top-left');
 
         var newDraw = new MapboxDraw({
             displayControlsDefault: false,
@@ -178,6 +183,8 @@ function TalhaoForm(props) {
 
         map.on('draw.create', () => updateTalhao(map, newDraw));
         map.on('draw.update', () => updateTalhao(map, newDraw));
+
+        return newDraw;
     }
 
     function updateTalhao(map, draw) {
@@ -224,59 +231,99 @@ function TalhaoForm(props) {
         return retVal.split('.').join('').split(' ').join('').split(',').join('').split('_').join('');
     };
 
+    function clearInput() {
+        setErrorCodigo(null);
+        setErrorDescricao(null);
+        setErrorAreaUtil(null);
+        setErrorCoordenadasTalhao(null);
 
-    function saveTalhao() {
-
-        var img = map.getCanvas().toDataURL();
-        var Data = new Date();
-        var filename = fileNameTalhaoEdicao ? fileNameTalhaoEdicao : generateHash(`${descricao}_talhao.png` + Data.getHours.toString()
-            + Data.getMinutes().toString() + Data.getSeconds().toString()
-            + Data.getMilliseconds().toString() + Math.floor(Math.random() * 500));
-
-        var file = dataURLtoFile(img, filename);
-
-        const ReactS3Client = new S3({
-            bucketName: process.env.REACT_APP_BUCKET_NAME,
-            accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-            secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
-            region: process.env.REACT_APP_AWS_DEFAULT_REGION,
-            dirName: process.env.REACT_APP_DIR_NAME
-        });
-
-        ReactS3Client.uploadFile(file, filename).then(({ location }) => {
-            if (id_talhao > 0) {
-                // PUT REQUETS ONLY JSON DATA
-                api.put(`http://f-agro-api.fulltrackapp.com/talhao/${id_talhao}/`, {
-                    tal_codigo: codigo,
-                    tal_descricao: descricao,
-                    tal_area_util: areaUtil,
-                    tal_coordenada: coordenadasTalhao,
-                    tal_imagem: location
-                }, (res) => {
-                    history.push(`/cadastros/talhao`);
-                })
-
-            } else {
-                // POST REQUETS ONLY FORM DATA
-
-                let form = new FormData();
-                form.append('tal_codigo', codigo);
-                form.append('tal_descricao', descricao);
-                form.append('tal_area_util', areaUtil);
-                form.append('tal_coordenada', coordenadasTalhao);
-                form.append('tal_imagem', location);
-
-                api.post('http://f-agro-api.fulltrackapp.com/talhao/', form, (res) => {
-                    history.push(`/cadastros/talhao`);
-                })
-            }
-        }).catch((error) => {
-            console.log('errro upload s3');
-            console.log(error);
-        });
     }
 
-    function voltarform() {
+    function validData() {
+
+        clearInput();
+        var valid = true;
+        if (parseInt(codigo) <= 0) {
+            setErrorCodigo("Codigo é obrigatorio*");
+            valid = false;
+        }
+
+        if (!descricao || descricao.length == 0) {
+            setErrorDescricao("Descrição é obrigatorio*");
+            valid = false;
+
+        }
+
+        if (!areaUtil || areaUtil <= 0) {
+            setErrorAreaUtil("Area é obrigatoria*");
+            valid = false;
+
+        }
+
+        if (!coordenadasTalhao || coordenadasTalhao.length <= 0) {
+            setErrorCoordenadasTalhao("Por favor desenhe o talhão ou import um shapefile*");
+            valid = false;
+        }
+
+        return valid;
+    }
+
+
+    function saveTalhao() {
+        if (validData()) {
+            var img = map.getCanvas().toDataURL();
+            var Data = new Date();
+            var filename = fileNameTalhaoEdicao ? fileNameTalhaoEdicao : generateHash(`${descricao}_talhao.png` + Data.getHours.toString()
+                + Data.getMinutes().toString() + Data.getSeconds().toString()
+                + Data.getMilliseconds().toString() + Math.floor(Math.random() * 500));
+
+            var file = dataURLtoFile(img, filename);
+
+            const ReactS3Client = new S3({
+                bucketName: process.env.REACT_APP_BUCKET_NAME,
+                accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+                secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+                region: process.env.REACT_APP_AWS_DEFAULT_REGION,
+                dirName: process.env.REACT_APP_DIR_NAME
+            });
+
+            ReactS3Client.uploadFile(file, filename).then(({ location }) => {
+                if (id_talhao > 0) {
+                    // PUT REQUETS ONLY JSON DATA
+                    api.put(`http://f-agro-api.fulltrackapp.com/talhao/${id_talhao}/`, {
+                        tal_codigo: codigo,
+                        tal_descricao: descricao,
+                        tal_area_util: areaUtil,
+                        tal_coordenada: coordenadasTalhao,
+                        tal_imagem: location
+                    }, (res) => {
+                        history.push(`/cadastros/talhao`);
+                    })
+
+                } else {
+                    // POST REQUETS ONLY FORM DATA
+
+                    let form = new FormData();
+                    form.append('tal_codigo', codigo);
+                    form.append('tal_descricao', descricao);
+                    form.append('tal_area_util', areaUtil);
+                    form.append('tal_coordenada', coordenadasTalhao);
+                    form.append('tal_imagem', location);
+
+                    api.post('http://f-agro-api.fulltrackapp.com/talhao/', form, (res) => {
+                        history.push(`/cadastros/talhao`);
+                    })
+                }
+            }).catch((error) => {
+                console.log('errro upload s3');
+                console.log(error);
+            });
+        }
+
+
+    }
+
+    function backForm() {
         history.push(`/cadastros/talhao`);
     }
 
@@ -333,18 +380,23 @@ function TalhaoForm(props) {
                 <div className="input-group">
                     <label>Descrição do talhão</label>
                     <input className="form-control" value={descricao} type="text" alt="digite a descricao do talhao" placeholder="Digite a descrição do talhao" onChange={(e) => setDescricao(e.target.value)} />
+                    <p className="error-input">{errorDescricao}</p>
                 </div>
                 <div className="input-group">
                     <label>Codigo</label>
                     <input className="form-control" value={codigo} type="text" alt="digite o codigo do talhao" placeholder="Digite o codigo do talhao" onChange={(e) => setCodigo(e.target.value)} />
+                    <p className="error-input">{errorCodigo}</p>
+
                 </div>
                 <div className="input-group">
                     <label>Area util</label>
                     <input className="form-control" value={areaUtil} type="number" alt="digite A area util" placeholder="Digite a area util" onChange={(e) => setAreaUtil(e.target.value)} />
+                    <p className="error-input">{errorAreaUtil}</p>
+
                 </div>
                 <div className="input-button">
                     <button className="btn btn-primary" id="btn-salvar" onClick={saveTalhao}>Salvar</button>
-                    <button className="btn btn-warning" id="btn-cancelar" onClick={voltarform}>Cancelar</button>
+                    <button className="btn btn-warning" id="btn-cancelar" onClick={backForm}>Cancelar</button>
                 </div>
             </div>
 
@@ -358,6 +410,8 @@ function TalhaoForm(props) {
 
             <div className="col-md-12 container-mapa">
                 <h3>Desenhe a area do talhão</h3>
+                <p className="error-input">{errorCoordenadasTalhao}</p>
+
                 <div className="mapa">
                     <MapBox onStyleLoad={onLoadMap} {...mapOptions} />
                 </div>

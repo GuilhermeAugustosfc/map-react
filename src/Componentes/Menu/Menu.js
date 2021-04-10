@@ -21,6 +21,7 @@ import "./Menu.css"
 
 export default function Menu({ children }) {
     const [open, setOpen] = React.useState(false);
+    const menuRef = React.useRef(null);
 
     const toggleDrawer = (open) => (event) => {
         if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -58,8 +59,8 @@ export default function Menu({ children }) {
             </List>
             <List>
                 <ListItem button key={'mapa'}>
-                    <ListItemIcon> 
-                        <GoGlobe color={'green'} size={25} /> 
+                    <ListItemIcon>
+                        <GoGlobe color={'green'} size={25} />
                     </ListItemIcon>
                     <Link to="/mapa" className="link-menu">
                         <ListItemText primary={'MAPA'} />
@@ -68,8 +69,8 @@ export default function Menu({ children }) {
             </List>
             <List>
                 <ListItem button key={'ordemservico'}>
-                    <ListItemIcon> 
-                        <GoCalendar color={'black'} size={25} /> 
+                    <ListItemIcon>
+                        <GoCalendar color={'black'} size={25} />
                     </ListItemIcon>
                     <Link to="/cadastros/ordemservico" className="link-menu">
                         <ListItemText primary={'ORDEM DE SERVIÇO'} />
@@ -78,8 +79,8 @@ export default function Menu({ children }) {
             </List>
             <List>
                 <ListItem button key={'talhao'}>
-                    <ListItemIcon> 
-                        <GoFileMedia color={'darkblue'} size={25} /> 
+                    <ListItemIcon>
+                        <GoFileMedia color={'darkblue'} size={25} />
                     </ListItemIcon>
                     <Link to="/cadastros/talhao" className="link-menu">
                         <ListItemText primary={'TALHÃO'} />
@@ -88,8 +89,8 @@ export default function Menu({ children }) {
             </List>
             <List>
                 <ListItem button key={'tabela'}>
-                    <ListItemIcon> 
-                        <GoNote color={'black'} size={25} /> 
+                    <ListItemIcon>
+                        <GoNote color={'black'} size={25} />
                     </ListItemIcon>
                     <Link to="/tabela" className="link-menu">
                         <ListItemText primary={'TABELA'} />
@@ -99,22 +100,20 @@ export default function Menu({ children }) {
         </div>
     )
     return (
-        <div>
-            <React.Fragment key={'left'}>
-                <NavBar />
-                <SwipeableDrawer
-                    anchor={'left'}
-                    open={open}
-                    onClose={toggleDrawer(false)}
-                    onOpen={toggleDrawer(true)}
-                >
-                    <MenuLateral />
-                </SwipeableDrawer>
+        <React.Fragment key={'left'}>
+            <NavBar />
+            <SwipeableDrawer
+                anchor={'left'}
+                open={open}
+                onClose={toggleDrawer(false)}
+                onOpen={toggleDrawer(true)}
+            >
+                <MenuLateral />
+            </SwipeableDrawer>
 
-                <div className="container-app">
-                    {children}
-                </div>
-            </React.Fragment>
-        </div>
+            <div className="container-app" ref={menuRef}>
+                {children}
+            </div>
+        </React.Fragment>
     );
 }

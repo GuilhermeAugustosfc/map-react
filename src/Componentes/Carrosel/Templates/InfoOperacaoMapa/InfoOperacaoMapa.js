@@ -13,35 +13,31 @@ const InfoOperacaoMapa = function ({ operacao }) {
             {operacao.ope_descricao}
         </div>
         <div className="bloco-operacao">
-            <div>
-                <div className="info-operacao">
-                    <strong><GiFireTail size={25} color={'yellow'} /></strong><p> {operacao.cul_descricao}</p>
-                </div>
-                <div className="info-operacao">
-                    <strong><AiFillCar size={25} color={'#2f7eff'} /> </strong><p> {operacao.osr_veiculo}</p>
-                </div>
+            <div className="info-operacao">
+                <strong>Cultura: </strong> {operacao.cul_descricao}
             </div>
-            <div>
-                <div className="info-operacao">
-                    <strong><IoIosSpeedometer size={25} color={'#5ccd5c'} /> </strong><p> {operacao.osr_velocidade}</p>
-                </div>
-                <div className="info-operacao">
-                    <strong><GiFarmer size={25} color={'#b7b7b7'} /> </strong><p> {operacao.osr_motorista}</p>
-                </div>
+            <div className="info-operacao">
+                <strong>Veiculo: </strong> {operacao.osr_veiculo}
+            </div>
+            <div className="info-operacao">
+                <strong>Velocidade: </strong> {operacao.osr_velocidade}
+            </div>
+            <div className="info-operacao">
+                <strong>Motorista: </strong> {operacao.osr_motorista}
+            </div>
+            <div className="info-operacao">
+                <strong>Implemento: </strong> {operacao.imp_descricao}
+            </div>
+            <div className="info-operacao">
+                <strong>Talhão: </strong> {operacao.tal_descricao}
+            </div>
+            <div className="info-operacao">
+                Periodo: {operacao.data_init} - {operacao.data_fim}
+            </div>
+            <div className="info-operacao">
+                <strong>Status: </strong> {operacao.status}
             </div>
         </div>
-
-
-        <div className="info-operacao">
-            <strong><GiFarmTractor size={25} color={'blanchedalmond'} /> </strong><p> {operacao.imp_descricao}</p>
-        </div>
-        <div className="info-operacao">
-            <p> {operacao.data_init} - {operacao.data_fim}</p>
-        </div>
-        <div className="info-operacao">
-            <strong>Status: </strong><p> {operacao.status}</p>
-        </div>
-
     </div>
 }
 
