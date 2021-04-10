@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react'
-import MapBox from '../../../Componentes/MapBox/mapboxExport';
+import MapBox from '../../../Componentes/MapBox/mapbox';
 import mapboxgl from 'mapbox-gl';
 import ZoomControl from 'mapbox-gl-controls/lib/zoom';
 import { useHistory } from "react-router";
@@ -80,6 +80,8 @@ function OrderServicoForm(props) {
             let talhaoSelecionado = parseInt(idTalhao) > 0 ? talhoes.filter((talhao) => idTalhao === talhao.tal_id)[0] : talhoes[0];
             let coordenadasTalhao = JSON.parse(talhaoSelecionado.tal_coordenada);
 
+            console.log(map);
+            console.log(talhoes);
             let feature = {
                 'type': 'Feature',
                 'geometry': {
