@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import MapBox from '../../Componentes/MapBox/mapbox';
 import Filtro from '../../Componentes/FiltroMapa/FiltroMapa';
@@ -6,7 +6,6 @@ import Carrosel from '../../Componentes/Carrosel/carrosel';
 
 import { consolidado, formatLineInMap, calcColorSpeed } from "../../helpers/mapHelper"
 import mapboxgl from 'mapbox-gl';
-import StylesControl from 'mapbox-gl-controls/lib/styles';
 import ZoomControl from 'mapbox-gl-controls/lib/zoom';
 
 import * as turf from "@turf/turf"
@@ -52,8 +51,7 @@ function MapaGeral(props) {
   })
 
   var popups = [];
-  var draw = null;
-  var markersOciosos = [];
+  var markersOciosos = useRef([]);
   var ultimaPosicaoVeiculo = {};
 
   var sourceLine = {};
@@ -78,71 +76,60 @@ function MapaGeral(props) {
       map.removeLayer('rota');
       map.removeSource('rota');
     }
+
     consolidado.resetConsolidado();
 
-    if (true) {
-      let conso = consolidado.consolidarTodosDados(dados, cercaConsolidado);
+    let conso = consolidado.consolidarTodosDados(dados, cercaConsolidado);
 
-      if (conso) {
-        setDadosConsolidado(conso);
-        markersOciosos = [];
-        if (conso.posicoesOciosas.length) {
-          for (var i in conso.posicoesOciosas) {
-            markersOciosos.push(
-              new mapboxgl.Marker({ color: 'orange' })
-                .setLngLat(conso.posicoesOciosas[i])
-                .addTo(map)
-            )
-          }
+    if (conso) {
+      setDadosConsolidado(conso);
+
+      if (markersOciosos.current.length > 0) {
+        for (var i in markersOciosos.current) {
+          markersOciosos.current[i].remove();
         }
+
+        markersOciosos.current = [];
       }
 
-      let geojson = formatLineInMap.resume(dados, velocidadeOperacao);
-
-      if (cercaConsolidado) {
-        console.log(Math.round(turf.area(cercaConsolidado) * 100) / 100 + " Area Total");
+      
+      if (conso.posicoesOciosas.length) {
+        for (var j in conso.posicoesOciosas) {
+          markersOciosos.current.push(
+            new mapboxgl.Marker({ color: 'orange' })
+              .setLngLat(conso.posicoesOciosas[j])
+              .addTo(map)
+          )
+        }
       }
-
-      map.addSource('rota', {
-        'type': 'geojson',
-        'data': geojson,
-      });
-
-      map.addLayer({
-        'id': 'rota',
-        'type': 'line',
-        'source': 'rota',
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round',
-        },
-        'paint': {
-          'line-color': ['get', 'color'],
-          'line-width': 3,
-        }
-      });
-
-    } else {
-      formatLineInMap.animacao(dados, map, velocidadeOperacao, function (eventoAtual) {
-        let conso = consolidado.consolidarRealTime({ cercaConsolidado, eventoAtual });
-
-        if (conso) {
-
-          setDadosConsolidado(conso);
-
-          markersOciosos = [];
-          if (conso.posicoesOciosas.length) {
-            markersOciosos.push(
-              new mapboxgl.Marker({ color: 'orange' })
-                .setLngLat(conso.posicoesOciosas)
-                .addTo(map)
-            )
-          }
-        }
-
-      });
     }
-  }, [dados])
+
+    let geojson = formatLineInMap.resume(dados, velocidadeOperacao);
+
+    if (cercaConsolidado) {
+      console.log(Math.round(turf.area(cercaConsolidado) * 100) / 100 + " Area Total");
+    }
+
+    map.addSource('rota', {
+      'type': 'geojson',
+      'data': geojson,
+    });
+
+    map.addLayer({
+      'id': 'rota',
+      'type': 'line',
+      'source': 'rota',
+      'layout': {
+        'line-join': 'round',
+        'line-cap': 'round',
+      },
+      'paint': {
+        'line-color': ['get', 'color'],
+        'line-width': 3,
+      }
+    });
+
+  }, [dados, cercaConsolidado, map, velocidadeOperacao])
 
   useEffect(() => {
 
@@ -156,7 +143,7 @@ function MapaGeral(props) {
       padding: 20
     });
 
-  }, [posicoes])
+  }, [posicoes, map])
 
   function atualizarMarkerMapa(data, map, aux) {
 
@@ -302,31 +289,31 @@ function MapaGeral(props) {
     })
   }
 
-  async function getlayerFazenda(map) {
-    let retorno = await fetch("https://fulltrackstatic.s3.amazonaws.com/anuncio/Ce3jaao765n5Rry37CeeCsf99o99euufyyar951ssa57j749-pt-br.json");
-    let geojson = await retorno.json();
+  // async function getlayerFazenda(map) {
+  //   let retorno = await fetch("https://fulltrackstatic.s3.amazonaws.com/anuncio/Ce3jaao765n5Rry37CeeCsf99o99euufyyar951ssa57j749-pt-br.json");
+  //   let geojson = await retorno.json();
 
 
-    // ADD LAYERS DA FAZENDA (MAPA)
-    map.addSource('fazenda', {
-      'type': 'geojson',
-      'data': geojson,
-    });
+  //   // ADD LAYERS DA FAZENDA (MAPA)
+  //   map.addSource('fazenda', {
+  //     'type': 'geojson',
+  //     'data': geojson,
+  //   });
 
-    map.addLayer({
-      'id': 'fazenda',
-      'type': 'line',
-      'source': 'fazenda',
-      'layout': {
-        'line-join': 'round',
-        'line-cap': 'round'
-      },
-      'paint': {
-        'line-color': '#888',
-        'line-width': 1,
-      }
-    });
-  }
+  //   map.addLayer({
+  //     'id': 'fazenda',
+  //     'type': 'line',
+  //     'source': 'fazenda',
+  //     'layout': {
+  //       'line-join': 'round',
+  //       'line-cap': 'round'
+  //     },
+  //     'paint': {
+  //       'line-color': '#888',
+  //       'line-width': 1,
+  //     }
+  //   });
+  // }
 
   async function onLoadMap(map) {
 

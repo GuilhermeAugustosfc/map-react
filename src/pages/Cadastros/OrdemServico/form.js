@@ -122,7 +122,7 @@ function OrderServicoForm(props) {
             });
 
         }
-    }, [talhoes, idTalhao])
+    }, [talhoes, idTalhao, map])
 
     function onLoadMap(map) {
 

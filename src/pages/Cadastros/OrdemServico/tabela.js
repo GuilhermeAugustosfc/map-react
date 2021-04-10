@@ -16,7 +16,6 @@ const OrdemServicoTabela = () => {
 
     useEffect(() => {
         api.get('http://f-agro-api.fulltrackapp.com/ordemservico/', {}, ({ data }) => {
-            var form = new FormData();
             setDadosOrdemServico(data);
         })
     }, []);
@@ -76,9 +75,9 @@ const OrdemServicoTabela = () => {
                 <div className="card-ordemservico" key={row.osr_id} onClick={() => clickOrdemServico(row)}>
                     <div style={{ display: 'flex' }}>
                         {row.tal_imagem ? (
-                            <img className="image-talhao-order-servico" width={100} height={100} src={row.tal_imagem} />
+                            <img className="image-talhao-order-servico" alt="imagem-talhao" width={100} height={100} src={row.tal_imagem} />
                         ) :
-                            <img className="image-talhao-order-servico" width={100} height={100} src={"https://adjditec.com/web/skin/img/noimage.jpg"} />
+                            <img className="image-talhao-order-servico" alt="imagem-talhao" width={100} height={100} src={"https://adjditec.com/web/skin/img/noimage.jpg"} />
                         }</div>
                     <div className="legenda">
                         <div className="legenda-talhao-order-servico">

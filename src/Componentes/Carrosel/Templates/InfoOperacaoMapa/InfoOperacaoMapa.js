@@ -1,10 +1,5 @@
 import React from 'react';
 import './InfoOperacaoMapa.css'
-import { AiFillCar } from "react-icons/ai";
-import { IoIosSpeedometer } from "react-icons/io";
-import { GiFarmer, GiFarmTractor, GiFireTail } from "react-icons/gi";
-
-
 
 const InfoOperacaoMapa = function ({ operacao }) {
 

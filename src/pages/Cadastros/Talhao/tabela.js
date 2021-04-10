@@ -53,9 +53,9 @@ const TalhaoTabela = () => {
                 <div className="card-talhao" key={row.tal_id} >
                     <div style={{ display: 'flex' }} onClick={() => onClickEditarTalhao(row.tal_id)} >
                         {row.tal_imagem ? (
-                            <img className="legenda-imagem" width={100} height={100} src={row.tal_imagem} />
+                            <img className="legenda-imagem" alt="imagem-talhao" width={100} height={100} src={row.tal_imagem} />
                         ) :
-                            <img className="legenda-imagem" width={100} height={100} src={"https://adjditec.com/web/skin/img/noimage.jpg"} />
+                            <img className="legenda-imagem" alt="imagem-talhao" width={100} height={100} src={"https://adjditec.com/web/skin/img/noimage.jpg"} />
                         }</div>
                     <div className="legenda-talhao">
                         <span className="legenda-talhao-descricao">

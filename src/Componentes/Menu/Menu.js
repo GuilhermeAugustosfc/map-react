@@ -60,7 +60,7 @@ export default function Menu({ children }) {
             <List>
                 <ListItem button key={'mapa'}>
                     <ListItemIcon>
-                        <GoGlobe color={'green'} size={25} />
+                        <GoGlobe color={'black'} size={25} />
                     </ListItemIcon>
                     <Link to="/mapa" className="link-menu">
                         <ListItemText primary={'MAPA'} />
@@ -80,7 +80,7 @@ export default function Menu({ children }) {
             <List>
                 <ListItem button key={'talhao'}>
                     <ListItemIcon>
-                        <GoFileMedia color={'darkblue'} size={25} />
+                        <GoFileMedia color={'black'} size={25} />
                     </ListItemIcon>
                     <Link to="/cadastros/talhao" className="link-menu">
                         <ListItemText primary={'TALHÃO'} />

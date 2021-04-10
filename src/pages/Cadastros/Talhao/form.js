@@ -56,7 +56,7 @@ function TalhaoForm(props) {
 
         if (talhao.tal_coordenada) {
             let coordinates = JSON.parse(talhao.tal_coordenada);
-            coordinates = coordinates.length == 1 ? coordinates : [coordinates];
+            coordinates = coordinates.length === 1 ? coordinates : [coordinates];
             setCoordenadasTalhao(JSON.stringify(coordinates));
 
             let feature = {
@@ -248,7 +248,7 @@ function TalhaoForm(props) {
             valid = false;
         }
 
-        if (!descricao || descricao.length == 0) {
+        if (!descricao || descricao.length === 0) {
             setErrorDescricao("Descrição é obrigatorio*");
             valid = false;
 
@@ -350,7 +350,7 @@ function TalhaoForm(props) {
             debugger
 
             if (coordenadasShapefile.length > 0) {
-                coordenadasShapefile = coordenadasShapefile.length == 1 ? coordenadasShapefile : [coordenadasShapefile];
+                coordenadasShapefile = coordenadasShapefile.length === 1 ? coordenadasShapefile : [coordenadasShapefile];
             }
 
             geojson.features[0].geometry.coordinates = coordenadasShapefile;

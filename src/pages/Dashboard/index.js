@@ -12,7 +12,6 @@ import * as turf from "@turf/turf"
 import SocketFulltrack from '../../services/socket'
 
 function Dashboard(props) {
-    const [map, setMap] = useState(null);
 
     const [mapOptions, setMapOptions] = useState({
         center: [-49.654063, -22.215288],
@@ -73,8 +72,6 @@ function Dashboard(props) {
     function onLoadMap(map) {
 
         // ADD CAMADA DOM MAPA
-        setMap(map);
-
         addMapBoxControll(map);
 
         loadImages(map, imagesMarkers, (images) => {
