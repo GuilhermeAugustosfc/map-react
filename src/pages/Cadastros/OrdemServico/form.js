@@ -114,6 +114,8 @@ function OrderServicoForm(props) {
                 }
             });
 
+            console.log(map.getLayer('talhao'));
+
             var bounds = coordenadasTalhao[0].reduce(function (bounds, coord) {
                 return bounds.extend(coord);
             }, new mapboxgl.LngLatBounds(coordenadasTalhao[0][0], coordenadasTalhao[0][0]));

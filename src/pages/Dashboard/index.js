@@ -40,6 +40,8 @@ function Dashboard(props) {
         aux.coordenadas = [parseFloat(data.ras_eve_longitude), parseFloat(data.ras_eve_latitude)];
 
         if (sourceMarkerIndex.hasOwnProperty(data.ras_vei_id)) {
+            console.log('marker ja registrado');
+            console.log(map.getSource('markersSymbol'));
             aux.allFeaturesMarkers = map.getSource('markersSymbol')._data;
             aux.featureMarkerAtual = aux.allFeaturesMarkers.features[sourceMarkerIndex[data.ras_vei_id]];
 
@@ -65,6 +67,8 @@ function Dashboard(props) {
                 ignicao: data.ras_eve_ignicao,
             }))
 
+            console.log('marker novo');
+            console.log(map.getSource('markersSymbol'));
             map.getSource('markersSymbol').setData(sourceMarker)
         }
     }
@@ -95,10 +99,10 @@ function Dashboard(props) {
                 'data': sourceMarker
             });
 
-            SocketFulltrack.init((data) => {
-                console.log(data);
-                atualizarMarkerMapa(data, map, aux);
-            })
+            console.log('add source');
+            console.log(map.getSource('markersSymbol'));
+
+           
 
             map.addLayer({
                 'id': 'markersSymbol',
@@ -127,6 +131,15 @@ function Dashboard(props) {
                     'text-halo-width': 2
                 }
             });
+
+            console.log('add layer');
+            console.log(map.getLayer('markersSymbol'));
+
+            SocketFulltrack.init((data) => {
+                atualizarMarkerMapa(data, map, aux);
+            })
+
+            
         })
 
         var popup = new mapboxgl.Popup({
