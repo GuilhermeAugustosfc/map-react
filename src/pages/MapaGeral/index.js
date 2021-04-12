@@ -79,61 +79,57 @@ function MapaGeral(props) {
 
     consolidado.resetConsolidado();
 
-    let conso = consolidado.consolidarTodosDados(dados, cercaConsolidado);
+    if (dados.length) {
+      let conso = consolidado.consolidarTodosDados(dados, cercaConsolidado);
 
-    if (conso) {
-      setDadosConsolidado(conso);
+      if (conso) {
+        setDadosConsolidado(conso);
 
-      if (markersOciosos.current.length > 0) {
-        for (var i in markersOciosos.current) {
-          markersOciosos.current[i].remove();
+        if (markersOciosos.current.length > 0) {
+          for (var i in markersOciosos.current) {
+            markersOciosos.current[i].remove();
+          }
+
+          markersOciosos.current = [];
         }
 
-        markersOciosos.current = [];
-      }
-
-      
-      if (conso.posicoesOciosas.length) {
-        for (var j in conso.posicoesOciosas) {
-          markersOciosos.current.push(
-            new mapboxgl.Marker({ color: 'orange' })
-              .setLngLat(conso.posicoesOciosas[j])
-              .addTo(map)
-          )
+        if (conso.posicoesOciosas.length) {
+          for (var j in conso.posicoesOciosas) {
+            markersOciosos.current.push(
+              new mapboxgl.Marker({ color: 'orange' })
+                .setLngLat(conso.posicoesOciosas[j])
+                .addTo(map)
+            )
+          }
         }
       }
+
+      let geojson = formatLineInMap.resume(dados, velocidadeOperacao);
+
+      map.addSource('rota', {
+        'type': 'geojson',
+        'data': geojson,
+      });
+
+      map.addLayer({
+        'id': 'rota',
+        'type': 'line',
+        'source': 'rota',
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round',
+        },
+        'paint': {
+          'line-color': ['get', 'color'],
+          'line-width': 3,
+        }
+      });
     }
-
-    let geojson = formatLineInMap.resume(dados, velocidadeOperacao);
-
-    if (cercaConsolidado) {
-      console.log(Math.round(turf.area(cercaConsolidado) * 100) / 100 + " Area Total");
-    }
-
-    map.addSource('rota', {
-      'type': 'geojson',
-      'data': geojson,
-    });
-
-    map.addLayer({
-      'id': 'rota',
-      'type': 'line',
-      'source': 'rota',
-      'layout': {
-        'line-join': 'round',
-        'line-cap': 'round',
-      },
-      'paint': {
-        'line-color': ['get', 'color'],
-        'line-width': 3,
-      }
-    });
-
   }, [dados, cercaConsolidado, map, velocidadeOperacao])
 
   useEffect(() => {
 
-    if (!map) return
+    if (!map || !posicoes.length) return
 
     var bounds = posicoes.reduce(function (bounds, coord) {
       return bounds.extend(coord);

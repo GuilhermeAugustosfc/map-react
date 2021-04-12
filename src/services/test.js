@@ -61,6 +61,13 @@ export default Mapbox;
 // });
 
 
+// CALCULAR AREA DA CERCA
+
+
+// if (cercaConsolidado) {
+//   console.log(Math.round(turf.area(cercaConsolidado) * 100) / 100 + " Area Total");
+// }
+
   // CASO FOR MONTAR A LINHA COMO POLYGON (VER O TANTO QUE FOI FEITO NO TALHAO)
 
     // let cercaRotaAtual = {

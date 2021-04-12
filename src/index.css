@@ -5,3 +5,7 @@ html, body {
     font-family: 'roboto';
     font-size: 16px;
 }
+
+.error-input {
+    color: #d20404;
+}

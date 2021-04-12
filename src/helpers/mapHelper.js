@@ -37,6 +37,23 @@ export const consolidado = {
     posicoesOciosas: [],
     posicoesDeslocamento: [],
     posicoesTrabalhando: [],
+    consolidado: {
+        tempoTrabalho: "00:00:00",
+        deslocamento: "00:00:00",
+        tempoDentroCerca: "00:00:00",
+        tempoDentroCercaDesligado: "00:00:00",
+        tempoDentroCercaOcioso: "00:00:00",
+        tempoDentroCercaTrabalhando: "00:00:00",
+        porcDentroCerca: 0,
+        porcForaCerca: 0,
+        porcDentroCercaOcioso: 0,
+        porcDentroCercaDesligado: 0,
+        porcDentroCercaTrabalhando: 0,
+        posicoesDesligadas: [],
+        posicoesOciosas: [],
+        posicoesDeslocamento: [],
+        posicoesTrabalhando: [],
+    },
     resetConsolidado: function () {
         this.tempoTrabalho = 0;
         this.tempoDentroCerca = 0;
@@ -196,13 +213,7 @@ export const consolidado = {
     },
     consolidarTodosDados: function (dados, cercaConsolidado) {
         if (!dados.length) {
-            return {
-                tempoTrabalho: "00:00:000",
-                deslocamento: "00:00:00",
-                tempoDentroCerca: "00:00:00",
-                porcDentroCerca: 0,
-                porcForaCerca: 0
-            }
+            return this.consolidado
         }
 
         if (!cercaConsolidado) {
@@ -280,8 +291,7 @@ export const consolidado = {
         this.dtInicialSeg = new Date(moment(dados[0].dt_gps, "DD/MM/YYYY HH:m:ss").format("YYYY-MM-DD HH:m:ss"));
         this.tempoTrabalhoAtual = ((this.dtFinalSeg - this.dtInicialSeg) / 1000);
 
-
-        return {
+        this.consolidado = {
             tempoTrabalho: moment.utc(this.tempoTrabalhoAtual * 1000).format('HH:mm:ss'),
             deslocamento: moment.utc(this.tempoDeslocamento * 1000).format('HH:mm:ss'),
             tempoDentroCerca: moment.utc(this.tempoDentroCerca * 1000).format('HH:mm:ss'),
@@ -298,6 +308,8 @@ export const consolidado = {
             posicoesDeslocamento: this.posicoesDeslocamento,
             posicoesTrabalhando: this.posicoesTrabalhando
         }
+
+        return this.consolidado
     }
 }
 
@@ -394,6 +406,7 @@ export const formatLineInMap = {
     },
 
     resume: function (dados, velocidadeCorreta) {
+
         this.dados = dados;
 
         let geojson = {
