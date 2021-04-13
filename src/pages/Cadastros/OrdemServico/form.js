@@ -471,7 +471,6 @@ function OrderServicoForm(props) {
 
                 </select>
 
-                <p className="error-input">{errorFazenda}</p>
             </div>
 
             <div className="col-md-6 form-group">
