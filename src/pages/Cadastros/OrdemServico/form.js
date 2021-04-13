@@ -511,23 +511,18 @@ function OrderServicoForm(props) {
 
                 <label className="label-form" id="labelTEmpoCinquentaMetro">Tempo cinquenta metros</label>
                 <input type="time" className="form-control" placeholder="Quantos segundos o veículo percorreu em 50 metros" value={tempoCinquentaMetro} onChange={(e) => setTempoCinquentaMetro(e.target.value)} />
-                <p className="error-input">{errorCinquentaMetro}</p>
 
                 <label className="label-form" id="labelVelocidadeOrdemServico">Velocidade de execuçaõ da operação</label>
                 <input type="number" className="form-control" placeholder="Qual a velocidade (km/h) a odem de serviço deverá ser executada" value={velocidadeOrdemServico} onChange={(e) => setVelocidadeOrdemServico(e.target.value)} />
-                <p className="error-input">{errorVelocidade}</p>
 
                 <label className="label-form" id="labelRpmExecutada">Rpm de execuçaõ da operação</label>
                 <input type="number" className="form-control" placeholder="Qual RPM a odem de serviço deverá ser executada" value={rpmOrdemServico} onChange={(e) => setRpmOrdemServico(e.target.value)} />
-                <p className="error-input">{errorRpm}</p>
 
                 <label className="label-form" id="labelCombustivel">Combustivel</label>
                 <input type="number" className="form-control" placeholder="Digite o combustivel" value={combustivel} onChange={(e) => setCombustivel(e.target.value)} />
-                <p className="error-input">{errorCombustivel}</p>
 
                 <label className="label-form" id="labelMarchaExecucao">Marcha da execuçaõ da operação</label>
                 <input type="number" className="form-control" placeholder="Qual marcha a odem de serviço deverá ser executada" value={marchaOrdemServico} onChange={(e) => setMarchaOrdemServico(e.target.value)} />
-                <p className="error-input">{errorMarcha}</p>
 
 
                 <div className="input-button">
@@ -571,7 +566,6 @@ function OrderServicoForm(props) {
                         </option>
                     ))}
                 </select>
-                <p className="error-input">{errorTalhao}</p>
 
                 <div className="mapa">
                     <MapBox onStyleLoad={onLoadMap} {...mapOptions} />
