@@ -88,8 +88,6 @@ function OrderServicoForm(props) {
             let talhaoSelecionado = parseInt(idTalhao) > 0 ? talhoes.filter((talhao) => idTalhao === talhao.tal_id)[0] : talhoes[0];
             let coordenadasTalhao = JSON.parse(talhaoSelecionado.tal_coordenada);
 
-            console.log(map);
-            console.log(talhoes);
             let feature = {
                 'type': 'Feature',
                 'geometry': {
@@ -122,7 +120,6 @@ function OrderServicoForm(props) {
                 }
             });
 
-            console.log(map.getLayer('talhao'));
 
             var bounds = coordenadasTalhao[0].reduce(function (bounds, coord) {
                 return bounds.extend(coord);
