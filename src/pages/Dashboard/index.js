@@ -16,7 +16,7 @@ function Dashboard(props) {
     const [mapOptions, setMapOptions] = useState({
         center: [-49.654063, -22.215288],
         style: "mapbox://styles/mapbox/satellite-v9",
-        zoom:[15],
+        zoom: [15],
         // preserveDrawingBuffer: true,
         // style: "mapbox://styles/mapbox/streets-v9",
         containerStyle: {
@@ -29,11 +29,20 @@ function Dashboard(props) {
     var sourceMarker = {};
     var sourceMarkerIndex = {};
 
-    var imagesMarkers = {
-        desligado: 'https://fulltrackstatic.s3.amazonaws.com/anuncio/Dm4aomaD9om6gr4D42kr0Pgn4Dlnml0l73o52p7D499p4png63-pt-br.png',
-        movimento: 'https://fulltrackstatic.s3.amazonaws.com/anuncio/Dm4aomaD9om6gr4D42kr0Pgn4Dlnml0l73o52p7D499p4png63-es-es.png',
-        ligado: 'https://fulltrackstatic.s3.amazonaws.com/anuncio/Dm4aomaD9om6gr4D42kr0Pgn4Dlnml0l73o52p7D499p4png63-en-us.png'
-    };
+    var imagesMarkers = [
+        {
+            url: "https://fulltrackstatic.s3.amazonaws.com/anuncio/Dm4aomaD9om6gr4D42kr0Pgn4Dlnml0l73o52p7D499p4png63-pt-br.png",
+            nome: "marker-desligado"
+        },
+        {
+            url: "https://fulltrackstatic.s3.amazonaws.com/anuncio/Dm4aomaD9om6gr4D42kr0Pgn4Dlnml0l73o52p7D499p4png63-es-es.png",
+            nome: "marker-ligado"
+        },
+        {
+            url: "https://fulltrackstatic.s3.amazonaws.com/anuncio/Dm4aomaD9om6gr4D42kr0Pgn4Dlnml0l73o52p7D499p4png63-en-us.png",
+            nome: "marker-movimento"
+        }
+    ]
 
     function atualizarMarkerMapa(data, map, aux) {
 
@@ -78,69 +87,70 @@ function Dashboard(props) {
         // ADD CAMADA DOM MAPA
         addMapBoxControll(map);
 
-        loadImages(map, imagesMarkers, (images) => {
-            map.addImage('marker-desligado', images['desligado']);
-            map.addImage('marker-ligado', images['ligado']);
-            map.addImage('marker-movimento', images['movimento']);
-
-            var aux = {
-                coordenadas: [],
-                allFeaturesMarkers: [],
-                featureMarkerAtual: []
-            }
-
-            sourceMarker = {
-                'type': 'FeatureCollection',
-                'features': []
-            }
-
-            map.addSource('markersSymbol', {
-                'type': 'geojson',
-                'data': sourceMarker
-            });
-
-            console.log('add source');
-            console.log(map.getSource('markersSymbol'));
-
-           
-
-            map.addLayer({
-                'id': 'markersSymbol',
-                'type': 'symbol',
-                'source': 'markersSymbol',
-                'layout': {
-                    'icon-size': 1,
-                    'icon-image': ['get', 'image_marker'],
-                    'icon-allow-overlap': true,
-                    // get the title name from the source's "title" property
-                    'text-field': ['get', 'desc_ativo'],
-                    'text-font': [
-                        'Open Sans Semibold',
-                        'Arial Unicode MS Bold'
-                    ],
-                    // 'text-offset': [0, 1.25],
-                    'text-anchor': 'bottom',
-                    'text-transform': 'uppercase',
-                    'text-letter-spacing': 0.05,
-                    'text-offset': [0, 1.5],
-                    'icon-offset': [0, -18]
-                },
-                'paint': {
-                    'text-color': '#202',
-                    'text-halo-color': '#fff',
-                    'text-halo-width': 2
-                }
-            });
-
-            console.log('add layer');
-            console.log(map.getLayer('markersSymbol'));
-
-            SocketFulltrack.init((data) => {
-                atualizarMarkerMapa(data, map, aux);
+        imagesMarkers.forEach(item => {
+            map.loadImage(item.url, function (error, image) {
+                map.addImage(item.nome, image)
             })
+        });
 
-            
+        var aux = {
+            coordenadas: [],
+            allFeaturesMarkers: [],
+            featureMarkerAtual: []
+        }
+
+        sourceMarker = {
+            'type': 'FeatureCollection',
+            'features': []
+        }
+
+        map.addSource('markersSymbol', {
+            'type': 'geojson',
+            'data': sourceMarker
+        });
+
+        console.log('add source');
+        console.log(map.getSource('markersSymbol'));
+
+
+
+        map.addLayer({
+            'id': 'markersSymbol',
+            'type': 'symbol',
+            'source': 'markersSymbol',
+            'layout': {
+                'icon-size': 1,
+                'icon-image': ['get', 'image_marker'],
+                'icon-allow-overlap': true,
+                // get the title name from the source's "title" property
+                'text-field': ['get', 'desc_ativo'],
+                'text-font': [
+                    'Open Sans Semibold',
+                    'Arial Unicode MS Bold'
+                ],
+                // 'text-offset': [0, 1.25],
+                'text-anchor': 'bottom',
+                'text-transform': 'uppercase',
+                'text-letter-spacing': 0.05,
+                'text-offset': [0, 1.5],
+                'icon-offset': [0, -18]
+            },
+            'paint': {
+                'text-color': '#202',
+                'text-halo-color': '#fff',
+                'text-halo-width': 2
+            }
+        });
+
+        console.log('add layer');
+        console.log(map.getLayer('markersSymbol'));
+
+        SocketFulltrack.init((data) => {
+            atualizarMarkerMapa(data, map, aux);
         })
+
+
+
 
         var popup = new mapboxgl.Popup({
             closeButton: false,
