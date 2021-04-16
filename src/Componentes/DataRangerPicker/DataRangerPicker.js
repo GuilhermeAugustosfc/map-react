@@ -7,21 +7,10 @@ import './DataRangerPicker.css'
 function Data(props) {
     return (
         <DateRangePicker
-            initialSettings={{
-                startDate: props.startDate,
-                endDate: props.endDate,
-                timePicker: true,
-                timePicker24Hour: true,
-                linkedCalendars: false,
-                timePickerSeconds: true,
-                autoApply: true,
-                locale: {
-                    format: 'DD/MM/YYYY HH:mm:ss',
-                }
-            }}
+            initialSettings={props.initialSettings}
             onHide={props.onChangeData}
         >
-            <button className="btn-show-daterangepicker">{props.startDate} - {props.endDate}</button>
+            <button className="btn-show-daterangepicker">{props.initialSetings.startDate} - {props.initialSetings.endDate}</button>
         </DateRangePicker>
     )
 }

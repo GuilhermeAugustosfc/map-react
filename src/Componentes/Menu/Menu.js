@@ -5,16 +5,13 @@ import {
     ListItem,
     IconButton,
     Typography,
-    Toolbar,
-    AppBar,
     List,
-    Button,
     SwipeableDrawer
 } from '@material-ui/core';
 
 import { Link } from 'react-router-dom'
 
-import { GoCalendar, GoGrabber, GoGlobe, GoFileMedia, GoNote } from 'react-icons/go'
+import { GoCalendar, GoGrabber, GoGlobe, GoFileMedia, GoNote, GoDeviceDesktop } from 'react-icons/go'
 
 import "./Menu.css"
 
@@ -30,21 +27,6 @@ export default function Menu({ children }) {
         setOpen(open);
     };
 
-    const NavBar = () => (
-        <AppBar position="fixed" id="navbar">
-            <Toolbar>
-                <IconButton onClick={toggleDrawer(true)} edge="start" color="inherit" aria-label="menu">
-                    <GoGrabber />
-                </IconButton>
-                <Typography variant="h6" className="title-nav">
-                    Agro
-                </Typography>
-                <Button color="inherit">Login</Button>
-            </Toolbar>
-        </AppBar>
-    )
-
-
     const MenuLateral = () => (
         <div
             className="menu-lateral"
@@ -56,6 +38,16 @@ export default function Menu({ children }) {
                 <Typography variant="h6">
                     Agro
                 </Typography>
+            </List>
+            <List>
+                <ListItem button key={'dashboard'}>
+                    <ListItemIcon>
+                        <GoDeviceDesktop color={'black'} size={25} />
+                    </ListItemIcon>
+                    <Link to="/" className="link-menu">
+                        <ListItemText primary={'DASHBOARD'} />
+                    </Link>
+                </ListItem>
             </List>
             <List>
                 <ListItem button key={'mapa'}>
@@ -101,7 +93,9 @@ export default function Menu({ children }) {
     )
     return (
         <React.Fragment key={'left'}>
-            <NavBar />
+            <IconButton id="menu-navbar" onClick={toggleDrawer(true)} edge="start" color="inherit" aria-label="menu">
+                <GoGrabber />
+            </IconButton>
             <SwipeableDrawer
                 anchor={'left'}
                 open={open}

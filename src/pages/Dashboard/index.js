@@ -3,10 +3,8 @@ import React, { useState } from 'react'
 import MapBox from '../../Componentes/MapBox/mapbox';
 
 import mapboxgl from 'mapbox-gl';
-import StylesControl from 'mapbox-gl-controls/lib/styles';
 import ZoomControl from 'mapbox-gl-controls/lib/zoom';
 
-import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import * as turf from "@turf/turf"
 
 import SocketFulltrack from '../../services/socket'
@@ -20,12 +18,11 @@ function Dashboard(props) {
         // preserveDrawingBuffer: true,
         // style: "mapbox://styles/mapbox/streets-v9",
         containerStyle: {
-            height: '93vh',
+            height: '100vh',
             width: '100vw'
         }
     })
 
-    var draw = null;
     var sourceMarker = {};
     var sourceMarkerIndex = {};
 
@@ -80,7 +77,7 @@ function Dashboard(props) {
     function onLoadMap(map) {
 
         // ADD CAMADA DOM MAPA
-        addMapBoxControll(map);
+        map.addControl(new ZoomControl(), 'top-left');
 
         imagesMarkers.forEach(item => {
             map.loadImage(item.url, function (error, image) {
@@ -138,9 +135,6 @@ function Dashboard(props) {
             }
         })
 
-
-
-
         var popup = new mapboxgl.Popup({
             closeButton: false,
             closeOnClick: false
@@ -169,40 +163,6 @@ function Dashboard(props) {
             map.getCanvas().style.cursor = '';
             popup.remove();
         });
-    }
-    
-    function addMapBoxControll(map) {
-        map.addControl(new StylesControl({
-            styles: [
-                {
-                    label: 'Streets',
-                    styleName: 'Mapbox Streets',
-                    styleUrl: 'mapbox://styles/mapbox/streets-v9',
-                },
-                {
-                    label: 'Satellite',
-                    styleName: 'Satellite',
-                    styleUrl: 'mapbox://styles/mapbox/satellite-v9',
-
-                },
-                {
-                    label: 'Terreno',
-                    styleName: 'Terreno',
-                    styleUrl: 'mapbox://styles/mapbox-map-design/ckhqrf2tz0dt119ny6azh975y',
-                },
-            ],
-        }), 'top-left');
-
-        draw = new MapboxDraw({
-            displayControlsDefault: false,
-            controls: {
-                polygon: true,
-                trash: true
-            },
-        })
-
-        map.addControl(draw, 'top-left');
-        map.addControl(new ZoomControl(), 'top-left');
     }
 
     function templatePopup(obj) {

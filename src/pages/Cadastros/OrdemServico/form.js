@@ -69,6 +69,7 @@ function OrderServicoForm(props) {
     const [rpmOrdemServico, setRpmOrdemServico] = useState("");
     const [combustivel, setCombustivel] = useState("");
     const [marchaOrdemServico, setMarchaOrdemServico] = useState("");
+    const [numeroOrdem, setNumeroOrdem] = useState("");
 
     const selectVeiculoRef = useRef(null);
     const selectMotoristaRef = useRef(null);
@@ -80,14 +81,11 @@ function OrderServicoForm(props) {
     const [errorMotorista, setErrorMotorista] = useState("");
     const [errorVeiculo, setErrorVeiculo] = useState("");
     const [errorCultura, setErrorCultura] = useState("");
-    const [errorCinquentaMetro, setErrorCinquentaMetro] = useState("");
 
     const [errorVelocidade, setErrorVelocidade] = useState("");
-    const [errorRpm, seterrorRpm] = useState("");
-    const [errorCombustivel, setErrorCombustivel] = useState("");
-    const [errorMarcha, setErrorMarcha] = useState("");
     const [errorTalhao, setErrorTalhao] = useState("");
     const [errorFazenda, setErrorFazenda] = useState("");
+    const [errorNumeroOrdem, setErrorNumeroOrdem] = useState("");
 
 
 
@@ -226,11 +224,7 @@ function OrderServicoForm(props) {
         setErrorTalhao("");
         setErrorSafra("");
         setErrorMotorista("");
-        setErrorCinquentaMetro("");
         setErrorVelocidade("");
-        seterrorRpm("");
-        setErrorCombustivel("");
-        setErrorMarcha("");
     }
 
     function validDataOrdemServices() {
@@ -284,28 +278,8 @@ function OrderServicoForm(props) {
             valid = false;
         }
 
-        if (!tempoCinquentaMetro) {
-            setErrorCinquentaMetro("error-border do tempo");
-            valid = false;
-        }
-
         if (!velocidadeOrdemServico) {
             setErrorVelocidade("error-border");
-            valid = false;
-        }
-
-        if (!rpmOrdemServico) {
-            seterrorRpm("error-border");
-            valid = false;
-        }
-
-        if (!combustivel) {
-            setErrorCombustivel("error-border");
-            valid = false;
-        }
-
-        if (!marchaOrdemServico) {
-            setErrorMarcha("error-border");
             valid = false;
         }
 
@@ -383,297 +357,353 @@ function OrderServicoForm(props) {
     return (
         <div className='container-ordem-servico'>
             <h3>CADASTRO DE ORDEM DE SERVIÇO</h3>
-            <div className="col-md-6 form-group">
-                <label className="label-form" id="labelOperacao">Operação</label>
-                <select
-                    htmlFor="labelOperacao"
-                    id="selectOperacao"
-                    className={`select-form ${errorOperacao}`}
-                    value={idOperacao}
-                    onChange={(e) => setIdOperacao(e.target.value)}
-                >
-                    <option
-                        key="0"
-                        value=""
-                    >
-                        Nenhum Selecionado
-                    </option>
-                    {operacoes.length && operacoes.map((operacao) => (
-                        <option
-                            key={operacao.ope_id}
-                            value={operacao.ope_id}>
-                            {operacao.ope_descricao}
-                        </option>
-                    ))}
 
-                </select>
-            </div>
+            <div className="col-md-6">
+                <div className="form-group-ordem-servico">
+                    <div className="form-group-ordem-servico-head">
+                        Ordem
+                    </div>
+                    <label className="label-form-ordem-servico" id="labelDataEmissao">Data emissão</label>
 
-            <div className="col-md-6 form-group">
-                <label className="label-form" id="labelImpremento">Implemento</label>
-                <select
-                    htmlFor="labelImpremento"
-                    id="selectImplemento"
-                    className={`select-form ${errorImplemento}`}
-                    value={idImplemento}
-                    onChange={(e) => setIdImplemento(e.target.value)}
-                >
-                    <option
-                        key="0"
-                        value=""
-                    >
-                        Nenhum Selecionado
-                    </option>
-                    {implementos.length && implementos.map((imp) => (
-                        <option
-                            key={imp.imp_id}
-                            value={imp.imp_id}>
-                            {imp.imp_descricao}
-                        </option>
-                    ))}
+                    <DateRangePicker
+                        onChangeData={onChangeData}
+                        initialSetings={{
+                            startDate: inicioPeriodo,
+                            endDate: fimPeriodo,
+                            timePicker: true,
+                            // timePicker24Hour: true,
+                            linkedCalendars: false,
+                            // timePickerSeconds: true,
+                            autoApply: true,
+                            locale: {
+                                format: 'DD/MM/YYYY HH:mm:ss',
+                            }
+                        }}
+                    />
+                    <label className="label-form-ordem-servico" id="labelNumero">Numero</label>
+                    <input type="number" className={`form-control ${errorNumeroOrdem}`} placeholder="Numero da ordem de serviço" value={numeroOrdem} onChange={(e) => setNumeroOrdem(e.target.value)} />
 
-                </select>
-
-            </div>
-
-            <div className="col-md-6 form-group">
-                <label className="label-form" id="labelMotorista">Motorista</label>
-                <select
-                    htmlFor="labelMotorista"
-                    id="selectMotorista"
-                    className={`select-form ${errorMotorista}`}
-                    ref={selectMotoristaRef}
-                    value={idMotorista}
-                    onChange={(e) => setIdMotorista(e.target.value)}
-                >
-                    <option
-                        key="0"
-                        value=""
-                    >
-                        Nenhum Selecionado
-                    </option>
-                    {motoristas.length && motoristas.map((mot) => (
-                        <option
-                            key={mot.ras_mot_id}
-                            value={mot.ras_mot_id}>
-                            {mot.ras_mot_nome}
-                        </option>
-                    ))}
-
-                </select>
-            </div>
-
-            <div className="col-md-6 form-group">
-                <label className="label-form" id="labelSafra">Safras</label>
-                <select
-                    htmlFor="labelSafra"
-                    id="selectSafra"
-                    className={`select-form ${errorSafra}`}
-                    value={idSafra}
-                    onChange={(e) => setIdSafra(e.target.value)}
-                >
-                    <option
-                        key="0"
-                        value=""
-                    >
-                        Nenhum Selecionado
-                    </option>
-                    {safras.length && safras.map((safra) => (
-                        <option
-                            key={safra.saf_id}
-                            value={safra.saf_id}>
-                            {safra.saf_descricao}
-                        </option>
-                    ))}
-
-                </select>
-            </div>
-
-            <div className="col-md-6 form-group">
-                <label className="label-form" id="labelCultura">Culturas</label>
-                <select
-                    htmlFor="labelCultura"
-                    id="selectCultura"
-                    className={`select-form ${errorCultura}`}
-                    value={idCultura}
-                    onChange={(e) => setIdCultura(e.target.value)}
-                >
-                    <option
-                        key="0"
-                        value=""
-                    >
-                        Nenhum Selecionado
-                    </option>
-                    {culturas.length && culturas.map((cultura) => (
-                        <option
-                            key={cultura.cul_id}
-                            value={cultura.cul_id}>
-                            {cultura.cul_descricao}
-                        </option>
-                    ))}
-
-                </select>
-
-            </div>
-
-            <div className="col-md-6 form-group">
-                <label className="label-form" id="labelVeiculos">Veiculos</label>
-                <select
-                    htmlFor="labelVeiculos"
-                    id="selectVeiculos"
-                    className={`select-form ${errorVeiculo}`}
-                    ref={selectVeiculoRef}
-                    value={idVeiculo}
-                    onChange={(e) => setIdVeiculo(e.target.value)}
-                >
-                    <option
-                        key="0"
-                        value=""
-                    >
-                        Nenhum Selecionado
-                    </option>
-                    {veiculos.length && veiculos.map((vei) => (
-                        <option
-                            key={vei.ras_vei_id}
-                            value={vei.ras_vei_id}>
-                            {vei.ras_vei_veiculo}
-                        </option>
-                    ))}
-
-                </select>
-
-            </div>
-
-            <div className="col-md-6 form-group">
-                <label className="label-form" id="labelFazenda">Fazendas</label>
-                <select
-                    htmlFor="labelFazenda"
-                    id="selectFazendas"
-                    className={`select-form ${errorFazenda}`}
-                    value={idFazenda}
-                    onChange={(e) => setIdFazenda(e.target.value)}
-                >
-                    <option
-                        key="0"
-                        value=""
-                    >
-                        Nenhum Selecionado
-                    </option>
-                    {fazendas.length && fazendas.map((fazenda) => (
-                        <option
-                            key={fazenda.faz_id}
-                            value={fazenda.faz_id}>
-                            {fazenda.faz_descricao}
-                        </option>
-                    ))}
-
-                </select>
-
-
-            </div>
-
-            <div className="col-md-6 form-group">
-                <label className="label-form" id="labelAno">Ano</label>
-                <select
-                    htmlFor="labelAno"
-                    id="selectAnos"
-                    className={`select-form ${errorAno}`}
-                    value={idAno}
-                    onChange={(e) => setIdAno(e.target.value)}
-                >
-                    <option
-                        key="0"
-                        value=""
-                    >
-                        Nenhum Selecionado
-                    </option>
-                    {anos.length && anos.map((anos) => (
-                        <option
-                            key={anos.ano_id}
-                            value={anos.ano_id}>
-                            {anos.ano_descricao}
-                        </option>
-                    ))}
-
-                </select>
-            </div>
-
-            <div className="col-md-6 form-group">
-                <label className="label-periodo-ordemservico">Periodo da ordem de serviço</label>
-                <DateRangePicker
-                    onChangeData={onChangeData}
-                    startDate={inicioPeriodo}
-                    endDate={fimPeriodo}
-                />
-
-                <label className="label-form" id="labelTEmpoCinquentaMetro">Tempo cinquenta metros</label>
-                <input type="time" className={`form-control ${errorCinquentaMetro}`} placeholder="Quantos segundos o veículo percorreu em 50 metros" value={tempoCinquentaMetro} onChange={(e) => setTempoCinquentaMetro(e.target.value)} />
-
-                <label className="label-form" id="labelVelocidadeOrdemServico">Velocidade de execuçaõ da operação</label>
-                <input type="number" className={`form-control ${errorVelocidade}`} placeholder="Qual a velocidade (km/h) a odem de serviço deverá ser executada" value={velocidadeOrdemServico} onChange={(e) => setVelocidadeOrdemServico(e.target.value)} />
-
-                <label className="label-form" id="labelRpmExecutada">Rpm de execuçaõ da operação</label>
-                <input type="number" className={`form-control ${errorRpm}`} placeholder="Qual RPM a odem de serviço deverá ser executada" value={rpmOrdemServico} onChange={(e) => setRpmOrdemServico(e.target.value)} />
-
-                <label className="label-form" id="labelCombustivel">Combustivel</label>
-                <input type="number" className={`form-control ${errorCombustivel}`} placeholder="Digite o combustivel" value={combustivel} onChange={(e) => setCombustivel(e.target.value)} />
-
-                <label className="label-form" id="labelMarchaExecucao">Marcha da execuçaõ da operação</label>
-                <input type="number" className={`form-control ${errorMarcha}`} placeholder="Qual marcha a odem de serviço deverá ser executada" value={marchaOrdemServico} onChange={(e) => setMarchaOrdemServico(e.target.value)} />
-
-
-                <div className="input-button">
-                    <Button
-                        variant="contained"
-                        size="large"
-                        id="btn-cancelar-ordem-servico"
-                        onClick={() => cancelarOrdemServico()}
-                        startIcon={<GoArrowLeft />}
-                    >
-                        Cancelar
-                    </Button>
-                    <Button
-                        variant="contained"
-                        size="large"
-                        id="btn-salvar-ordem-servico"
-                        onClick={() => saveOrdemService()}
-                        startIcon={<GoCheck />}
-                    >
-                        Salvar
-                    </Button>
                 </div>
-            </div>
 
-            <div className="col-md-6 form-group">
-                <label className="label-form" id="labelTalhao">Talhao</label>
-                <select
-                    htmlFor="labelTalhao"
-                    id="selectTalhao"
-                    className={`select-form ${errorTalhao}`}
-                    value={idTalhao}
-                    onChange={(e) => {
-                        setIdTalhao(e.target.value)
-                    }}
-                >
-                    <option
-                        key="0"
-                        value=""
+                <div className="form-group-ordem-servico">
+                    <div className="form-group-ordem-servico-head">
+                        Culturas
+                    </div>
+                    <label className="label-form-ordem-servico" id="labelCultura">Culturas</label>
+                    <select
+                        htmlFor="labelCultura"
+                        id="selectCultura"
+                        className={`select-form ${errorCultura}`}
+                        value={idCultura}
+                        onChange={(e) => setIdCultura(e.target.value)}
                     >
-                        Nenhum Selecionado
-                    </option>
-                    {talhoes.length && talhoes.map((talhao) => (
                         <option
-                            key={talhao.tal_id}
-                            value={talhao.tal_id}>
-                            {talhao.tal_descricao}
-                        </option>
-                    ))}
-                </select>
+                            key="0"
+                            value=""
+                        >
+                            Nenhum Selecionado
+                    </option>
+                        {culturas.length && culturas.map((cultura) => (
+                            <option
+                                key={cultura.cul_id}
+                                value={cultura.cul_id}>
+                                {cultura.cul_descricao}
+                            </option>
+                        ))}
 
-                <div className="mapa">
-                    <MapBox onStyleLoad={onLoadMap} {...mapOptions} />
+                    </select>
+                    <div style={{display:'flex'}}>
+                        <div style={{flex:1, marginRight:'11px'}}>
+                            <label className="label-form-ordem-servico" id="labelAno">Ano</label>
+                            <select
+                                htmlFor="labelAno"
+                                id="selectAnos"
+                                className={`select-form ${errorAno}`}
+                                value={idAno}
+                                onChange={(e) => setIdAno(e.target.value)}
+                            >
+                                <option
+                                    key="0"
+                                    value=""
+                                >
+                                    Nenhum Selecionado
+                                </option>
+                                {anos.length && anos.map((anos) => (
+                                    <option
+                                        key={anos.ano_id}
+                                        value={anos.ano_id}>
+                                        {anos.ano_descricao}
+                                    </option>
+                                ))}
+
+                            </select>
+                        </div>
+                        <div style={{flex:1}}>
+                            <label className="label-form-ordem-servico" id="labelSafra">Safras</label>
+                            <select
+                                htmlFor="labelSafra"
+                                id="selectSafra"
+                                className={`select-form ${errorSafra}`}
+                                value={idSafra}
+                                onChange={(e) => setIdSafra(e.target.value)}
+                            >
+                                <option
+                                    key="0"
+                                    value=""
+                                >
+                                    Nenhum Selecionado
+                                </option>
+                                {safras.length && safras.map((safra) => (
+                                    <option
+                                        key={safra.saf_id}
+                                        value={safra.saf_id}>
+                                        {safra.saf_descricao}
+                                    </option>
+                                ))}
+
+                            </select>
+                        </div>
+                    </div>
+
+                    <label className="label-form-ordem-servico" id="labelFazenda">Fazendas</label>
+                    <select
+                        htmlFor="labelFazenda"
+                        id="selectFazendas"
+                        className={`select-form ${errorFazenda}`}
+                        value={idFazenda}
+                        onChange={(e) => setIdFazenda(e.target.value)}
+                    >
+                        <option
+                            key="0"
+                            value=""
+                        >
+                            Nenhum Selecionado
+                        </option>
+                        {fazendas.length && fazendas.map((fazenda) => (
+                            <option
+                                key={fazenda.faz_id}
+                                value={fazenda.faz_id}>
+                                {fazenda.faz_descricao}
+                            </option>
+                        ))}
+
+                    </select>
                 </div>
+
+                <div className="form-group-ordem-servico">
+                    <div className="form-group-ordem-servico-head">
+                        Operação
+                    </div>
+                    <label className="label-form-ordem-servico" id="labelOperacao">Operação</label>
+                    <select
+                        htmlFor="labelOperacao"
+                        id="selectOperacao"
+                        className={`select-form ${errorOperacao}`}
+                        value={idOperacao}
+                        onChange={(e) => setIdOperacao(e.target.value)}
+                    >
+                        <option
+                            key="0"
+                            value=""
+                        >
+                            Nenhum Selecionado
+                    </option>
+                        {operacoes.length && operacoes.map((operacao) => (
+                            <option
+                                key={operacao.ope_id}
+                                value={operacao.ope_id}>
+                                {operacao.ope_descricao}
+                            </option>
+                        ))}
+
+                    </select>
+
+                    <label className="label-periodo-ordemservico">Periodo</label>
+                    <DateRangePicker
+                        onChangeData={onChangeData}
+                        initialSetings={{
+                            startDate: inicioPeriodo,
+                            endDate: fimPeriodo,
+                            timePicker: true,
+                            // timePicker24Hour: true,
+                            linkedCalendars: false,
+                            // timePickerSeconds: true,
+                            autoApply: true,
+                            locale: {
+                                format: 'DD/MM/YYYY HH:mm:ss',
+                            }
+                        }}
+                    />
+
+                </div>
+
+                <div className="form-group-ordem-servico">
+                    <div className="form-group-ordem-servico-head">
+                        Lavouras
+                    </div>
+                    <label className="label-form-ordem-servico" id="labelTalhao">Talhao</label>
+                    <select
+                        htmlFor="labelTalhao"
+                        id="selectTalhao"
+                        className={`select-form ${errorTalhao}`}
+                        value={idTalhao}
+                        onChange={(e) => {
+                            setIdTalhao(e.target.value)
+                        }}
+                    >
+                        <option
+                            key="0"
+                            value=""
+                        >
+                            Nenhum Selecionado
+                    </option>
+                        {talhoes.length && talhoes.map((talhao) => (
+                            <option
+                                key={talhao.tal_id}
+                                value={talhao.tal_id}>
+                                {talhao.tal_descricao}
+                            </option>
+                        ))}
+                    </select>
+
+                    <div className="mapa">
+                        <MapBox onStyleLoad={onLoadMap} {...mapOptions} />
+                    </div>
+                </div>
+
             </div>
+
+            <div className="col-md-6">
+                <div className="form-group-ordem-servico">
+                    <div className="form-group-ordem-servico-head">
+                        Operadores
+                    </div>
+                    <label className="label-form-ordem-servico" id="labelMotorista">Motorista</label>
+                    <select
+                        htmlFor="labelMotorista"
+                        id="selectMotorista"
+                        className={`select-form ${errorMotorista}`}
+                        ref={selectMotoristaRef}
+                        value={idMotorista}
+                        onChange={(e) => setIdMotorista(e.target.value)}
+                    >
+                        <option
+                            key="0"
+                            value=""
+                        >
+                            Nenhum Selecionado
+                        </option>
+                        {motoristas.length && motoristas.map((mot) => (
+                            <option
+                                key={mot.ras_mot_id}
+                                value={mot.ras_mot_id}>
+                                {mot.ras_mot_nome}
+                            </option>
+                        ))}
+
+                    </select>
+                </div>
+
+                <div className="form-group-ordem-servico">
+                    <div className="form-group-ordem-servico-head">
+                        Maquinas e implementos
+                    </div>
+                    <label className="label-form-ordem-servico" id="labelVeiculos">Veiculos</label>
+                    <select
+                        htmlFor="labelVeiculos"
+                        id="selectVeiculos"
+                        className={`select-form ${errorVeiculo}`}
+                        ref={selectVeiculoRef}
+                        value={idVeiculo}
+                        onChange={(e) => setIdVeiculo(e.target.value)}
+                    >
+                        <option
+                            key="0"
+                            value=""
+                        >
+                            Nenhum Selecionado
+                    </option>
+                        {veiculos.length && veiculos.map((vei) => (
+                            <option
+                                key={vei.ras_vei_id}
+                                value={vei.ras_vei_id}>
+                                {vei.ras_vei_veiculo}
+                            </option>
+                        ))}
+
+                    </select>
+
+                    <label className="label-form-ordem-servico" id="labelImpremento">Implemento</label>
+                    <select
+                        htmlFor="labelImpremento"
+                        id="selectImplemento"
+                        className={`select-form ${errorImplemento}`}
+                        value={idImplemento}
+                        onChange={(e) => setIdImplemento(e.target.value)}
+                    >
+                        <option
+                            key="0"
+                            value=""
+                        >
+                            Nenhum Selecionado
+                    </option>
+                        {implementos.length && implementos.map((imp) => (
+                            <option
+                                key={imp.imp_id}
+                                value={imp.imp_id}>
+                                {imp.imp_descricao}
+                            </option>
+                        ))}
+
+                    </select>
+
+                </div>
+
+                <div className="form-group-ordem-servico">
+                    <div className="form-group-ordem-servico-head">
+                        Configuração da Ordem de serviço
+                </div>
+                    <label className="label-form-ordem-servico" id="labelTEmpoCinquentaMetro">Tempo cinquenta metros</label>
+                    <input type="time" className={`form-control `} placeholder="Quantos segundos o veículo percorreu em 50 metros" value={tempoCinquentaMetro} onChange={(e) => setTempoCinquentaMetro(e.target.value)} />
+
+                    <label className="label-form-ordem-servico" id="labelVelocidadeOrdemServico">Velocidade de execuçaõ da operação</label>
+                    <input type="number" className={`form-control ${errorVelocidade}`} placeholder="Qual a velocidade (km/h) a odem de serviço deverá ser executada" value={velocidadeOrdemServico} onChange={(e) => setVelocidadeOrdemServico(e.target.value)} />
+
+                    <label className="label-form-ordem-servico" id="labelRpmExecutada">Rpm de execuçaõ da operação</label>
+                    <input type="number" className={`form-control`} placeholder="Qual RPM a odem de serviço deverá ser executada" value={rpmOrdemServico} onChange={(e) => setRpmOrdemServico(e.target.value)} />
+
+                    <label className="label-form-ordem-servico" id="labelCombustivel">Combustivel</label>
+                    <input type="number" className={`form-control`} placeholder="Digite o combustivel" value={combustivel} onChange={(e) => setCombustivel(e.target.value)} />
+
+                    <label className="label-form-ordem-servico" id="labelMarchaExecucao">Marcha da execuçaõ da operação</label>
+                    <input type="number" className={`form-control`} placeholder="Qual marcha a odem de serviço deverá ser executada" value={marchaOrdemServico} onChange={(e) => setMarchaOrdemServico(e.target.value)} />
+
+
+                    <div className="input-button">
+                        <Button
+                            variant="contained"
+                            size="large"
+                            id="btn-cancelar-ordem-servico"
+                            onClick={() => cancelarOrdemServico()}
+                            startIcon={<GoArrowLeft />}
+                        >
+                            Cancelar
+                    </Button>
+                        <Button
+                            variant="contained"
+                            size="large"
+                            id="btn-salvar-ordem-servico"
+                            onClick={() => saveOrdemService()}
+                            startIcon={<GoCheck />}
+                        >
+                            Salvar
+                    </Button>
+                    </div>
+                </div>
+
+            </div>
+
+
 
             <input type="hidden" value={idOrdemServico} />
 

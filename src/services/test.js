@@ -149,8 +149,43 @@ export default Mapbox;
     // });
 
 
+// IMPORTAR CAMADAS MAPBOX
+// import StylesControl from 'mapbox-gl-controls/lib/styles';
+
+// map.addControl(new StylesControl({
+//     styles: [
+//         {
+//             label: 'Streets',
+//             styleName: 'Mapbox Streets',
+//             styleUrl: 'mapbox://styles/mapbox/streets-v9',
+//         },
+//         {
+//             label: 'Satellite',
+//             styleName: 'Satellite',
+//             styleUrl: 'mapbox://styles/mapbox/satellite-v9',
+
+//         },
+//         {
+//             label: 'Terreno',
+//             styleName: 'Terreno',
+//             styleUrl: 'mapbox://styles/mapbox-map-design/ckhqrf2tz0dt119ny6azh975y',
+//         },
+//     ],
+// }), 'top-left');
 
 
+// import MapboxDraw from "@mapbox/mapbox-gl-draw";
+
+// ADD DRAW NO MAPA (CRIAÇÃO DE CERCA, AMRMER, REGUA)
+// draw = new MapboxDraw({
+//     displayControlsDefault: false,
+//     controls: {
+//         polygon: true,
+//         trash: true
+//     },
+// })
+
+// map.addControl(draw, 'top-left');
 
 
 

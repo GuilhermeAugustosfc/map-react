@@ -45,7 +45,7 @@ function MapaGeral(props) {
     style: "mapbox://styles/mapbox/satellite-v9",
     // style: "mapbox://styles/mapbox/streets-v9",
     containerStyle: {
-      height: '93vh',
+      height: '100vh',
       width: '100vw'
     }
   })
