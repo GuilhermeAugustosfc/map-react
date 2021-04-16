@@ -65,10 +65,6 @@ function MapaGeral(props) {
   };
 
   useEffect(() => {
-    document.querySelector('body').style.overflow = "hidden";
-  }, []);
-
-  useEffect(() => {
 
     if (!map) return
 
@@ -316,7 +312,7 @@ function MapaGeral(props) {
     setMap(map);
 
     map.on('click', 'rota', (e) => onClickRota(e, map))
-    map.on('mousemove', 'rota', (e) => onMouseOverFeature(e, map));
+    // map.on('mousemove', 'rota', (e) => onMouseOverFeature(e, map));
 
     let { id } = props.match.params;
 

@@ -13,13 +13,13 @@ function Data(props) {
                 timePicker: true,
                 timePicker24Hour: true,
                 linkedCalendars: false,
-                showCustomRangeLabel: false,
                 timePickerSeconds: true,
+                autoApply: true,
                 locale: {
                     format: 'DD/MM/YYYY HH:mm:ss',
                 }
             }}
-            onApply={props.onChangeData}
+            onHide={props.onChangeData}
         >
             <button className="btn-show-daterangepicker">{props.startDate} - {props.endDate}</button>
         </DateRangePicker>

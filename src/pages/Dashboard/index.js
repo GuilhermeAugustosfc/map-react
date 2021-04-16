@@ -170,25 +170,7 @@ function Dashboard(props) {
             popup.remove();
         });
     }
-
-    function loadImages(map, urls, callback) {
-        var results = {};
-        for (var name in urls) {
-            map.loadImage(urls[name], makeCallback(name));
-        }
-
-        function makeCallback(name) {
-            return function (err, image) {
-                results[name] = err ? null : image;
-
-                // if all images are loaded, call the callback
-                if (Object.keys(results).length === Object.keys(urls).length) {
-                    callback(results);
-                }
-            };
-        }
-    }
-
+    
     function addMapBoxControll(map) {
         map.addControl(new StylesControl({
             styles: [

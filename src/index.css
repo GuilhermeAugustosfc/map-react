@@ -9,3 +9,7 @@ html, body {
 .error-input {
     color: #d20404;
 }
+
+.error-border {
+    border: 1px solid #d20404;
+}
