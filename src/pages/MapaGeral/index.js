@@ -676,7 +676,7 @@ function MapaGeral(props) {
     <>
       <MapBox onStyleData={onStyleData} onStyleLoad={onLoadMap} {...mapOptions} />
       {/* <InfoConsolidadoMapa dados={dadosConsolidado} /> */}
-      <Filtro onclickButtonGerar={onclickButtonGerar} />
+      {/* <Filtro onclickButtonGerar={onclickButtonGerar} /> */}
       <Carrosel operacao={operacao} consolidado={dadosConsolidado} />
     </>
   );
