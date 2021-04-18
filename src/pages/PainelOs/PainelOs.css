@@ -1,0 +1,56 @@
+.container-painel-os {
+    display: block;
+    position: relative;
+    height: 100vh;
+    background-color: #010101eb;
+    padding-top: 21px;
+    color: #e4e4e4;
+}
+
+.painel-os-title {
+    text-align: center;
+    font-size: 30px;
+    margin-bottom: 38px;
+    font-family: inherit;
+    line-height: 1.1;
+    color: white;
+    font-weight: bold;
+    text-shadow: 0px 0px 4px black;
+}
+.tabela-painel-os {
+    font-weight: 600;
+}
+.tabela-painel-os thead{
+    background-color: #002790;
+    color: white;
+}
+
+.tabela-painel-os tbody tr:nth-child(even) {
+    background-color: #342f33;
+}
+
+.tabela-painel-os tbody tr:nth-child(odd) {
+    background-color: #605a5a;
+}
+.tabela-painel-os tbody tr:hover {
+    opacity: 0.9;
+}
+.paienl-os-coluna {
+    color: white;
+    font-weight: bold;
+    text-shadow: 0px 0px 4px black;
+}
+.tabela-painel-os-coluna-motorista {
+    color: #fffc00;
+    font-weight: bold;
+    font-size: 18px;
+    text-shadow: 0px 0px 4px #8e0000;
+}
+
+.tabela-painel-os-coluna-status {
+    color: #08ff08;
+}
+
+
+
+

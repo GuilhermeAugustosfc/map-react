@@ -13,6 +13,8 @@ import { Link } from 'react-router-dom'
 
 import { GoCalendar, GoGrabber, GoGlobe, GoFileMedia, GoNote, GoDeviceDesktop } from 'react-icons/go'
 
+import { BiMapAlt } from 'react-icons/bi'
+
 import "./Menu.css"
 
 
@@ -40,54 +42,64 @@ export default function Menu({ children }) {
                 </Typography>
             </List>
             <List>
-                <ListItem button key={'dashboard'}>
-                    <ListItemIcon>
-                        <GoDeviceDesktop color={'black'} size={25} />
-                    </ListItemIcon>
-                    <Link to="/" className="link-menu">
+                <Link to="/painel" className="link-menu">
+                    <ListItem button key={'painelOs'}>
+                        <ListItemIcon>
+                            <GoDeviceDesktop color={'black'} size={25} />
+                        </ListItemIcon>
+                        <ListItemText primary={'PainelOs'} />
+                    </ListItem>
+                </Link>
+            </List>
+            <List>
+                <Link to="/" className="link-menu">
+                    <ListItem button key={'dashboard'}>
+                        <ListItemIcon>
+                            <BiMapAlt color={'black'} size={25} />
+                        </ListItemIcon>
                         <ListItemText primary={'DASHBOARD'} />
-                    </Link>
-                </ListItem>
+                    </ListItem>
+                </Link>
             </List>
             <List>
-                <ListItem button key={'mapa'}>
-                    <ListItemIcon>
-                        <GoGlobe color={'black'} size={25} />
-                    </ListItemIcon>
-                    <Link to="/mapa" className="link-menu">
+                <Link to="/mapa" className="link-menu">
+                    <ListItem button key={'mapa'}>
+                        <ListItemIcon>
+                            <GoGlobe color={'black'} size={25} />
+                        </ListItemIcon>
                         <ListItemText primary={'MAPA'} />
-                    </Link>
-                </ListItem>
+                    </ListItem>
+                </Link>
             </List>
             <List>
-                <ListItem button key={'ordemservico'}>
-                    <ListItemIcon>
-                        <GoCalendar color={'black'} size={25} />
-                    </ListItemIcon>
-                    <Link to="/cadastros/ordemservico" className="link-menu">
+                <Link to="/cadastros/ordemservico" className="link-menu">
+                    <ListItem button key={'ordemservico'}>
+                        <ListItemIcon>
+                            <GoCalendar color={'black'} size={25} />
+                        </ListItemIcon>
                         <ListItemText primary={'ORDEM DE SERVIÇO'} />
-                    </Link>
-                </ListItem>
+                    </ListItem>
+                </Link>
             </List>
             <List>
-                <ListItem button key={'talhao'}>
-                    <ListItemIcon>
-                        <GoFileMedia color={'black'} size={25} />
-                    </ListItemIcon>
-                    <Link to="/cadastros/talhao" className="link-menu">
+                <Link to="/cadastros/talhao" className="link-menu">
+                    <ListItem button key={'talhao'}>
+                        <ListItemIcon>
+                            <GoFileMedia color={'black'} size={25} />
+                        </ListItemIcon>
                         <ListItemText primary={'TALHÃO'} />
-                    </Link>
-                </ListItem>
+                    </ListItem>
+                </Link>
             </List>
             <List>
-                <ListItem button key={'tabela'}>
-                    <ListItemIcon>
-                        <GoNote color={'black'} size={25} />
-                    </ListItemIcon>
-                    <Link to="/tabela" className="link-menu">
+                <Link to="/tabela" className="link-menu">
+                    <ListItem button key={'tabela'}>
+                        <ListItemIcon>
+                            <GoNote color={'black'} size={25} />
+                        </ListItemIcon>
                         <ListItemText primary={'TABELA'} />
-                    </Link>
-                </ListItem>
+                    </ListItem>
+                </Link>
             </List>
         </div>
     )

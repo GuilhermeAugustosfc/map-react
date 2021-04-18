@@ -16,6 +16,7 @@ import OrdemServicoTabela from "./pages/Cadastros/OrdemServico/tabela";
 import OrdemServicoForm from "./pages/Cadastros/OrdemServico/form";
 
 import Mapa from "./pages/MapaGeral";
+import PainelOs from "./pages/PainelOs";
 
 import Dashboard from "./pages/Dashboard";
 
@@ -37,8 +38,7 @@ const Routes = () => (
         <Switch>
             <PrivateRoute exact path="/" component={(props) => <Dashboard {...props} />} />
             {/* <Route exact path="/login" component={Login} /> */}
-
-            <PrivateRoute exact path="/menu" component={(props) => <Menu {...props} />} />
+            <PrivateRoute exact path="/painel" component={(props) => <PainelOs {...props} />} />
 
             <PrivateRoute exact path="/cadastros/talhao" component={(props) => <TalhaoTabela {...props} />} />
             <PrivateRoute exact path="/cadastros/talhao/form" component={(props) => <TalhaoForm {...props} />} />
