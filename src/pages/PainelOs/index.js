@@ -38,7 +38,7 @@ const PainelOs = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {dadosPainelOs.length && dadosPainelOs.map((operacao, i) => (
+                        {dadosPainelOs.length > 0 && dadosPainelOs.map((operacao, i) => (
                             <tr key={i}>
                                 <td className="paienl-os-coluna">{operacao.osr_codigo}</td>
                                 <td className="paienl-os-coluna tabela-painel-os-coluna-operacao">{operacao.ope_descricao}</td>

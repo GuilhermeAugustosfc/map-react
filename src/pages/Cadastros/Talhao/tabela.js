@@ -30,11 +30,17 @@ const TalhaoTabela = () => {
 
     function onClickNovoTalhao() {
         history.push(`/cadastros/talhao/form/`);
-
     }
 
-    function deleteTalhao(id) {
-        api.delete(`http://f-agro-api.fulltrackapp.com/talhao/${id}`, {}, ({ data }) => {
+    function deleteTalhao(id, url_s3_image) {
+        let form = new FormData();
+        form.append('id', id);
+
+        if (url_s3_image && url_s3_image.split('talhao/').length > 0) {
+            form.append('filename', url_s3_image.split('talhao/')[1])
+        }
+
+        api.post(`http://f-agro-api.fulltrackapp.com/talhao/delete`, form, ({ data }) => {
             getDados();
         })
     }
@@ -49,7 +55,7 @@ const TalhaoTabela = () => {
                     </div>
                 </div>
             </div>
-            {dadosTalhao.length && dadosTalhao.map((row) => (
+            {dadosTalhao.length > 0 && dadosTalhao.map((row) => (
                 <div className="card-talhao" key={row.tal_id} >
                     <div style={{ display: 'flex' }} onClick={() => onClickEditarTalhao(row.tal_id)} >
                         {row.tal_imagem ? (
@@ -65,7 +71,7 @@ const TalhaoTabela = () => {
                             {row.tal_area_util}
                         </div>
                         <div className="button-talhao" style={{ float: "right" }}>
-                            <GoTrashcan color={'#900000'} onClick={() => deleteTalhao(row.tal_id)} size={23} />
+                            <GoTrashcan color={'#900000'} onClick={() => deleteTalhao(row.tal_id, row.tal_imagem)} size={23} />
                         </div>
                     </div>
                 </div>

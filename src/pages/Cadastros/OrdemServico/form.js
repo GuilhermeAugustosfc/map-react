@@ -199,6 +199,7 @@ function OrderServicoForm(props) {
                 setIdCultura(ordemServico.osr_id_cultura);
                 setIdFazenda(ordemServico.osr_id_fazenda);
                 setIdTalhao(ordemServico.osr_id_talhao);
+                setNumeroOrdem(ordemServico.osr_codigo);
                 setIdImplemento(ordemServico.osr_id_implemento);
                 setIdMotorista(ordemServico.osr_id_motorista);
                 setIdOperacao(ordemServico.osr_id_operacao);
@@ -225,6 +226,7 @@ function OrderServicoForm(props) {
         setErrorSafra("");
         setErrorMotorista("");
         setErrorVelocidade("");
+        setErrorNumeroOrdem("")
     }
 
     function validDataOrdemServices() {
@@ -283,6 +285,10 @@ function OrderServicoForm(props) {
             valid = false;
         }
 
+        if (!errorNumeroOrdem) {
+            setErrorNumeroOrdem("error-border")
+        }
+
         return valid;
     }
 
@@ -299,6 +305,7 @@ function OrderServicoForm(props) {
                     osr_id_talhao: idTalhao,
                     osr_id_safra: idSafra,
                     osr_id_ano: idAno,
+                    osr_codigo:numeroOrdem,
                     osr_id_motorista: idMotorista,
                     osr_periodo_ini: moment(inicioPeriodo, "DD/MM/YYYY HH:mm:ss").format("YYYY-MM-DD HH:mm:ss"),
                     osr_periodo_fim: moment(fimPeriodo, "DD/MM/YYYY HH:mm:ss").format("YYYY-MM-DD HH:mm:ss"),
@@ -325,6 +332,7 @@ function OrderServicoForm(props) {
                 form.append('osr_id_fazenda', idFazenda);
                 form.append('osr_id_safra', idSafra);
                 form.append('osr_id_ano', idAno);
+                form.append('osr_codigo', numeroOrdem);
                 form.append('osr_id_motorista', idMotorista);
                 form.append('osr_periodo_ini', moment(inicioPeriodo, "DD/MM/YYYY HH:mm:ss").format("YYYY-MM-DD HH:mm:ss"));
                 form.append('osr_periodo_fim', moment(fimPeriodo, "DD/MM/YYYY HH:mm:ss").format("YYYY-MM-DD HH:mm:ss"));
