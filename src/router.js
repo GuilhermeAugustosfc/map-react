@@ -36,9 +36,8 @@ const PrivateRoute = ({component: Component, ...rest}) => (
 const Routes = () => (
     <BrowserRouter>
         <Switch>
-            <PrivateRoute exact path="/" component={(props) => <Dashboard {...props} />} />
+            <PrivateRoute exact path="/" component={(props) => <PainelOs {...props} />} />
             {/* <Route exact path="/login" component={Login} /> */}
-            <PrivateRoute exact path="/painel" component={(props) => <PainelOs {...props} />} />
 
             <PrivateRoute exact path="/cadastros/talhao" component={(props) => <TalhaoTabela {...props} />} />
             <PrivateRoute exact path="/cadastros/talhao/form" component={(props) => <TalhaoForm {...props} />} />
@@ -50,7 +49,7 @@ const Routes = () => (
 
             <PrivateRoute exact path="/mapa" component={(props) => <Mapa {...props} />} />
             <PrivateRoute exact path="/mapa/:id" component={(props) => <Mapa {...props} />} />
-            <PrivateRoute exact path="/tabela" component={(props) => <Tabela {...props} />} />
+            <PrivateRoute exact path="/relatorio" component={(props) => <Tabela {...props} />} />
             
             <PrivateRoute path="*" component={() => <h1>Pagina não encontrada</h1>} />
         </Switch>

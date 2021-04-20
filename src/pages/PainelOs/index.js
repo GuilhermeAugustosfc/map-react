@@ -5,6 +5,7 @@ import api from '../../services/api'
 import { GoBook } from 'react-icons/go'
 
 import './PainelOs.css';
+import moment from "moment";
 
 const PainelOs = () => {
 
@@ -20,7 +21,7 @@ const PainelOs = () => {
         <div className="container-painel-os">
             <div className="painel-os-title">
                 <p>ORDENS DE SERVIÇOS DE HOJE</p>
-                <div>17/04/2021</div>
+                <div>{moment().format("DD/MM/YYYY")}</div>
             </div>
             <div className="container-tabela-os">
                 <table className="tabela-painel-os table table-dark table-stripped">
@@ -38,7 +39,7 @@ const PainelOs = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {dadosPainelOs.length > 0 && dadosPainelOs.map((operacao, i) => (
+                        {dadosPainelOs && dadosPainelOs.length > 0 && dadosPainelOs.map((operacao, i) => (
                             <tr key={i}>
                                 <td className="paienl-os-coluna">{operacao.osr_codigo}</td>
                                 <td className="paienl-os-coluna tabela-painel-os-coluna-operacao">{operacao.ope_descricao}</td>

@@ -78,7 +78,7 @@ function TalhaoForm(props) {
             }, new mapboxgl.LngLatBounds(coordinates[0][0], coordinates[0][0]));
 
             map.fitBounds(bounds, {
-                padding: 20,
+                // padding: 20,
                 maxZoom: 15,
             });
         }
@@ -135,43 +135,92 @@ function TalhaoForm(props) {
             },
             styles: [
                 {
-                    'id': 'gl-draw-polygon-fill-inactive',
-                    'type': 'fill',
-                    'filter': ['all', ['==', 'active', 'false'],
-                        ['==', '$type', 'Polygon'],
-                        ['!=', 'mode', 'static']
-                    ],
-                    'paint': {
-                        'fill-color': '#3bb2d0',
-                        'fill-outline-color': '#3bb2d0',
-                        'fill-opacity': 0.7
+                    "id": "gl-draw-polygon-fill",
+                    "type": "fill",
+                    "filter": ["all", ["==", "$type", "Polygon"], ["!=", "mode", "static"]],
+                    "paint": {
+                        "fill-color": "#D20C0C",
+                        "fill-outline-color": "#D20C0C",
+                        "fill-opacity": 0.6
                     }
                 },
+                // polygon outline stroke
+                // This doesn't style the first edge of the polygon, which uses the line stroke styling instead
                 {
-                    'id': 'gl-draw-polygon-fill-active',
-                    'type': 'fill',
-                    'filter': ['all', ['==', 'active', 'true'],
-                        ['==', '$type', 'Polygon']
-                    ],
-                    'paint': {
-                        'fill-color': '#fbb03b',
-                        'fill-outline-color': '#fbb03b',
-                        'fill-opacity': 0.7
+                    "id": "gl-draw-polygon-stroke-active",
+                    "type": "line",
+                    "filter": ["all", ["==", "$type", "Polygon"], ["!=", "mode", "static"]],
+                    "layout": {
+                        "line-cap": "round",
+                        "line-join": "round"
+                    },
+                    "paint": {
+                        "line-color": "#D20C0C",
+                        "line-dasharray": [0.2, 2],
+                        "line-width": 2
                     }
                 },
+                // vertex point halos
                 {
-                    'id': 'gl-draw-polygon-fill-static',
-                    'type': 'fill',
-                    'filter': ['all', ['==', 'mode', 'static'],
-                        ['==', '$type', 'Polygon']
-                    ],
-                    'paint': {
-                        'fill-color': '#404040',
-                        'fill-outline-color': '#404040',
-                        'fill-opacity': 0.7
+                    "id": "gl-draw-polygon-and-line-vertex-halo-active",
+                    "type": "circle",
+                    "filter": ["all", ["==", "meta", "vertex"], ["==", "$type", "Point"], ["!=", "mode", "static"]],
+                    "paint": {
+                        "circle-radius": 5,
+                        "circle-color": "#FFF"
+                    }
+                },
+                // vertex points
+                {
+                    "id": "gl-draw-polygon-and-line-vertex-active",
+                    "type": "circle",
+                    "filter": ["all", ["==", "meta", "vertex"], ["==", "$type", "Point"], ["!=", "mode", "static"]],
+                    "paint": {
+                        "circle-radius": 3,
+                        "circle-color": "#D20C0C",
                     }
                 },
 
+                // INACTIVE (static, already drawn)
+                // line stroke
+                {
+                    "id": "gl-draw-line-static",
+                    "type": "line",
+                    "filter": ["all", ["==", "$type", "LineString"], ["==", "mode", "static"]],
+                    "layout": {
+                        "line-cap": "round",
+                        "line-join": "round"
+                    },
+                    "paint": {
+                        "line-color": "#000",
+                        "line-width": 3
+                    }
+                },
+                // polygon fill
+                {
+                    "id": "gl-draw-polygon-fill-static",
+                    "type": "fill",
+                    "filter": ["all", ["==", "$type", "Polygon"], ["==", "mode", "static"]],
+                    "paint": {
+                        "fill-color": "#000",
+                        "fill-outline-color": "#000",
+                        "fill-opacity": 0.1
+                    }
+                },
+                // polygon outline
+                {
+                    "id": "gl-draw-polygon-stroke-static",
+                    "type": "line",
+                    "filter": ["all", ["==", "$type", "Polygon"], ["==", "mode", "static"]],
+                    "layout": {
+                        "line-cap": "round",
+                        "line-join": "round"
+                    },
+                    "paint": {
+                        "line-color": "#000",
+                        "line-width": 3
+                    }
+                }
             ]
         })
 
@@ -189,6 +238,7 @@ function TalhaoForm(props) {
 
     function updateTalhao(map, draw) {
         var data = draw.getAll();
+        console.log(draw);
         if (data.features.length > 0) {
             // draw.setFeatureProperty(data.features[0].id, 'fill-color', "black")
             setCoordenadasTalhao(JSON.stringify(data.features[0].geometry.coordinates));
@@ -200,7 +250,7 @@ function TalhaoForm(props) {
 
             map.fitBounds(bounds, {
                 padding: 20,
-                maxZoom: 15,
+                maxZoom: 13,
             });
 
             // map.jumpTo({ 'center': talhaoLatLon[0], 'zoom': 13 });

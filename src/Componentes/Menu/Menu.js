@@ -42,7 +42,7 @@ export default function Menu({ children }) {
                 </Typography>
             </List>
             <List>
-                <Link to="/painel" className="link-menu">
+                <Link to="/" className="link-menu">
                     <ListItem button key={'painelOs'}>
                         <ListItemIcon>
                             <GoDeviceDesktop color={'black'} size={25} />
@@ -51,7 +51,7 @@ export default function Menu({ children }) {
                     </ListItem>
                 </Link>
             </List>
-            <List>
+            {/* <List>
                 <Link to="/" className="link-menu">
                     <ListItem button key={'dashboard'}>
                         <ListItemIcon>
@@ -60,7 +60,7 @@ export default function Menu({ children }) {
                         <ListItemText primary={'DASHBOARD'} />
                     </ListItem>
                 </Link>
-            </List>
+            </List> */}
             <List>
                 <Link to="/mapa" className="link-menu">
                     <ListItem button key={'mapa'}>
@@ -92,12 +92,12 @@ export default function Menu({ children }) {
                 </Link>
             </List>
             <List>
-                <Link to="/tabela" className="link-menu">
-                    <ListItem button key={'tabela'}>
+                <Link to="/relatorio" className="link-menu">
+                    <ListItem button key={'relatorio'}>
                         <ListItemIcon>
                             <GoNote color={'black'} size={25} />
                         </ListItemIcon>
-                        <ListItemText primary={'TABELA'} />
+                        <ListItemText primary={'RELATORIO'} />
                     </ListItem>
                 </Link>
             </List>

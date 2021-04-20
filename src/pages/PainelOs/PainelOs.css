@@ -2,9 +2,12 @@
     display: block;
     position: relative;
     height: 100vh;
-    background-color: #010101eb;
+    background-color: #e9e9e9eb;
     padding-top: 21px;
     color: #e4e4e4;
+}
+.container-tabela-os {
+    margin: 0px 31px;
 }
 
 .painel-os-title {
@@ -13,15 +16,15 @@
     margin-bottom: 38px;
     font-family: inherit;
     line-height: 1.1;
-    color: white;
+    color: black;
     font-weight: bold;
-    text-shadow: 0px 0px 4px black;
+    /* text-shadow: 0px 0px 4px black; */
 }
 .tabela-painel-os {
     font-weight: 600;
 }
 .tabela-painel-os thead{
-    background-color: #002790;
+    background-color: #008000;
     color: white;
 }
 
