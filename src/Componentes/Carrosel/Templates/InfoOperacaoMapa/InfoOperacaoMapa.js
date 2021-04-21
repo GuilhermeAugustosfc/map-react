@@ -15,9 +15,6 @@ const InfoOperacaoMapa = function ({ operacao }) {
                 <strong>Veiculo: </strong> {operacao.osr_veiculo}
             </div>
             <div className="info-operacao">
-                <strong>Velocidade: </strong> {operacao.osr_velocidade}
-            </div>
-            <div className="info-operacao">
                 <strong>Motorista: </strong> {operacao.osr_motorista}
             </div>
             <div className="info-operacao">

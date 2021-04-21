@@ -1,14 +1,14 @@
-.container-form {
-    padding: 20px;
+.container-form-talhao {
+    padding: 56px 14px;
     display: flex;
     flex-direction: column;
 }
 
-.form {
+.form-talhao {
     flex: 1 1;
     display: flex;
     justify-content: space-between;
-    margin-bottom: 30px;
+    margin-bottom: 15px;
 }
 
 .input-button {
@@ -36,3 +36,22 @@
     display: flex;
 }
 
+.talhao-map-head {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 14px;
+    align-items: center;
+}
+
+.talhao-map-head p {
+    margin: 0;
+}
+
+.talhao-map-head-titulo {
+    font-weight: bold;
+    font-size: 23px;
+}
+
+.talhao-map-head-obs {
+
+}

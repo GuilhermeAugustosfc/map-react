@@ -15,15 +15,15 @@ import SocketFulltrack from '../../services/socket'
 
 function MapaGeral(props) {
 
-  const [posicoes, setPosicoes] = useState([]);
   const [dados, setDados] = useState([]);
-  const [cercaConsolidado, setCercaConsolidado] = useState(null);
 
-  const [operacao, setOperacao] = useState({
+  const [operacaoConfig, setOperacaoConfig] = useState({
+    cerca:null,
+    velocidade:null
+  })
 
-  });
-  const [velocidadeOperacao, setVelocidadeOperacao] = useState({});
-
+  const [operacao, setOperacao] = useState({});
+  
   const [dadosConsolidado, setDadosConsolidado] = useState({
     tempoTrabalho: "00:00:00",
     deslocamento: "00:00:00",
@@ -51,7 +51,7 @@ function MapaGeral(props) {
       width: '100vw'
     }
   })
-  
+
   var markersOciosos = useRef([]);
   var ultimaPosicaoVeiculo = {};
 
@@ -86,7 +86,7 @@ function MapaGeral(props) {
     consolidado.resetConsolidado();
 
     if (dados.length) {
-      let conso = consolidado.consolidarTodosDados(dados, cercaConsolidado);
+      let conso = consolidado.consolidarTodosDados(dados, operacaoConfig.cerca);
 
       if (conso) {
         setDadosConsolidado(conso);
@@ -110,7 +110,7 @@ function MapaGeral(props) {
         }
       }
 
-      let geojson = formatLineInMap.resume(dados, velocidadeOperacao);
+      let geojson = formatLineInMap.resume(dados, operacaoConfig.velocidade);
 
       map.addSource('rota', {
         'type': 'geojson',
@@ -131,21 +131,7 @@ function MapaGeral(props) {
         }
       });
     }
-  }, [dados, cercaConsolidado, map, velocidadeOperacao])
-
-  useEffect(() => {
-
-    if (!map || !posicoes.length) return
-
-    var bounds = posicoes.reduce(function (bounds, coord) {
-      return bounds.extend(coord);
-    }, new mapboxgl.LngLatBounds(posicoes[0], posicoes[0]));
-
-    map.fitBounds(bounds, {
-      padding: 20
-    });
-
-  }, [posicoes, map])
+  }, [dados, map, operacaoConfig])
 
   function atualizarMarkerMapa(data, map, aux) {
 
@@ -271,7 +257,7 @@ function MapaGeral(props) {
 
   }
 
-  function buscarDados(form) {
+  function buscarDados(form, map) {
 
     if (map && map.getSource('rota')) {
       map.removeSource('rota')
@@ -286,8 +272,9 @@ function MapaGeral(props) {
         // INVERTENDO AS POSCISAO DAS COORDENADAS
         data[i].lst_localizacao = [data[i].lst_localizacao[1], data[i].lst_localizacao[0]];
       }
+
       setDados(data);
-      setPosicoes(posicoesTratadas);
+      zoomRota(posicoesTratadas, map)
     })
   }
 
@@ -308,7 +295,6 @@ function MapaGeral(props) {
 
       setOperacao(operacaoAtual);
 
-      setVelocidadeOperacao(parseInt(operacaoAtual.osr_velocidade));
 
       addTalhaoOrdemServico(operacaoAtual, map);
 
@@ -320,7 +306,7 @@ function MapaGeral(props) {
         timezone: 'America/Sao_Paulo',
         idioma: 'pt-BR',
         id_indice: 5554,
-      })
+      }, map)
 
 
       if (operacaoAtual.status === 'andamento') {
@@ -350,7 +336,7 @@ function MapaGeral(props) {
         });
 
         SocketFulltrack.init((data) => {
-          if (data.ras_eve_aut_id === id) {
+          if (data.ras_vei_id === id) {
             atualizarMarkerMapa(data, map, aux);
           }
         })
@@ -417,9 +403,24 @@ function MapaGeral(props) {
     }
   }
 
+
+  function zoomRota(posicoes, map) {
+    var bounds = posicoes.reduce(function (bounds, coord) {
+      return bounds.extend(coord);
+    }, new mapboxgl.LngLatBounds(posicoes[0], posicoes[0]));
+
+    map.fitBounds(bounds, {
+      padding: 20
+    });
+  }
+
   function addTalhaoOrdemServico(orderServico, map) {
     var coordenadasTalhao = JSON.parse(orderServico.tal_coordenada);
-    setCercaConsolidado(turf.polygon(coordenadasTalhao));
+
+    setOperacaoConfig({
+      cerca:turf.polygon(coordenadasTalhao),
+      velocidade:parseInt(orderServico.osr_velocidade)
+    })
 
     let feature = {
       'type': 'Feature',
@@ -576,22 +577,10 @@ function MapaGeral(props) {
   //   }
   // }
 
-  function onStyleData(map, Ct) {
-    if (Ct && Ct.style.stylesheet && Ct.style.stylesheet.owner === "mapbox-map-design" && !map.getSource('mapbox-dem')) {
-      map.addSource('mapbox-dem', {
-        'type': 'raster-dem',
-        'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
-        'tileSize': 512,
-        'maxzoom': 14
-      });
-      // add the DEM source as a terrain layer with exaggerated height
-      map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
-    }
-  }
 
   return (
     <>
-      <MapBox onStyleData={onStyleData} onStyleLoad={onLoadMap} {...mapOptions} />
+      <MapBox onStyleLoad={onLoadMap} {...mapOptions} />
       <Carrosel operacao={operacao} consolidado={dadosConsolidado} />
     </>
   );

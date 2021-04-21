@@ -43,7 +43,7 @@ function TalhaoForm(props) {
         zoom: [12],
         containerStyle: {
             height: '70vh',
-            width: '94vw',
+            width: '97vw',
         }
     })
 
@@ -105,26 +105,6 @@ function TalhaoForm(props) {
     }
 
     function addMapBoxControll(map) {
-        // map.addControl(new StylesControl({
-        //     styles: [
-        //         {
-        //             label: 'Streets',
-        //             styleName: 'Mapbox Streets',
-        //             styleUrl: 'mapbox://styles/mapbox/streets-v9',
-        //         },
-        //         {
-        //             label: 'Satellite',
-        //             styleName: 'Satellite',
-        //             styleUrl: 'mapbox://styles/mapbox/satellite-v9',
-
-        //         },
-        //         {
-        //             label: 'Terreno',
-        //             styleName: 'Terreno',
-        //             styleUrl: 'mapbox://styles/mapbox-map-design/ckhqrf2tz0dt119ny6azh975y',
-        //         },
-        //     ],
-        // }), 'top-left');
 
         var newDraw = new MapboxDraw({
             displayControlsDefault: false,
@@ -133,94 +113,237 @@ function TalhaoForm(props) {
                 polygon: true,
                 trash: true
             },
-            styles: [
-                {
-                    "id": "gl-draw-polygon-fill",
-                    "type": "fill",
-                    "filter": ["all", ["==", "$type", "Polygon"], ["!=", "mode", "static"]],
-                    "paint": {
-                        "fill-color": "#D20C0C",
-                        "fill-outline-color": "#D20C0C",
-                        "fill-opacity": 0.6
-                    }
-                },
-                // polygon outline stroke
-                // This doesn't style the first edge of the polygon, which uses the line stroke styling instead
-                {
-                    "id": "gl-draw-polygon-stroke-active",
-                    "type": "line",
-                    "filter": ["all", ["==", "$type", "Polygon"], ["!=", "mode", "static"]],
-                    "layout": {
-                        "line-cap": "round",
-                        "line-join": "round"
-                    },
-                    "paint": {
-                        "line-color": "#D20C0C",
-                        "line-dasharray": [0.2, 2],
-                        "line-width": 2
-                    }
-                },
-                // vertex point halos
-                {
-                    "id": "gl-draw-polygon-and-line-vertex-halo-active",
-                    "type": "circle",
-                    "filter": ["all", ["==", "meta", "vertex"], ["==", "$type", "Point"], ["!=", "mode", "static"]],
-                    "paint": {
-                        "circle-radius": 5,
-                        "circle-color": "#FFF"
-                    }
-                },
-                // vertex points
-                {
-                    "id": "gl-draw-polygon-and-line-vertex-active",
-                    "type": "circle",
-                    "filter": ["all", ["==", "meta", "vertex"], ["==", "$type", "Point"], ["!=", "mode", "static"]],
-                    "paint": {
-                        "circle-radius": 3,
-                        "circle-color": "#D20C0C",
-                    }
-                },
-
-                // INACTIVE (static, already drawn)
-                // line stroke
-                {
-                    "id": "gl-draw-line-static",
-                    "type": "line",
-                    "filter": ["all", ["==", "$type", "LineString"], ["==", "mode", "static"]],
-                    "layout": {
-                        "line-cap": "round",
-                        "line-join": "round"
-                    },
-                    "paint": {
-                        "line-color": "#000",
-                        "line-width": 3
-                    }
-                },
-                // polygon fill
-                {
-                    "id": "gl-draw-polygon-fill-static",
-                    "type": "fill",
-                    "filter": ["all", ["==", "$type", "Polygon"], ["==", "mode", "static"]],
-                    "paint": {
-                        "fill-color": "#000",
-                        "fill-outline-color": "#000",
-                        "fill-opacity": 0.1
-                    }
-                },
-                // polygon outline
-                {
-                    "id": "gl-draw-polygon-stroke-static",
-                    "type": "line",
-                    "filter": ["all", ["==", "$type", "Polygon"], ["==", "mode", "static"]],
-                    "layout": {
-                        "line-cap": "round",
-                        "line-join": "round"
-                    },
-                    "paint": {
-                        "line-color": "#000",
-                        "line-width": 3
-                    }
+            styles: [{
+                'id': 'gl-draw-polygon-fill-inactive',
+                'type': 'fill',
+                'filter': ['all', ['==', 'active', 'false'],
+                  ['==', '$type', 'Polygon'],
+                  ['!=', 'mode', 'static']
+                ],
+                'paint': {
+                  'fill-color': [
+                    "case", ['==', ['get', "user_class_id"], 1], "#00ff00", ['==', ['get', "user_class_id"], 2], "#0000ff",
+                    '#ff0000'
+                  ],
+                  'fill-outline-color': '#3bb2d0',
+                  'fill-opacity': 0.5
                 }
+              },
+              {
+                'id': 'gl-draw-polygon-fill-active',
+                'type': 'fill',
+                'filter': ['all', ['==', 'active', 'true'],
+                  ['==', '$type', 'Polygon']
+                ],
+                'paint': {
+                  'fill-color': '#fbb03b',
+                  'fill-outline-color': '#fbb03b',
+                  'fill-opacity': 0.1
+                }
+              },
+              {
+                'id': 'gl-draw-polygon-midpoint',
+                'type': 'circle',
+                'filter': ['all', ['==', '$type', 'Point'],
+                  ['==', 'meta', 'midpoint']
+                ],
+                'paint': {
+                  'circle-radius': 3,
+                  'circle-color': '#fbb03b'
+                }
+              },
+              {
+                'id': 'gl-draw-polygon-stroke-inactive',
+                'type': 'line',
+                'filter': ['all', ['==', 'active', 'false'],
+                  ['==', '$type', 'Polygon'],
+                  ['!=', 'mode', 'static']
+                ],
+                'layout': {
+                  'line-cap': 'round',
+                  'line-join': 'round'
+                },
+                'paint': {
+                  'line-color': '#3bb2d0',
+                  'line-width': 2
+                }
+              },
+              {
+                'id': 'gl-draw-polygon-stroke-active',
+                'type': 'line',
+                'filter': ['all', ['==', 'active', 'true'],
+                  ['==', '$type', 'Polygon']
+                ],
+                'layout': {
+                  'line-cap': 'round',
+                  'line-join': 'round'
+                },
+                'paint': {
+                  'line-color': '#fbb03b',
+                  'line-dasharray': [0.2, 2],
+                  'line-width': 2
+                }
+              },
+              {
+                'id': 'gl-draw-line-inactive',
+                'type': 'line',
+                'filter': ['all', ['==', 'active', 'false'],
+                  ['==', '$type', 'LineString'],
+                  ['!=', 'mode', 'static']
+                ],
+                'layout': {
+                  'line-cap': 'round',
+                  'line-join': 'round'
+                },
+                'paint': {
+                  'line-color': '#3bb2d0',
+                  'line-width': 2
+                }
+              },
+              {
+                'id': 'gl-draw-line-active',
+                'type': 'line',
+                'filter': ['all', ['==', '$type', 'LineString'],
+                  ['==', 'active', 'true']
+                ],
+                'layout': {
+                  'line-cap': 'round',
+                  'line-join': 'round'
+                },
+                'paint': {
+                  'line-color': '#fbb03b',
+                  'line-dasharray': [0.2, 2],
+                  'line-width': 2
+                }
+              },
+              {
+                'id': 'gl-draw-polygon-and-line-vertex-stroke-inactive',
+                'type': 'circle',
+                'filter': ['all', ['==', 'meta', 'vertex'],
+                  ['==', '$type', 'Point'],
+                  ['!=', 'mode', 'static']
+                ],
+                'paint': {
+                  'circle-radius': 5,
+                  'circle-color': '#fff'
+                }
+              },
+              {
+                'id': 'gl-draw-polygon-and-line-vertex-inactive',
+                'type': 'circle',
+                'filter': ['all', ['==', 'meta', 'vertex'],
+                  ['==', '$type', 'Point'],
+                  ['!=', 'mode', 'static']
+                ],
+                'paint': {
+                  'circle-radius': 3,
+                  'circle-color': '#fbb03b'
+                }
+              },
+              {
+                'id': 'gl-draw-point-point-stroke-inactive',
+                'type': 'circle',
+                'filter': ['all', ['==', 'active', 'false'],
+                  ['==', '$type', 'Point'],
+                  ['==', 'meta', 'feature'],
+                  ['!=', 'mode', 'static']
+                ],
+                'paint': {
+                  'circle-radius': 5,
+                  'circle-opacity': 1,
+                  'circle-color': '#fff'
+                }
+              },
+              {
+                'id': 'gl-draw-point-inactive',
+                'type': 'circle',
+                'filter': ['all', ['==', 'active', 'false'],
+                  ['==', '$type', 'Point'],
+                  ['==', 'meta', 'feature'],
+                  ['!=', 'mode', 'static']
+                ],
+                'paint': {
+                  'circle-radius': 3,
+                  'circle-color': '#3bb2d0'
+                }
+              },
+              {
+                'id': 'gl-draw-point-stroke-active',
+                'type': 'circle',
+                'filter': ['all', ['==', '$type', 'Point'],
+                  ['==', 'active', 'true'],
+                  ['!=', 'meta', 'midpoint']
+                ],
+                'paint': {
+                  'circle-radius': 7,
+                  'circle-color': '#fff'
+                }
+              },
+              {
+                'id': 'gl-draw-point-active',
+                'type': 'circle',
+                'filter': ['all', ['==', '$type', 'Point'],
+                  ['!=', 'meta', 'midpoint'],
+                  ['==', 'active', 'true']
+                ],
+                'paint': {
+                  'circle-radius': 5,
+                  'circle-color': '#fbb03b'
+                }
+              },
+              {
+                'id': 'gl-draw-polygon-fill-static',
+                'type': 'fill',
+                'filter': ['all', ['==', 'mode', 'static'],
+                  ['==', '$type', 'Polygon']
+                ],
+                'paint': {
+                  'fill-color': '#404040',
+                  'fill-outline-color': '#404040',
+                  'fill-opacity': 0.1
+                }
+              },
+              {
+                'id': 'gl-draw-polygon-stroke-static',
+                'type': 'line',
+                'filter': ['all', ['==', 'mode', 'static'],
+                  ['==', '$type', 'Polygon']
+                ],
+                'layout': {
+                  'line-cap': 'round',
+                  'line-join': 'round'
+                },
+                'paint': {
+                  'line-color': '#404040',
+                  'line-width': 2
+                }
+              },
+              {
+                'id': 'gl-draw-line-static',
+                'type': 'line',
+                'filter': ['all', ['==', 'mode', 'static'],
+                  ['==', '$type', 'LineString']
+                ],
+                'layout': {
+                  'line-cap': 'round',
+                  'line-join': 'round'
+                },
+                'paint': {
+                  'line-color': '#404040',
+                  'line-width': 2
+                }
+              },
+              {
+                'id': 'gl-draw-point-static',
+                'type': 'circle',
+                'filter': ['all', ['==', 'mode', 'static'],
+                  ['==', '$type', 'Point']
+                ],
+                'paint': {
+                  'circle-radius': 5,
+                  'circle-color': '#404040'
+                }
+              }
             ]
         })
 
@@ -422,8 +545,8 @@ function TalhaoForm(props) {
     }
 
     return (
-        <div className="container-form">
-            <div className="col-md-12 form">
+        <div className="container-form-talhao">
+            <div className="col-md-12 form-talhao">
                 <div className="input-group">
                     <label>Descrição do talhão</label>
                     <input className="form-control" value={descricao} type="text" alt="digite a descricao do talhao" placeholder="Digite a descrição do talhao" onChange={(e) => setDescricao(e.target.value)} />
@@ -449,19 +572,18 @@ function TalhaoForm(props) {
 
             <input type="hidden" value={id_talhao} />
 
-            <div className="import-group">
+            <div className="col-md-12 import-group">
                 <input ref={selecionarFileRef} className="btn" id="btn-selecionar-shape" type="file" />
                 <button className="btn" id="btn-importar-shape" onClick={() => importarShapeFile()}>Importar</button>
-
             </div>
 
             <div className="col-md-12 container-mapa">
-                <h3>Desenhe a area do talhão</h3>
-                <p className="error-input">{errorCoordenadasTalhao}</p>
-
-                <div className="mapa">
-                    <MapBox onStyleLoad={onLoadMap} {...mapOptions} />
+                <div className="talhao-map-head">
+                    <p className="talhao-map-head-titulo">Desenhe a area do talhão</p>
+                    <p className="talhao-map-head-obs">Obs: A foto do talhão é tirada no momento que o talhão for salvo.</p>
                 </div>
+                <p className="error-input">{errorCoordenadasTalhao}</p>
+                <MapBox onStyleLoad={onLoadMap} {...mapOptions} />
             </div>
         </div>
     );

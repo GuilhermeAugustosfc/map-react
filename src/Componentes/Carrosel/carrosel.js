@@ -7,7 +7,7 @@ import OwlCarousel from 'react-owl-carousel2';
 import 'react-owl-carousel2/lib/styles.css'; //Allows for server-side rendering.
 import './carrosel.css';
 
-function Carrosel(props) {
+function Carrosel({operacao, consolidado}) {
 
     const [templates, setTemplates] = useState([
         InfoConsolidadoMapa, TemplateTest, TemplateTest, TemplateTest, TemplateTest
@@ -41,17 +41,16 @@ function Carrosel(props) {
         )
     }
     useEffect(() => {
-        if (Object.keys(props.operacao).length) {
+        if (Object.keys(operacao).length) {
             setTemplates((templates) => [...[TemplateOperacao, TemplateConfigOperacao],...templates])
         }
-        console.log(props);
-    }, [props])
+    }, [operacao])
 
     return (
         <OwlCarousel options={options} events={events} >
             {templates.map((Component, index) => (
                 <div className="template-scrol-horizontal" key={index}>
-                    <Component {...props} />
+                    <Component consolidado={consolidado} operacao={operacao} />
                 </div>
             ))}
         </OwlCarousel>
@@ -59,9 +58,5 @@ function Carrosel(props) {
     );
 }
 
-function carroselPropsAreEqual(prevProps, nextProps) {
-    return JSON.stringify(prevProps.consolidado) === JSON.stringify(nextProps.consolidado)
-      && JSON.stringify(prevProps.operacao) === JSON.stringify(nextProps.operacao);
-  }
+export default Carrosel;
 
-export default React.memo(Carrosel, carroselPropsAreEqual);

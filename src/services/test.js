@@ -36,6 +36,20 @@ function Mapbox() {
 
 export default Mapbox;
 
+// function onStyleData(map, Ct) {
+//     if (Ct && Ct.style.stylesheet && Ct.style.stylesheet.owner === "mapbox-map-design" && !map.getSource('mapbox-dem')) {
+//       map.addSource('mapbox-dem', {
+//         'type': 'raster-dem',
+//         'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+//         'tileSize': 512,
+//         'maxzoom': 14
+//       });
+//       // add the DEM source as a terrain layer with exaggerated height
+//       map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+//     }
+//   }
+
+
 // function onMouseOverFeature(e, map) {
 
 //     var features = map.queryRenderedFeatures(e.point);

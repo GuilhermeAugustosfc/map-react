@@ -12,10 +12,6 @@ const Map = ReactMapboxGl({
 
 const Mapbox = forwardRef((props, refMap) => {
 
-    useEffect(() => {
-        console.log(props);
-        
-    }, [props])
     return (
         <Map ref={refMap} {...props} />
     );
