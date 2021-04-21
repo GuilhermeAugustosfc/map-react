@@ -238,9 +238,9 @@ function TalhaoForm(props) {
 
     function updateTalhao(map, draw) {
         var data = draw.getAll();
-        console.log(draw);
         if (data.features.length > 0) {
             // draw.setFeatureProperty(data.features[0].id, 'fill-color', "black")
+
             setCoordenadasTalhao(JSON.stringify(data.features[0].geometry.coordinates));
             var talhaoLatLon = data.features[0].geometry.coordinates[0];
 
@@ -369,8 +369,6 @@ function TalhaoForm(props) {
                 console.log(error);
             });
         }
-
-
     }
 
     function backForm() {
@@ -397,7 +395,6 @@ function TalhaoForm(props) {
         if (this.readyState === 2 && !this.error) {
             var geojson = shp.parseZip(this.result);
             var coordenadasShapefile = geojson.features[0].geometry.coordinates;
-            debugger
 
             if (coordenadasShapefile.length > 0) {
                 coordenadasShapefile = coordenadasShapefile.length === 1 ? coordenadasShapefile : [coordenadasShapefile];

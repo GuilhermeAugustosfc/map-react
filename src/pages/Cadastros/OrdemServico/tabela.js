@@ -71,7 +71,7 @@ const OrdemServicoTabela = () => {
                     </div>
                 </div>
             </div>
-            {dadosOrdemServico.length && dadosOrdemServico.map((row) => (
+            {dadosOrdemServico && dadosOrdemServico.length && dadosOrdemServico.map((row) => (
                 <div className="card-ordemservico" key={row.osr_id} onClick={() => clickOrdemServico(row)}>
                     <div style={{ display: 'flex' }}>
                         {row.tal_imagem ? (
