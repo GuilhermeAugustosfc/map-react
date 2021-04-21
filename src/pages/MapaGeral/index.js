@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import MapBox from '../../Componentes/MapBox/mapbox';
-import Filtro from '../../Componentes/FiltroMapa/FiltroMapa';
+
 import Carrosel from '../../Componentes/Carrosel/carrosel';
 
 import { consolidado, formatLineInMap, calcColorSpeed } from "../../helpers/mapHelper"
@@ -19,7 +19,9 @@ function MapaGeral(props) {
   const [dados, setDados] = useState([]);
   const [cercaConsolidado, setCercaConsolidado] = useState(null);
 
-  const [operacao, setOperacao] = useState({});
+  const [operacao, setOperacao] = useState({
+
+  });
   const [velocidadeOperacao, setVelocidadeOperacao] = useState({});
 
   const [dadosConsolidado, setDadosConsolidado] = useState({
@@ -49,8 +51,7 @@ function MapaGeral(props) {
       width: '100vw'
     }
   })
-
-  var popups = [];
+  
   var markersOciosos = useRef([]);
   var ultimaPosicaoVeiculo = {};
 
@@ -58,11 +59,20 @@ function MapaGeral(props) {
   var sourceMarker = {};
   var sourceMarkerIndex = {};
 
-  var imagesMarkers = {
-    desligado: 'https://fulltrackstatic.s3.amazonaws.com/anuncio/Dm4aomaD9om6gr4D42kr0Pgn4Dlnml0l73o52p7D499p4png63-pt-br.png',
-    movimento: 'https://fulltrackstatic.s3.amazonaws.com/anuncio/Dm4aomaD9om6gr4D42kr0Pgn4Dlnml0l73o52p7D499p4png63-es-es.png',
-    ligado: 'https://fulltrackstatic.s3.amazonaws.com/anuncio/Dm4aomaD9om6gr4D42kr0Pgn4Dlnml0l73o52p7D499p4png63-en-us.png'
-  };
+  var imagesMarkers = [
+    {
+      url: "https://fulltrackstatic.s3.amazonaws.com/anuncio/Dm4aomaD9om6gr4D42kr0Pgn4Dlnml0l73o52p7D499p4png63-pt-br.png",
+      nome: "marker-desligado"
+    },
+    {
+      url: "https://fulltrackstatic.s3.amazonaws.com/anuncio/Dm4aomaD9om6gr4D42kr0Pgn4Dlnml0l73o52p7D499p4png63-es-es.png",
+      nome: "marker-ligado"
+    },
+    {
+      url: "https://fulltrackstatic.s3.amazonaws.com/anuncio/Dm4aomaD9om6gr4D42kr0Pgn4Dlnml0l73o52p7D499p4png63-en-us.png",
+      nome: "marker-movimento"
+    }
+  ]
 
   useEffect(() => {
 
@@ -281,32 +291,6 @@ function MapaGeral(props) {
     })
   }
 
-  // async function getlayerFazenda(map) {
-  //   let retorno = await fetch("https://fulltrackstatic.s3.amazonaws.com/anuncio/Ce3jaao765n5Rry37CeeCsf99o99euufyyar951ssa57j749-pt-br.json");
-  //   let geojson = await retorno.json();
-
-
-  //   // ADD LAYERS DA FAZENDA (MAPA)
-  //   map.addSource('fazenda', {
-  //     'type': 'geojson',
-  //     'data': geojson,
-  //   });
-
-  //   map.addLayer({
-  //     'id': 'fazenda',
-  //     'type': 'line',
-  //     'source': 'fazenda',
-  //     'layout': {
-  //       'line-join': 'round',
-  //       'line-cap': 'round'
-  //     },
-  //     'paint': {
-  //       'line-color': '#888',
-  //       'line-width': 1,
-  //     }
-  //   });
-  // }
-
   async function onLoadMap(map) {
 
     setMap(map);
@@ -321,9 +305,11 @@ function MapaGeral(props) {
     if (id) {
 
       let operacaoAtual = props.location.state;
-      console.log(operacaoAtual);
+
+      setOperacao(operacaoAtual);
+
       setVelocidadeOperacao(parseInt(operacaoAtual.osr_velocidade));
-      setOperacao(operacaoAtual)
+
       addTalhaoOrdemServico(operacaoAtual, map);
 
       buscarDados({
@@ -338,63 +324,65 @@ function MapaGeral(props) {
 
 
       if (operacaoAtual.status === 'andamento') {
-        loadImages(map, imagesMarkers, (images) => {
-          map.addImage('marker-desligado', images['desligado']);
-          map.addImage('marker-ligado', images['ligado']);
-          map.addImage('marker-movimento', images['movimento']);
 
-          var aux = {
-            rotaAtual: [],
-            indexCor: null,
-            coordenadas: [],
-            allFeaturesMarkers: [],
-            featureMarkerAtual: []
-          }
-
-          sourceMarker = {
-            'type': 'FeatureCollection',
-            'features': []
-          }
-
-          map.addSource('markersSymbol', {
-            'type': 'geojson',
-            'data': sourceMarker
-          });
-
-          SocketFulltrack.init((data) => {
-            if (data.ras_eve_aut_id === id) {
-              atualizarMarkerMapa(data, map, aux);
-            }
+        imagesMarkers.forEach(item => {
+          map.loadImage(item.url, function (error, image) {
+            map.addImage(item.nome, image)
           })
+        });
 
-          map.addLayer({
-            'id': 'markersSymbol',
-            'type': 'symbol',
-            'source': 'markersSymbol',
-            'layout': {
-              'icon-size': 1,
-              'icon-image': ['get', 'image_marker'],
-              'icon-allow-overlap': true,
-              // get the title name from the source's "title" property
-              'text-field': ['get', 'desc_ativo'],
-              'text-font': [
-                'Open Sans Semibold',
-                'Arial Unicode MS Bold'
-              ],
-              // 'text-offset': [0, 1.25],
-              'text-anchor': 'bottom',
-              'text-transform': 'uppercase',
-              'text-letter-spacing': 0.05,
-              'text-offset': [0, 1.5],
-              'icon-offset': [0, -18]
-            },
-            'paint': {
-              'text-color': '#202',
-              'text-halo-color': '#fff',
-              'text-halo-width': 2
-            }
-          });
+        var aux = {
+          rotaAtual: [],
+          indexCor: null,
+          coordenadas: [],
+          allFeaturesMarkers: [],
+          featureMarkerAtual: []
+        }
+
+        sourceMarker = {
+          'type': 'FeatureCollection',
+          'features': []
+        }
+
+        map.addSource('markersSymbol', {
+          'type': 'geojson',
+          'data': sourceMarker
+        });
+
+        SocketFulltrack.init((data) => {
+          if (data.ras_eve_aut_id === id) {
+            atualizarMarkerMapa(data, map, aux);
+          }
         })
+
+        map.addLayer({
+          'id': 'markersSymbol',
+          'type': 'symbol',
+          'source': 'markersSymbol',
+          'layout': {
+            'icon-size': 1,
+            'icon-image': ['get', 'image_marker'],
+            'icon-allow-overlap': true,
+            // get the title name from the source's "title" property
+            'text-field': ['get', 'desc_ativo'],
+            'text-font': [
+              'Open Sans Semibold',
+              'Arial Unicode MS Bold'
+            ],
+            // 'text-offset': [0, 1.25],
+            'text-anchor': 'bottom',
+            'text-transform': 'uppercase',
+            'text-letter-spacing': 0.05,
+            'text-offset': [0, 1.5],
+            'icon-offset': [0, -18]
+          },
+          'paint': {
+            'text-color': '#202',
+            'text-halo-color': '#fff',
+            'text-halo-width': 2
+          }
+        });
+
       }
 
       var popup = new mapboxgl.Popup({
@@ -488,63 +476,6 @@ function MapaGeral(props) {
     });
   }
 
-  function loadImages(map, urls, callback) {
-    var results = {};
-    for (var name in urls) {
-      map.loadImage(urls[name], makeCallback(name));
-    }
-
-    function makeCallback(name) {
-      return function (err, image) {
-        results[name] = err ? null : image;
-
-        // if all images are loaded, call the callback
-        if (Object.keys(results).length === Object.keys(urls).length) {
-          callback(results);
-        }
-      };
-    }
-  }
-  function onMouseOverFeature(e, map) {
-
-    var features = map.queryRenderedFeatures(e.point);
-    var displayProperties = [
-      'id',
-      'layer',
-      'source',
-      'sourceLayer',
-      'state',
-      'properties',
-      'geometry'
-    ];
-
-
-    var displayFeatures = features.map(function (feat) {
-      let displayFeat = {};
-
-      displayProperties.forEach(function (prop) {
-        displayFeat[prop] = feat[prop];
-      });
-      return displayFeat;
-    });
-
-    if (displayFeatures.length && ['rota'].includes(displayFeatures[0].source)) {
-      if (popups.length > 0) {
-        for (var i in popups) {
-          popups[i].remove();
-        }
-        popups = [];
-      }
-
-      let popup = new mapboxgl.Popup()
-        .setLngLat(e.lngLat)
-        .setHTML(templatePopup(displayFeatures[0].properties))
-        .addTo(map);
-
-      popups.push(popup)
-    }
-  }
-
   function onClickRota(e, map) {
     new mapboxgl.Popup()
       .setLngLat(e.lngLat)
@@ -566,20 +497,6 @@ function MapaGeral(props) {
                 ${obj.desc_ativo}
               </div>
             </div>`
-  }
-
-  function onclickButtonGerar(data) {
-    if (data.dt_inicial && data.dt_final) {
-      buscarDados({
-        dt_final: data.dt_final.toLocaleString("pt-BR"),
-        dt_inicial: data.dt_inicial.toLocaleString("pt-BR"),
-        id_ativo: 241354,
-        id_motorista: 0,
-        timezone: 'America/Sao_Paulo',
-        idioma: 'pt-BR',
-        id_indice: 5554,
-      })
-    }
   }
 
   // function onClickConsolidado(stringConsolidado, dados) {
@@ -675,8 +592,6 @@ function MapaGeral(props) {
   return (
     <>
       <MapBox onStyleData={onStyleData} onStyleLoad={onLoadMap} {...mapOptions} />
-      {/* <InfoConsolidadoMapa dados={dadosConsolidado} /> */}
-      {/* <Filtro onclickButtonGerar={onclickButtonGerar} /> */}
       <Carrosel operacao={operacao} consolidado={dadosConsolidado} />
     </>
   );

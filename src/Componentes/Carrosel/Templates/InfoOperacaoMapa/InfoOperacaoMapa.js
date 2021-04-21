@@ -26,12 +26,6 @@ const InfoOperacaoMapa = function ({ operacao }) {
             <div className="info-operacao">
                 <strong>Talhão: </strong> {operacao.tal_descricao}
             </div>
-            <div className="info-operacao">
-                Periodo: {operacao.data_init} - {operacao.data_fim}
-            </div>
-            <div className="info-operacao">
-                <strong>Status: </strong> {operacao.status}
-            </div>
         </div>
     </div>
 }

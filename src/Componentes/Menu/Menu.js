@@ -13,8 +13,6 @@ import { Link } from 'react-router-dom'
 
 import { GoCalendar, GoGrabber, GoGlobe, GoFileMedia, GoNote, GoDeviceDesktop } from 'react-icons/go'
 
-import { BiMapAlt } from 'react-icons/bi'
-
 import "./Menu.css"
 
 

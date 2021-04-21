@@ -1,15 +1,20 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import InfoConsolidadoMapa from './Templates/InfoConsolidadoMapa/InfoConsolidadoMapa'
 import TemplateOperacao from './Templates/InfoOperacaoMapa/InfoOperacaoMapa'
+import TemplateConfigOperacao from './Templates/InfoConfigOperacaoMapa/InfoConfigOperacaoMapa'
 import OwlCarousel from 'react-owl-carousel2';
 import 'react-owl-carousel2/lib/styles.css'; //Allows for server-side rendering.
 import './carrosel.css';
 
 function Carrosel(props) {
 
+    const [templates, setTemplates] = useState([
+        InfoConsolidadoMapa, TemplateTest, TemplateTest, TemplateTest, TemplateTest
+    ]);
+
     const options = {
-        items: 3,
+        items: 4,
         nav: false,
         rewind: true,
         merge: true
@@ -20,7 +25,7 @@ function Carrosel(props) {
         onChanged: function (event) { }
     };
 
-    const TemplateTest = () => {
+    function TemplateTest() {
         return (
             <>
                 <h5>Ultimos evnetos</h5>
@@ -36,12 +41,15 @@ function Carrosel(props) {
         )
     }
     useEffect(() => {
-    }, [])
-
+        if (Object.keys(props.operacao).length) {
+            setTemplates((templates) => [...[TemplateOperacao, TemplateConfigOperacao],...templates])
+        }
+        console.log(props);
+    }, [props])
 
     return (
         <OwlCarousel options={options} events={events} >
-            {[TemplateOperacao, InfoConsolidadoMapa, TemplateTest, TemplateTest, TemplateTest, TemplateTest].map((Component, index) => (
+            {templates.map((Component, index) => (
                 <div className="template-scrol-horizontal" key={index}>
                     <Component {...props} />
                 </div>
@@ -51,4 +59,9 @@ function Carrosel(props) {
     );
 }
 
-export default Carrosel;
+function carroselPropsAreEqual(prevProps, nextProps) {
+    return JSON.stringify(prevProps.consolidado) === JSON.stringify(nextProps.consolidado)
+      && JSON.stringify(prevProps.operacao) === JSON.stringify(nextProps.operacao);
+  }
+
+export default React.memo(Carrosel, carroselPropsAreEqual);

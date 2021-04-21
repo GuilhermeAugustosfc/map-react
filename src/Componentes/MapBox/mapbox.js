@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react'
+import React, { forwardRef, useEffect } from 'react'
 
 import ReactMapboxGl from 'react-mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -12,6 +12,10 @@ const Map = ReactMapboxGl({
 
 const Mapbox = forwardRef((props, refMap) => {
 
+    useEffect(() => {
+        console.log(props);
+        
+    }, [props])
     return (
         <Map ref={refMap} {...props} />
     );

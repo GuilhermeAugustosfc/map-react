@@ -36,6 +36,46 @@ function Mapbox() {
 
 export default Mapbox;
 
+// function onMouseOverFeature(e, map) {
+
+//     var features = map.queryRenderedFeatures(e.point);
+//     var displayProperties = [
+//       'id',
+//       'layer',
+//       'source',
+//       'sourceLayer',
+//       'state',
+//       'properties',
+//       'geometry'
+//     ];
+
+
+//     var displayFeatures = features.map(function (feat) {
+//       let displayFeat = {};
+
+//       displayProperties.forEach(function (prop) {
+//         displayFeat[prop] = feat[prop];
+//       });
+//       return displayFeat;
+//     });
+
+//     if (displayFeatures.length && ['rota'].includes(displayFeatures[0].source)) {
+//       if (popups.length > 0) {
+//         for (var i in popups) {
+//           popups[i].remove();
+//         }
+//         popups = [];
+//       }
+
+//       let popup = new mapboxgl.Popup()
+//         .setLngLat(e.lngLat)
+//         .setHTML(templatePopup(displayFeatures[0].properties))
+//         .addTo(map);
+
+//       popups.push(popup)
+//     }
+//   }
+
 // map.on('load', async function () {
 
 //     let retorno = await fetch("https://fulltrackstatic.s3.amazonaws.com/kmz/118z18onond7713j617j6s6j738fao3a18ann7sn177jzad78-pt-br.json");

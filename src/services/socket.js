@@ -2,7 +2,6 @@
 const SOCKET = {
     socket: null,
     init: function (call) {
-        console.log(this.socket);
         if (this.socket) {
             return
         }

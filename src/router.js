@@ -18,8 +18,6 @@ import OrdemServicoForm from "./pages/Cadastros/OrdemServico/form";
 import Mapa from "./pages/MapaGeral";
 import PainelOs from "./pages/PainelOs";
 
-import Dashboard from "./pages/Dashboard";
-
 import isLogged from "./validacao/routerValidacao"
 
 const PrivateRoute = ({component: Component, ...rest}) => (
