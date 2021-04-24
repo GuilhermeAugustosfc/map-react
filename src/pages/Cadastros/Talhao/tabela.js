@@ -4,6 +4,7 @@ import { useHistory } from "react-router";
 
 import { GoTrashcan, GoPlus } from 'react-icons/go'
 
+import Swal from 'sweetalert2'
 
 import './tabela.css'
 
@@ -33,16 +34,40 @@ const TalhaoTabela = () => {
     }
 
     function deleteTalhao(id, url_s3_image) {
-        let form = new FormData();
-        form.append('id', id);
+        Swal.fire({
+            title: 'Você tem certeza ?',
+            text: 'Você tem certeza que deseja deletar esse Talhão ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sim, eu quero!',
+            cancelButtonText: 'Não, me enganei!'
+        }).then((result) => {
+            if (result.value) {
+                let form = new FormData();
+                form.append('id', id);
 
-        if (url_s3_image && url_s3_image.split('talhao/').length > 0) {
-            form.append('filename', url_s3_image.split('talhao/')[1])
-        }
+                if (url_s3_image && url_s3_image.split('talhao/').length > 0) {
+                    form.append('filename', url_s3_image.split('talhao/')[1])
+                }
 
-        api.post(`http://f-agro-api.fulltrackapp.com/talhao/delete`, form, ({ data }) => {
-            getDados();
+                api.post(`http://f-agro-api.fulltrackapp.com/talhao/delete`, form, ({ data }) => {
+                    Swal.fire(
+                        'Deletado !',
+                        'O talhão foi deletado com sucesso.',
+                        'success'
+                    )
+                    getDados();
+                })
+
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                Swal.fire(
+                    'Operação cancelada',
+                    'Você não deletou seu talhão!',
+                    'error'
+                )
+            }
         })
+
     }
 
     return (
@@ -70,8 +95,8 @@ const TalhaoTabela = () => {
                         <div className="legenda-area-util">
                             {row.tal_area_util}
                         </div>
-                        <div className="button-talhao" style={{ float: "right" }}>
-                            <GoTrashcan color={'#900000'} onClick={() => deleteTalhao(row.tal_id, row.tal_imagem)} size={23} />
+                        <div className="button-delete-talhao">
+                            <GoTrashcan color={'#900000bf'} onClick={() => deleteTalhao(row.tal_id, row.tal_imagem)} size={23} />
                         </div>
                     </div>
                 </div>

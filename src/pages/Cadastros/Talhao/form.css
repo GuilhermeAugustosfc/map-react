@@ -11,7 +11,7 @@
     margin-bottom: 15px;
 }
 
-.input-button {
+.input-button-talhao {
     align-items: flex-end;
     display: flex;
     justify-content: center;
@@ -52,6 +52,20 @@
     font-size: 23px;
 }
 
-.talhao-map-head-obs {
+#btn-salvar-talhao {
+    margin-right: 7px;
+    background-color: #dcffd9;
+}
 
+#btn-cancelar-talhao {
+    background-color: #ffa50038;
+}
+
+.talhao-map-head-obs {
+    background-color: #cccccc08;
+    padding: 5px;
+    border-radius: 10px;
+    box-shadow: 1px 1px 2px 0px #00000094;
+    font-weight: 500;
+    cursor: pointer;
 }

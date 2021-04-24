@@ -67,3 +67,17 @@
     justify-content: space-between;
     align-items: center;
 }
+
+.button-delete-talhao {
+    display: flex;
+    padding: 7px;
+    border: 1px solid #00000030;
+    box-shadow: 1px 2px 2px 0px #ccc;
+    transition: all .1s ease-in-out;
+    border-radius: 50%;
+}
+
+.button-delete-talhao:hover {
+    box-shadow: 0px 0px 4px 0px #ccc;
+
+}

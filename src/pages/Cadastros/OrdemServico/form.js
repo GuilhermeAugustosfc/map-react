@@ -9,7 +9,6 @@ import moment from 'moment';
 
 import { GoCheck, GoArrowLeft } from 'react-icons/go'
 
-
 import Button from '@material-ui/core/Button';
 import './form.css';
 
@@ -355,7 +354,6 @@ function OrderServicoForm(props) {
     function onChangeData(ev, picker) {
         setInicioPeriodo(picker.startDate.format('DD/MM/YYYY HH:mm:ss'))
         setFimPeriodo(picker.endDate.format('DD/MM/YYYY HH:mm:ss'))
-        console.log('atualziou');
     }
 
     function cancelarOrdemServico() {
