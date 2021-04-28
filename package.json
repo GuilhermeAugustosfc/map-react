@@ -12,6 +12,7 @@
     "@turf/turf": "^6.3.0",
     "axios": "^0.21.1",
     "bootstrap-daterangepicker": "^3.1.0",
+    "chokidar": "^2.1.8",
     "fontsource-roboto": "^4.0.0",
     "mapbox-gl": "^1.11.1",
     "mapbox-gl-controls": "^1.8.0",
