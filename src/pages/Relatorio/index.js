@@ -6,11 +6,28 @@ import { useHistory } from "react-router";
 
 import { GoBook } from 'react-icons/go'
 
-import './tabela.css';
+import DateRangePicker from "../../Componentes/DataRangerPicker/DataRangerPicker";
+import moment from 'moment'
+import Button from '@material-ui/core/Button';
+
+import { HiOutlineDocumentReport, HiFilter } from 'react-icons/hi'
+
+
+import './relatorio.css';
 
 const Tabela = () => {
 
     let history = useHistory();
+
+    const [idMotorista, setIdMotorista] = useState(0);
+    const [motoristas, setMotoristas] = useState([]);
+
+    const [idVeiculo, setIdVeiculo] = useState(0);
+    const [veiculos, setVeiculos] = useState([]);
+
+    const [inicioPeriodo, setInicioPeriodo] = useState(moment().startOf('date').format('DD/MM/YYYY HH:mm:ss'));
+    const [fimPeriodo, setFimPeriodo] = useState(moment().endOf('date').format('DD/MM/YYYY HH:mm:ss'));
+
 
     const [consolidadoGeral, setConsolidadoGeral] = useState([{
         id: 0,
@@ -34,12 +51,13 @@ const Tabela = () => {
         odometro: 0
     }]);
 
-    
+
 
     const columnsConsolidadoGeral = [
-        {field:'id', headerName: 'Action', align: 'left', headerAlign: 'left', 
-            renderCell:(value) => {
-                return <GoBook size={30} style={{cursor:'pointer', color:'#355b9a'}} onClick={() => onClickDetalhesDataGrid(value.row)}/>;
+        {
+            field: 'id', headerName: 'Action', align: 'left', headerAlign: 'left',
+            renderCell: (value) => {
+                return <GoBook size={30} style={{ cursor: 'pointer', color: '#355b9a' }} onClick={() => onClickDetalhesDataGrid(value.row)} />;
             }
         },
         { field: 'ras_vei_tipo', headerName: 'Tipo', align: 'center', headerAlign: 'center' },
@@ -65,7 +83,7 @@ const Tabela = () => {
 
                 value.element.style.cursor = "pointer";
                 value.element.setAttribute("title", value.getValue("total_movimento"));
-                
+
                 return `${value.value} %`;
 
             },
@@ -111,9 +129,10 @@ const Tabela = () => {
 
 
     const columnsConsolidadoDetalhes = [
-        {field:'id', headerName: 'Action', align: 'left', headerAlign: 'left', 
-            renderCell:(value) => {
-                return <GoBook size={30} style={{cursor:'pointer', color:'#355b9a'}} onClick={() => onClickDetalhesToMap(value.row)}/>;
+        {
+            field: 'id', headerName: 'Action', align: 'left', headerAlign: 'left',
+            renderCell: (value) => {
+                return <GoBook size={30} style={{ cursor: 'pointer', color: '#355b9a' }} onClick={() => onClickDetalhesToMap(value.row)} />;
             }
         },
         { field: 'data_f', headerName: 'Data', align: 'center', headerAlign: 'center' },
@@ -139,7 +158,7 @@ const Tabela = () => {
 
                 value.element.style.cursor = "pointer";
                 value.element.setAttribute("title", value.getValue("total_movimento"));
-                
+
                 return `${value.value} %`;
 
             },
@@ -184,7 +203,7 @@ const Tabela = () => {
 
                 value.element.style.cursor = "pointer";
                 value.element.setAttribute("title", value.getValue("total_improdutivo"));
-                
+
                 return `${value.value} %`;
 
             },
@@ -206,7 +225,21 @@ const Tabela = () => {
         },
     ];
 
+    function onChangeData(ev, picker) {
+        setInicioPeriodo(picker.startDate.format('DD/MM/YYYY HH:mm:ss'))
+        setFimPeriodo(picker.endDate.format('DD/MM/YYYY HH:mm:ss'))
+    }
+
     useEffect(() => {
+
+        api.get(`http://f-agro-api.fulltrackapp.com/motorista`, {}, ({ data }) => {
+            setMotoristas(data.data);
+        });
+
+        api.get(`http://f-agro-api.fulltrackapp.com/veiculo`, {}, ({ data }) => {
+            setVeiculos(data.data);
+        });
+
         api.get('http://f-agro-api.fulltrackapp.com/eficiencia?data_ini=2021-03-01&data_fim=2021-03-20', {}, ({ data }) => {
 
             data = data.map((row, index) => {
@@ -230,7 +263,7 @@ const Tabela = () => {
         console.log(rowDataGrid);
     }
 
-    
+
     function onClickDetalhesToMap(rowDataGrid) {
         rowDataGrid.data_init = rowDataGrid.data_f;
         rowDataGrid.data_fim = rowDataGrid.data_f;
@@ -238,13 +271,114 @@ const Tabela = () => {
         history.push(`/mapa/${rowDataGrid.id_veiculo}`, rowDataGrid)
     }
 
+    function gerarRelatorio() {
+        var data = {
+            id_motorista: idMotorista,
+            id_veiculo: idVeiculo,
+            dt_inicio: inicioPeriodo,
+            dt_fim: fimPeriodo
+        }
+
+        
+    }
+
+    function changeMenu() {
+        
+    }
+
 
     return (
-        <div className="ContainerDatagrid">
+        <div className="container-relatorio">
             <div className="panel-heading">
                 <div className="row">
                     <div className="col-lg-12">
-                        <h2><b>Produtividade por veículo</b></h2>
+                        <h2><b>Realatorio de Ordem de Serviço</b></h2>
+                    </div>
+                </div>
+                <div className="relatorio-filtro-container">
+                    <div className="relatorio-filtro-heading">
+                        <HiFilter onClick={changeMenu} cursor="pointer" /> Filtros
+                    </div>
+                    <div className="relatorio-filtro-body">
+                        <div>
+                            <label className="label-periodo-ordemservico">Periodo</label>
+                            <DateRangePicker
+                                onChangeData={onChangeData}
+                                initialSetings={{
+                                    startDate: inicioPeriodo,
+                                    endDate: fimPeriodo,
+                                    timePicker: true,
+                                    // timePicker24Hour: true,
+                                    linkedCalendars: false,
+                                    // timePickerSeconds: true,
+                                    autoApply: true,
+                                    locale: {
+                                        format: 'DD/MM/YYYY HH:mm:ss',
+                                    }
+                                }}
+                            />
+                        </div>
+                        <div>
+                            <label className="label-form-ordem-servico" id="labelMotorista">Motorista</label>
+                            <select
+                                htmlFor="labelMotorista"
+                                id="selectMotorista"
+                                className={`select-form`}
+                                value={idMotorista}
+                                onChange={(e) => setIdMotorista(e.target.value)}
+                            >
+                                <option
+                                    key="0"
+                                    value=""
+                                >
+                                    Nenhum Selecionado
+                                </option>
+                                {motoristas.length && motoristas.map((mot) => (
+                                    <option
+                                        key={mot.ras_mot_id}
+                                        value={mot.ras_mot_id}>
+                                        {mot.ras_mot_nome}
+                                    </option>
+                                ))}
+
+                            </select>
+                        </div>
+                        <div>
+                            <label className="label-form-ordem-servico" id="labelVeiculos">Veiculos</label>
+                            <select
+                                htmlFor="labelVeiculos"
+                                id="selectVeiculos"
+                                className={`select-form`}
+                                value={idVeiculo}
+                                onChange={(e) => setIdVeiculo(e.target.value)}
+                            >
+                                <option
+                                    key="0"
+                                    value=""
+                                >
+                                    Nenhum Selecionado
+                                </option>
+                                {veiculos.length && veiculos.map((vei) => (
+                                    <option
+                                        key={vei.ras_vei_id}
+                                        value={vei.ras_vei_id}>
+                                        {vei.ras_vei_veiculo}
+                                    </option>
+                                ))}
+
+                            </select>
+                        </div>
+                        <div>
+                            <Button
+                                variant="contained"
+                                size="medium"
+                                id="btn-gerar-relatorio"
+                                onClick={() => gerarRelatorio()}
+                                startIcon={<HiOutlineDocumentReport />}
+                            >
+                                Gerar
+                            </Button>
+                        </div>
                     </div>
                 </div>
                 <div className="row">
@@ -254,12 +388,7 @@ const Tabela = () => {
                 </div>
                 <div className="row">
                     <div className="col-lg-12">
-                        <h4>TOTAL DO PERÍODO SELECIONADO</h4>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-lg-12">
-                        <h4>Período de <b>01/03/2021</b> até <b>31/03/2021</b></h4>
+                        <h4>Período de <b>{inicioPeriodo}</b> até <b>{fimPeriodo}</b></h4>
                     </div>
                 </div>
                 <div className="row">
@@ -283,9 +412,15 @@ const Tabela = () => {
                     </div>
                 </div>
             </div>
-            <DataGrid key="dataGrid1" className="DataGrid" rows={consolidadoGeral} columns={columnsConsolidadoGeral} />
+            <div className="row container-tabelas">
+                <div className="col-md-6">
+                    <DataGrid key="dataGrid1" className="DataGrid" rows={consolidadoGeral} columns={columnsConsolidadoGeral} />
+                </div>
+                <div className="col-md-6">
+                    <DataGrid key="dataGrid2" className="DataGrid" rows={consolidadoDetalhes} columns={columnsConsolidadoDetalhes} />
+                </div>
+            </div>
 
-            <DataGrid key="dataGrid2" className="DataGrid" rows={consolidadoDetalhes} columns={columnsConsolidadoDetalhes} />
         </div>
     );
 };

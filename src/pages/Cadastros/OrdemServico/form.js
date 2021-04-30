@@ -304,7 +304,7 @@ function OrderServicoForm(props) {
                     osr_id_talhao: idTalhao,
                     osr_id_safra: idSafra,
                     osr_id_ano: idAno,
-                    osr_codigo:numeroOrdem,
+                    osr_codigo: numeroOrdem,
                     osr_id_motorista: idMotorista,
                     osr_periodo_ini: moment(inicioPeriodo, "DD/MM/YYYY HH:mm:ss").format("YYYY-MM-DD HH:mm:ss"),
                     osr_periodo_fim: moment(fimPeriodo, "DD/MM/YYYY HH:mm:ss").format("YYYY-MM-DD HH:mm:ss"),
@@ -418,8 +418,8 @@ function OrderServicoForm(props) {
                         ))}
 
                     </select>
-                    <div style={{display:'flex'}}>
-                        <div style={{flex:1, marginRight:'11px'}}>
+                    <div style={{ display: 'flex' }}>
+                        <div style={{ flex: 1, marginRight: '11px' }}>
                             <label className="label-form-ordem-servico" id="labelAno">Ano</label>
                             <select
                                 htmlFor="labelAno"
@@ -444,7 +444,7 @@ function OrderServicoForm(props) {
 
                             </select>
                         </div>
-                        <div style={{flex:1}}>
+                        <div style={{ flex: 1 }}>
                             <label className="label-form-ordem-servico" id="labelSafra">Safras</label>
                             <select
                                 htmlFor="labelSafra"
@@ -694,7 +694,7 @@ function OrderServicoForm(props) {
                             startIcon={<GoArrowLeft />}
                         >
                             Cancelar
-                    </Button>
+                        </Button>
                         <Button
                             variant="contained"
                             size="large"

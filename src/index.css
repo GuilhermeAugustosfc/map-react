@@ -6,6 +6,10 @@ html, body {
     font-size: 16px;
 }
 
+.container-app {
+    height: 100vh;
+}
+
 .error-input {
     color: #d20404;
 }

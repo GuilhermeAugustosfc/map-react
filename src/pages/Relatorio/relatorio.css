@@ -1,0 +1,57 @@
+.container-relatorio {
+    display: block;
+    position: relative;
+    height: 100vh;
+    padding: 0px 5px;
+}
+
+.container-tabelas, .container-tabelas > div{
+    height: 100%;
+}
+
+.DataGrid {
+    width: 100%;
+}
+
+.panel-heading {
+    position: relative;
+    text-align: center;
+}
+
+.relatorio-filtro-container {
+    position: fixed;
+    top: 4px;
+    right: -15px;
+    z-index: 1;
+    background: white;
+    box-shadow: 0px 0px 1px 0px black;
+    text-align: left;
+}
+
+.relatorio-filtro-heading {
+    text-align: left;
+    font-size: 23px;
+    margin-bottom: 10px;
+    font-weight: 500;
+    background: #69696921;
+    padding: 0 2px;
+
+}
+
+.relatorio-filtro-body {
+    display: flex;
+    flex-direction: column;
+    padding: 0px 0px 12px 11px;
+}
+
+.relatorio-filtro-body > div {
+    flex: 1;
+    margin-right: 18px;
+}
+
+#btn-gerar-relatorio {
+    width: 100%;
+    margin-top: 13px;
+    background-color: #00e7ff80;
+
+}

@@ -7,7 +7,7 @@ import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 import Menu from "./Componentes/Menu/Menu"
 
 
-import Tabela from "./pages/Tabela";
+import Relatorio from "./pages/Relatorio";
 
 import TalhaoTabela from "./pages/Cadastros/Talhao/tabela";
 import TalhaoForm from "./pages/Cadastros/Talhao/form";
@@ -47,7 +47,7 @@ const Routes = () => (
 
             <PrivateRoute exact path="/mapa" component={(props) => <Mapa {...props} />} />
             <PrivateRoute exact path="/mapa/:id" component={(props) => <Mapa {...props} />} />
-            <PrivateRoute exact path="/relatorio" component={(props) => <Tabela {...props} />} />
+            <PrivateRoute exact path="/relatorio" component={(props) => <Relatorio {...props} />} />
             
             <PrivateRoute path="*" component={() => <h1>Pagina não encontrada</h1>} />
         </Switch>

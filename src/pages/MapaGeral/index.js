@@ -53,7 +53,7 @@ function MapaGeral(props) {
   })
 
   var markersOciosos = useRef([]);
-  var ultimaPosicaoVeiculo = {};
+  var ultimaPosicaoVeiculo = useRef({});
 
   var sourceLine = {};
   var sourceMarker = {};
@@ -112,6 +112,9 @@ function MapaGeral(props) {
 
       let geojson = formatLineInMap.resume(dados, operacaoConfig.velocidade);
 
+      let ultimaPosicaoRota = dados[dados.length -1];
+      ultimaPosicaoVeiculo.current[ultimaPosicaoRota.id_ativo] = [ultimaPosicaoRota.lst_localizacao];
+
       map.addSource('rota', {
         'type': 'geojson',
         'data': geojson,
@@ -137,11 +140,12 @@ function MapaGeral(props) {
 
     aux.coordenadas = [parseFloat(data.ras_eve_longitude), parseFloat(data.ras_eve_latitude)];
 
-    if (sourceLine.hasOwnProperty(data.ras_vei_id)) {
-
-      ultimaPosicaoVeiculo[data.ras_vei_id].push(aux.coordenadas);
-      aux.rotaAtual = map.getSource(`source_${data.ras_vei_id}`)._data;
-
+      // IMENDANDO AS POSICOES DO SOCKET COM A ROTA DELE ----
+    if (ultimaPosicaoVeiculo.current.hasOwnProperty(data.ras_vei_id)) {
+      aux.rotaAtual = map.getSource(`rota`)._data;
+      ultimaPosicaoVeiculo.current[data.ras_vei_id].push(aux.coordenadas);
+      aux.indexCor = calcColorSpeed(data.ras_eve_velocidade, operacaoConfig.velocidade);
+    
       aux.rotaAtual.features.push({
         'type': 'Feature',
         'properties': {
@@ -153,75 +157,105 @@ function MapaGeral(props) {
         },
         'geometry': {
           'type': 'LineString',
-          'coordinates': ultimaPosicaoVeiculo[data.ras_vei_id]
+          'coordinates': ultimaPosicaoVeiculo.current[data.ras_vei_id]
         }
       })
-
-      map.getSource(`source_${data.ras_vei_id}`).setData(aux.rotaAtual)
-
-      ultimaPosicaoVeiculo[data.ras_vei_id] = [];
-      ultimaPosicaoVeiculo[data.ras_vei_id] = [aux.coordenadas]
-
-    } else {
-
-      sourceLine[data.ras_vei_id] = [];
-      sourceLine[data.ras_vei_id] = {
-        features: [],
-        type: "FeatureCollection"
-      }
-
-      map.addSource(`source_${data.ras_vei_id}`, {
-        'type': 'geojson',
-        'data': sourceLine[data.ras_vei_id],
-      });
-
-
-      map.addLayer({
-        'id': `source_${data.ras_vei_id}`,
-        'type': 'line',
-        'source': `source_${data.ras_vei_id}`,
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round',
-        },
-        'paint': {
-          'line-color': ['get', 'color'],
-          'line-width': 3,
-        }
-      });
-
-      // map.jumpTo({ 'center': aux.coordenadas, 'zoom': 15 });
-
-      aux.indexCor = calcColorSpeed(data.ras_eve_velocidade);
-
-      if (!ultimaPosicaoVeiculo.hasOwnProperty(data.ras_vei_id)) {
-        ultimaPosicaoVeiculo[data.ras_vei_id] = [];
-        ultimaPosicaoVeiculo[data.ras_vei_id].push(aux.coordenadas)
-      }
-
-      ultimaPosicaoVeiculo[data.ras_vei_id].push(aux.coordenadas);
-
-      aux.rotaAtual = map.getSource(`source_${data.ras_vei_id}`)._data;
-      aux.rotaAtual.features.push({
-        'type': 'Feature',
-        'properties': {
-          'color': colorsSpeed[aux.indexCor].color,
-          'velocidade': data.ras_eve_velocidade,
-          'dt_gps': data.ras_eve_data_gps,
-          'desc_ativo': data.ras_vei_veiculo,
-          'ignicao': data.ras_eve_ignicao,
-        },
-        'geometry': {
-          'type': 'LineString',
-          'coordinates': ultimaPosicaoVeiculo[data.ras_vei_id]
-        }
-      })
-
-      map.getSource(`source_${data.ras_vei_id}`).setData(aux.rotaAtual)
-
-      ultimaPosicaoVeiculo[data.ras_vei_id] = [];
-      ultimaPosicaoVeiculo[data.ras_vei_id] = [aux.coordenadas]
+  
+      map.getSource(`rota`).setData(aux.rotaAtual)
+  
+      ultimaPosicaoVeiculo.current[data.ras_vei_id] = [];
+      ultimaPosicaoVeiculo.current[data.ras_vei_id] = [aux.coordenadas]
+      
     }
+
+
+      // ------------------------------------------------
+
+    // if (sourceLine.hasOwnProperty(data.ras_vei_id)) {
+
+    //   ultimaPosicaoVeiculo[data.ras_vei_id].push(aux.coordenadas);
+    //   aux.rotaAtual = map.getSource(`source_${data.ras_vei_id}`)._data;
+
+    //   aux.rotaAtual.features.push({
+    //     'type': 'Feature',
+    //     'properties': {
+    //       'color': colorsSpeed[aux.indexCor].color,
+    //       'velocidade': data.ras_eve_velocidade,
+    //       'dt_gps': data.ras_eve_data_gps,
+    //       'desc_ativo': data.ras_vei_veiculo,
+    //       'ignicao': data.ras_eve_ignicao
+    //     },
+    //     'geometry': {
+    //       'type': 'LineString',
+    //       'coordinates': ultimaPosicaoVeiculo[data.ras_vei_id]
+    //     }
+    //   })
+
+    //   map.getSource(`source_${data.ras_vei_id}`).setData(aux.rotaAtual)
+
+    //   ultimaPosicaoVeiculo[data.ras_vei_id] = [];
+    //   ultimaPosicaoVeiculo[data.ras_vei_id] = [aux.coordenadas]
+
+    // } else {
+
+    //   sourceLine[data.ras_vei_id] = [];
+    //   sourceLine[data.ras_vei_id] = {
+    //     features: [],
+    //     type: "FeatureCollection"
+    //   }
+
+    //   map.addSource(`source_${data.ras_vei_id}`, {
+    //     'type': 'geojson',
+    //     'data': sourceLine[data.ras_vei_id],
+    //   });
+
+
+    //   map.addLayer({
+    //     'id': `source_${data.ras_vei_id}`,
+    //     'type': 'line',
+    //     'source': `source_${data.ras_vei_id}`,
+    //     'layout': {
+    //       'line-join': 'round',
+    //       'line-cap': 'round',
+    //     },
+    //     'paint': {
+    //       'line-color': ['get', 'color'],
+    //       'line-width': 3,
+    //     }
+    //   });
+
+    //   // map.jumpTo({ 'center': aux.coordenadas, 'zoom': 15 });
+
+    //   aux.indexCor = calcColorSpeed(data.ras_eve_velocidade, operacaoConfig.velocidade);
+
+    //   if (!ultimaPosicaoVeiculo.hasOwnProperty(data.ras_vei_id)) {
+    //     ultimaPosicaoVeiculo[data.ras_vei_id] = [];
+    //     ultimaPosicaoVeiculo[data.ras_vei_id].push(aux.coordenadas)
+    //   }
+
+    //   ultimaPosicaoVeiculo[data.ras_vei_id].push(aux.coordenadas);
+
+    //   aux.rotaAtual = map.getSource(`source_${data.ras_vei_id}`)._data;
+    //   aux.rotaAtual.features.push({
+    //     'type': 'Feature',
+    //     'properties': {
+    //       'color': colorsSpeed[aux.indexCor].color,
+    //       'velocidade': data.ras_eve_velocidade,
+    //       'dt_gps': data.ras_eve_data_gps,
+    //       'desc_ativo': data.ras_vei_veiculo,
+    //       'ignicao': data.ras_eve_ignicao,
+    //     },
+    //     'geometry': {
+    //       'type': 'LineString',
+    //       'coordinates': ultimaPosicaoVeiculo[data.ras_vei_id]
+    //     }
+    //   })
+
+    //   map.getSource(`source_${data.ras_vei_id}`).setData(aux.rotaAtual)
+
+    //   ultimaPosicaoVeiculo[data.ras_vei_id] = [];
+    //   ultimaPosicaoVeiculo[data.ras_vei_id] = [aux.coordenadas]
+    // }
 
     if (sourceMarkerIndex.hasOwnProperty(data.ras_vei_id)) {
       aux.allFeaturesMarkers = map.getSource('markersSymbol')._data;
@@ -282,7 +316,7 @@ function MapaGeral(props) {
 
     setMap(map);
 
-    map.on('click', 'rota', (e) => onClickRota(e, map))
+    map.on('click', 'rota', (e) => onClickRota(e, map));
     // map.on('mousemove', 'rota', (e) => onMouseOverFeature(e, map));
 
     let { id } = props.match.params;
@@ -294,7 +328,6 @@ function MapaGeral(props) {
       let operacaoAtual = props.location.state;
 
       setOperacao(operacaoAtual);
-
 
       addTalhaoOrdemServico(operacaoAtual, map);
 
@@ -494,8 +527,8 @@ function MapaGeral(props) {
               <div class="info_popup popup_velocidade">
                 ${obj.velocidade} km/h
               </div>
-              <div class="info_popup popup_desc">
-                ${obj.desc_ativo}
+              <div class="info_popup popup_dt_gps">
+                ${obj.dt_gps}
               </div>
             </div>`
   }
