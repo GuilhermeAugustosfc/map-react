@@ -6,6 +6,7 @@ import { useHistory } from "react-router";
 import api from '../../../services/api';
 import DateRangePicker from "../../../Componentes/DataRangerPicker/DataRangerPicker";
 import moment from 'moment';
+import BotaoForm from "../../../Componentes/BotaoForm/botaoForm";
 
 import { GoCheck, GoArrowLeft } from 'react-icons/go'
 
@@ -396,104 +397,113 @@ function OrderServicoForm(props) {
                         Culturas
                     </div>
                     <label className="label-form-ordem-servico" id="labelCultura">Culturas</label>
-                    <select
-                        htmlFor="labelCultura"
-                        id="selectCultura"
-                        className={`select-form ${errorCultura}`}
-                        value={idCultura}
-                        onChange={(e) => setIdCultura(e.target.value)}
-                    >
-                        <option
-                            key="0"
-                            value=""
+                    <BotaoForm chaveId={"cul_id"} chaveDesc={"cul_descricao"} states={setCulturas} valor={culturas} id={idCultura} url={"cultura"} >
+                        <select
+                            htmlFor="labelCultura"
+                            id="selectCultura"
+                            className={`select-form ${errorCultura}`}
+                            value={idCultura}
+                            onChange={(e) => setIdCultura(e.target.value)}
                         >
-                            Nenhum Selecionado
-                    </option>
-                        {culturas.length && culturas.map((cultura) => (
                             <option
-                                key={cultura.cul_id}
-                                value={cultura.cul_id}>
-                                {cultura.cul_descricao}
-                            </option>
-                        ))}
-
-                    </select>
-                    <div style={{ display: 'flex' }}>
-                        <div style={{ flex: 1, marginRight: '11px' }}>
-                            <label className="label-form-ordem-servico" id="labelAno">Ano</label>
-                            <select
-                                htmlFor="labelAno"
-                                id="selectAnos"
-                                className={`select-form ${errorAno}`}
-                                value={idAno}
-                                onChange={(e) => setIdAno(e.target.value)}
+                                key="0"
+                                value=""
                             >
+                                Nenhum Selecionado
+                            </option>
+                            {culturas.length && culturas.map((cultura) => (
                                 <option
-                                    key="0"
-                                    value=""
-                                >
-                                    Nenhum Selecionado
+                                    key={cultura.cul_id}
+                                    value={cultura.cul_id}>
+                                    {cultura.cul_descricao}
                                 </option>
-                                {anos.length && anos.map((anos) => (
-                                    <option
-                                        key={anos.ano_id}
-                                        value={anos.ano_id}>
-                                        {anos.ano_descricao}
-                                    </option>
-                                ))}
+                            ))}
 
-                            </select>
+                        </select>
+                    </BotaoForm>
+                    <div style={{display:'flex'}}>
+                        <div style={{flex:1, marginRight:'11px'}}>
+                            <label className="label-form-ordem-servico" id="labelAno">Ano</label>
+                            
+                            <BotaoForm chaveId={"ano_id"} chaveDesc={"ano_descricao"} states={setAnos} valor={anos} id={idAno} url={"ano"} >
+                                <select
+                                    htmlFor="labelAno"
+                                    id="selectAnos"
+                                    className={`select-form ${errorAno}`}
+                                    value={idAno}
+                                    onChange={(e) => setIdAno(e.target.value)}
+                                >
+                                    <option
+                                        key="0"
+                                        value=""
+                                    >
+                                        Nenhum Selecionado
+                                    </option>
+                                    {anos.length && anos.map((anos) => (
+                                        <option
+                                            key={anos.ano_id}
+                                            value={anos.ano_id}>
+                                            {anos.ano_descricao}
+                                        </option>
+                                    ))}
+
+                                </select>
+                            </BotaoForm>
                         </div>
                         <div style={{ flex: 1 }}>
                             <label className="label-form-ordem-servico" id="labelSafra">Safras</label>
-                            <select
-                                htmlFor="labelSafra"
-                                id="selectSafra"
-                                className={`select-form ${errorSafra}`}
-                                value={idSafra}
-                                onChange={(e) => setIdSafra(e.target.value)}
-                            >
-                                <option
-                                    key="0"
-                                    value=""
+                            <BotaoForm chaveId={"saf_id"} chaveDesc={"saf_descricao"} states={setSafras} valor={safras} id={idSafra} url={"safra"} >
+                                <select
+                                    htmlFor="labelSafra"
+                                    id="selectSafra"
+                                    className={`select-form ${errorSafra}`}
+                                    value={idSafra}
+                                    onChange={(e) => setIdSafra(e.target.value)}
                                 >
-                                    Nenhum Selecionado
-                                </option>
-                                {safras.length && safras.map((safra) => (
                                     <option
-                                        key={safra.saf_id}
-                                        value={safra.saf_id}>
-                                        {safra.saf_descricao}
+                                        key="0"
+                                        value=""
+                                    >
+                                        Nenhum Selecionado
                                     </option>
-                                ))}
-
-                            </select>
+                                    {safras.length && safras.map((safra) => (
+                                        <option
+                                            key={safra.saf_id}
+                                            value={safra.saf_id}>
+                                            {safra.saf_descricao}
+                                        </option>
+                                    ))}
+    
+                                </select>
+                            </BotaoForm>
                         </div>
                     </div>
 
                     <label className="label-form-ordem-servico" id="labelFazenda">Fazendas</label>
-                    <select
-                        htmlFor="labelFazenda"
-                        id="selectFazendas"
-                        className={`select-form ${errorFazenda}`}
-                        value={idFazenda}
-                        onChange={(e) => setIdFazenda(e.target.value)}
-                    >
-                        <option
-                            key="0"
-                            value=""
+                    <BotaoForm chaveId={"faz_id"} chaveDesc={"faz_descricao"} states={setFazendas} valor={fazendas} id={idFazenda} url={"fazenda"} >
+                        <select
+                            htmlFor="labelFazenda"
+                            id="selectFazendas"
+                            className={`select-form ${errorFazenda}`}
+                            value={idFazenda}
+                            onChange={(e) => setIdFazenda(e.target.value)}
                         >
-                            Nenhum Selecionado
-                        </option>
-                        {fazendas.length && fazendas.map((fazenda) => (
                             <option
-                                key={fazenda.faz_id}
-                                value={fazenda.faz_id}>
-                                {fazenda.faz_descricao}
+                                key="0"
+                                value=""
+                            >
+                                Nenhum Selecionado
                             </option>
-                        ))}
+                            {fazendas.length && fazendas.map((fazenda) => (
+                                <option
+                                    key={fazenda.faz_id}
+                                    value={fazenda.faz_id}>
+                                    {fazenda.faz_descricao}
+                                </option>
+                            ))}
 
-                    </select>
+                        </select>
+                    </BotaoForm>
                 </div>
 
                 <div className="form-group-ordem-servico">
@@ -501,28 +511,31 @@ function OrderServicoForm(props) {
                         Operação
                     </div>
                     <label className="label-form-ordem-servico" id="labelOperacao">Operação</label>
-                    <select
-                        htmlFor="labelOperacao"
-                        id="selectOperacao"
-                        className={`select-form ${errorOperacao}`}
-                        value={idOperacao}
-                        onChange={(e) => setIdOperacao(e.target.value)}
-                    >
-                        <option
-                            key="0"
-                            value=""
-                        >
-                            Nenhum Selecionado
-                    </option>
-                        {operacoes.length && operacoes.map((operacao) => (
-                            <option
-                                key={operacao.ope_id}
-                                value={operacao.ope_id}>
-                                {operacao.ope_descricao}
-                            </option>
-                        ))}
+                    <BotaoForm chaveId={"ope_id"} chaveDesc={"ope_descricao"} states={setOperacoes} valor={operacoes} id={idOperacao} url={"operacao"} >
 
-                    </select>
+                        <select
+                            htmlFor="labelOperacao"
+                            id="selectOperacao"
+                            className={`select-form ${errorOperacao}`}
+                            value={idOperacao}
+                            onChange={(e) => setIdOperacao(e.target.value)}
+                        >
+                            <option
+                                key="0"
+                                value=""
+                            >
+                                Nenhum Selecionado
+                        </option>
+                            {operacoes.length && operacoes.map((operacao) => (
+                                <option
+                                    key={operacao.ope_id}
+                                    value={operacao.ope_id}>
+                                    {operacao.ope_descricao}
+                                </option>
+                            ))}
+
+                        </select>
+                    </BotaoForm>
 
                     <label className="label-periodo-ordemservico">Periodo</label>
                     <DateRangePicker
@@ -640,29 +653,30 @@ function OrderServicoForm(props) {
                     </select>
 
                     <label className="label-form-ordem-servico" id="labelImpremento">Implemento</label>
-                    <select
-                        htmlFor="labelImpremento"
-                        id="selectImplemento"
-                        className={`select-form ${errorImplemento}`}
-                        value={idImplemento}
-                        onChange={(e) => setIdImplemento(e.target.value)}
-                    >
-                        <option
-                            key="0"
-                            value=""
+                    <BotaoForm chaveId={"imp_id"} chaveDesc={"imp_descricao"} states={setImplementos} valor={implementos} id={idImplemento} url={"implemento"} >
+                        <select
+                            htmlFor="labelImpremento"
+                            id="selectImplemento"
+                            className={`select-form ${errorImplemento}`}
+                            value={idImplemento}
+                            onChange={(e) => setIdImplemento(e.target.value)}
                         >
-                            Nenhum Selecionado
-                    </option>
-                        {implementos.length && implementos.map((imp) => (
                             <option
-                                key={imp.imp_id}
-                                value={imp.imp_id}>
-                                {imp.imp_descricao}
-                            </option>
-                        ))}
+                                key="0"
+                                value=""
+                            >
+                                Nenhum Selecionado
+                        </option>
+                            {implementos.length && implementos.map((imp) => (
+                                <option
+                                    key={imp.imp_id}
+                                    value={imp.imp_id}>
+                                    {imp.imp_descricao}
+                                </option>
+                            ))}
 
-                    </select>
-
+                        </select>
+                    </BotaoForm>
                 </div>
 
                 <div className="form-group-ordem-servico">
