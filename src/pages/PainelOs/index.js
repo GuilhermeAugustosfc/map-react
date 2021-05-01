@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 
 import api from '../../services/api'
 
-import { GoBook } from 'react-icons/go'
-
 import mqtt from 'mqtt'
 import { store } from 'react-notifications-component';
 
@@ -46,15 +44,17 @@ const PainelOs = () => {
                 return <div className="tabela-painel-os-coluna-status-pausar">PAUSADO</div>
             case 'aguardando':
                 return <div className="tabela-painel-os-coluna-status-aguardando">{status}</div>
+            default:
+                return <div className="tabela-painel-os-coluna-status-aguardando">{status}</div>
             }
         
     }
 
-    const atualizarPainelOs = function (macro) {
+    function atualizarPainelOs (macro) {
         setDadosPainelOs((state) => {
             var newArr = [...state];
             let indexOs = newArr.findIndex((row, index) => { 
-                if (row.osr_id == macro.mac_id_operacao ) {
+                if (row.osr_id === macro.mac_id_operacao ) {
                     return index;
                 }
             })
@@ -68,7 +68,7 @@ const PainelOs = () => {
             message: templateMacro(macro),
             type: "info",
             insert: "bottom",
-            container: "top-right",
+            container: "bottom-right",
             animationIn: ["animate__animated", "animate__fadeIn"],
             animationOut: ["animate__animated", "animate__fadeOut"],
             dismiss: {
@@ -91,7 +91,7 @@ const PainelOs = () => {
             
                 client.on('message', function (topic, message) {
                     // message is Buffer
-                    var message = message.toString();
+                    message = message.toString();
                     var macro = {};
                     try {
                         macro = JSON.parse(message)

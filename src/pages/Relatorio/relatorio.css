@@ -20,7 +20,7 @@
 
 .relatorio-filtro-container {
     position: fixed;
-    top: 4px;
+    top: 36px;
     right: -15px;
     z-index: 1;
     background: white;
@@ -33,6 +33,8 @@
     font-size: 23px;
     margin-bottom: 10px;
     font-weight: 500;
+    display: flex;
+    align-items: center;
     background: #69696921;
     padding: 0 2px;
 
@@ -53,5 +55,39 @@
     width: 100%;
     margin-top: 13px;
     background-color: #00e7ff80;
+}
 
+.btn-relatorio-filtro {
+    float: right;
+    font-size: 33px;
+    transform: translateY(7px);
+    cursor: pointer;
+    background: #ccc0;
+}
+
+.relatorio-coluna-macro {
+    text-transform: uppercase;
+    font-size: 18px;
+    color: black;
+    text-align: center;
+}
+
+.relatorio-macro-iniciar-color {
+    text-shadow: 0px 0px 1px #08ff08;
+}
+
+.relatorio-macro-pausar-color {
+    text-shadow: 0px 0px 1px black;
+}
+
+.relatorio-macro-deslocamento-color {
+    text-shadow: 0px 0px 1px darkgray;
+}
+
+.relatorio-macro-finalizar-color {
+    text-shadow: 0px 0px 1px #0090ff;
+}
+
+.relatorio-macro-aguardando-color {
+    text-shadow: 0px 0px 1px #ffa500;
 }

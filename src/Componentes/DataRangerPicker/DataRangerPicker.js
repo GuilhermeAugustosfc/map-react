@@ -5,12 +5,45 @@ import 'bootstrap-daterangepicker/daterangepicker.css';
 import './DataRangerPicker.css'
 
 function Data(props) {
+    
     return (
         <DateRangePicker
-            initialSettings={props.initialSettings}
+            initialSettings={{
+                autoApply:true,
+                timePicker:true,
+                timePickerSeconds:true,
+                timePicker24Hour:true,
+                applyButtonClasses: false,
+                locale:{
+                    daysOfWeek:[
+                        "Dom",
+                        "Seg",
+                        "Ter",
+                        "Qua",
+                        "Qui",
+                        "Sex",
+                        "Sab",
+                    ],
+                    monthNames:[
+                        "Jan",
+                        "Fev",
+                        "Mar",
+                        "Abr",
+                        "Mai",
+                        "Jun",
+                        "Jul",
+                        "Ago",
+                        "Set",
+                        "Out",
+                        "Nov",
+                        "Dez",
+                    ]
+                }
+            }}
             onHide={props.onChangeData}
+            
         >
-            <button className="btn-show-daterangepicker">{props.initialSetings.startDate} - {props.initialSetings.endDate}</button>
+            <button className="btn-show-daterangepicker">{props.startDate} - {props.endDate}</button>
         </DateRangePicker>
     )
 }

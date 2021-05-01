@@ -374,18 +374,8 @@ function OrderServicoForm(props) {
 
                     <DateRangePicker
                         onChangeData={onChangeData}
-                        initialSetings={{
-                            startDate: inicioPeriodo,
-                            endDate: fimPeriodo,
-                            timePicker: true,
-                            // timePicker24Hour: true,
-                            linkedCalendars: false,
-                            // timePickerSeconds: true,
-                            autoApply: true,
-                            locale: {
-                                format: 'DD/MM/YYYY HH:mm:ss',
-                            }
-                        }}
+                        startDate={inicioPeriodo}
+                        endDate={fimPeriodo}
                     />
                     <label className="label-form-ordem-servico" id="labelNumero">Numero</label>
                     <input type="number" className={`form-control ${errorNumeroOrdem}`} placeholder="Numero da ordem de serviço" value={numeroOrdem} onChange={(e) => setNumeroOrdem(e.target.value)} />
@@ -540,18 +530,8 @@ function OrderServicoForm(props) {
                     <label className="label-periodo-ordemservico">Periodo</label>
                     <DateRangePicker
                         onChangeData={onChangeData}
-                        initialSetings={{
-                            startDate: inicioPeriodo,
-                            endDate: fimPeriodo,
-                            timePicker: true,
-                            // timePicker24Hour: true,
-                            linkedCalendars: false,
-                            // timePickerSeconds: true,
-                            autoApply: true,
-                            locale: {
-                                format: 'DD/MM/YYYY HH:mm:ss',
-                            }
-                        }}
+                        startDate={inicioPeriodo}
+                        endDate={fimPeriodo}
                     />
 
                 </div>

@@ -10,7 +10,11 @@ import DateRangePicker from "../../Componentes/DataRangerPicker/DataRangerPicker
 import moment from 'moment'
 import Button from '@material-ui/core/Button';
 
+
+import { store } from 'react-notifications-component';
 import { HiOutlineDocumentReport, HiFilter } from 'react-icons/hi'
+
+import { Fade } from '@material-ui/core';
 
 
 import './relatorio.css';
@@ -25,204 +29,125 @@ const Tabela = () => {
     const [idVeiculo, setIdVeiculo] = useState(0);
     const [veiculos, setVeiculos] = useState([]);
 
+    const [errorMotorista, setErrorMotorista] = useState("");
+    const [errorVeiculo, setErrorVeiculo] = useState("");
+
     const [inicioPeriodo, setInicioPeriodo] = useState(moment().startOf('date').format('DD/MM/YYYY HH:mm:ss'));
     const [fimPeriodo, setFimPeriodo] = useState(moment().endOf('date').format('DD/MM/YYYY HH:mm:ss'));
 
+    const [showMenu, setShowMenu] = useState(true);
 
-    const [consolidadoGeral, setConsolidadoGeral] = useState([{
+    const [orderServices, setOrdemServices] = useState([{
         id: 0,
-        ras_vei_tipo: "",
-        veiculo: "",
-        total_jornada_seg: 0,
-        total_ocioso_porc: 0,
-        total_movimento_porc: 0,
-        velocidade_media: 0,
-        odometro: 0
+        ope_descricao: "",
+        osr_motorista: "",
+        osr_veiculo: "",
+        tal_descricao: "",
+        osr_periodo_ini: "",
+        osr_periodo_fim: ""
     }]);
 
-    const [consolidadoDetalhes, setConsolidadoDetalhes] = useState([{
+    const [macros, setMacros] = useState([{
         id: 0,
-        ras_vei_tipo: "",
-        veiculo: "",
-        total_jornada_seg: 0,
-        total_ocioso_porc: 0,
-        total_movimento_porc: 0,
-        velocidade_media: 0,
-        odometro: 0
+        mac_data: "",
+        mac_macro: "",
     }]);
 
 
 
-    const columnsConsolidadoGeral = [
+    const columnsOrderServices = [
         {
             field: 'id', headerName: 'Action', align: 'left', headerAlign: 'left',
             renderCell: (value) => {
-                return <GoBook size={30} style={{ cursor: 'pointer', color: '#355b9a' }} onClick={() => onClickDetalhesDataGrid(value.row)} />;
+                return <GoBook size={30} style={{ cursor: 'pointer', color: '#355b9a' }} onClick={() => onClickOperacao(value.row)} />;
             }
         },
-        { field: 'ras_vei_tipo', headerName: 'Tipo', align: 'center', headerAlign: 'center' },
-        { field: 'veiculo', headerName: 'Veiculo', flex: 1, align: 'center', headerAlign: 'center' },
+        { field: 'ope_descricao', headerName: 'Operação', align: 'center', headerAlign: 'center' },
+        { field: 'osr_motorista', headerName: 'Motorista', flex: 1, align: 'center', headerAlign: 'center' },
+        { field: 'osr_veiculo', headerName: 'Veiculo', flex: 1, align: 'center', headerAlign: 'center'},
+        { field: 'tal_descricao', headerName: 'Talhão', flex: 1, align: 'center', headerAlign: 'center'},
         {
-            field: 'total_jornada_seg', headerName: 'Tempo da Jornada', type: 'number', flex: 1, align: 'center', headerAlign: 'left',
-            valueFormatter: (value) => value.row.total_jornada
-        },
-        {
-            field: 'total_ocioso_porc', headerName: '% Ocioso', flex: 1, type: 'number', align: 'center', headerAlign: 'center',
+            field: 'osr_periodo_ini', headerName: 'Inicio', flex: 1, align: 'center', headerAlign: 'left',
             valueFormatter: (value) => {
-                if (!value.element) return
-
-                if (value.value > 60) {
-                    value.element.style.backgroundColor = "#FF6347";
-                } else if (value.value > 40) {
-                    value.element.style.backgroundColor = "#FFA500";
-                } else if (value.value > 20) {
-                    value.element.style.backgroundColor = "#FFFF00";
-                } else {
-                    value.element.style.backgroundColor = "#82ff47";
+                if(value.value) {
+                    return moment(value.value, "YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY HH:mm:ss");
                 }
-
-                value.element.style.cursor = "pointer";
-                value.element.setAttribute("title", value.getValue("total_movimento"));
-
-                return `${value.value} %`;
-
+                return ""
             },
-            valueGetter: (params) => parseInt(params.value) || 0
         },
         {
-            field: 'total_movimento_porc', headerName: '% Eficiencia', flex: 1, type: 'number', align: 'center', headerAlign: 'left',
+            field: 'osr_periodo_fim', headerName: 'Fim', flex: 1, align: 'center', headerAlign: 'center',
             valueFormatter: (value) => {
-                if (!value.element) return
-
-                if (value.value < 20) {
-                    value.element.style.backgroundColor = "#FF6347";
-                } else if (value.value < 40) {
-                    value.element.style.backgroundColor = "#FFA500";
-                } else if (value.value < 60) {
-                    value.element.style.backgroundColor = "#FFFF00";
-                } else {
-                    value.element.style.backgroundColor = "#82ff47";
+                if(value.value) {
+                    return moment(value.value, "YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY HH:mm:ss");
                 }
+                return ""
 
-                value.element.style.cursor = "pointer";
-                value.element.setAttribute("title", value.getValue("total_movimento"));
-
-                return `${value.value} %`
-            },
-            valueGetter: (params) => parseInt(params.value) || 0
-        },
-        {
-            field: 'velocidade_media', headerName: 'Velocidade Media', flex: 1, type: 'number', align: 'center', headerAlign: 'left',
-            valueFormatter: (value) => {
-                return `${value.value} Km/h`
-            },
-            valueGetter: (params) => parseInt(params.value) || 0
-        },
-        {
-            field: 'odometro', headerName: 'Odometro', flex: 1, type: 'number', align: 'center', headerAlign: 'center',
-            valueFormatter: (value) => {
-                return `${value.value} Km/h`
-            },
-            valueGetter: (params) => parseInt(params.value) || 0
-        },
+            }
+        }
     ];
 
 
-    const columnsConsolidadoDetalhes = [
+    const columnsMacros = [
         {
             field: 'id', headerName: 'Action', align: 'left', headerAlign: 'left',
             renderCell: (value) => {
-                return <GoBook size={30} style={{ cursor: 'pointer', color: '#355b9a' }} onClick={() => onClickDetalhesToMap(value.row)} />;
+                return <GoBook size={30} style={{ cursor: 'pointer', color: '#355b9a' }} />;
             }
         },
-        { field: 'data_f', headerName: 'Data', align: 'center', headerAlign: 'center' },
-        { field: 'veiculo', headerName: 'Veiculo', flex: 1, align: 'center', headerAlign: 'center' },
         {
-            field: 'total_jornada_seg', headerName: 'Tempo da Jornada', type: 'number', flex: 1, align: 'center', headerAlign: 'left',
-            valueFormatter: (value) => value.row.total_jornada
-        },
-        {
-            field: 'total_ocioso_porc', headerName: '% Ocioso', flex: 1, type: 'number', align: 'center', headerAlign: 'center',
+            field: 'mac_data', headerName: 'Data da Macro', flex: 1, align: 'center', headerAlign: 'center',
             valueFormatter: (value) => {
-                if (!value.element) return
-
-                if (value.value > 60) {
-                    value.element.style.backgroundColor = "#FF6347";
-                } else if (value.value > 40) {
-                    value.element.style.backgroundColor = "#FFA500";
-                } else if (value.value > 20) {
-                    value.element.style.backgroundColor = "#FFFF00";
-                } else {
-                    value.element.style.backgroundColor = "#82ff47";
+                if(value.value) {
+                    return moment(value.value, "YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY HH:mm:ss");
                 }
-
-                value.element.style.cursor = "pointer";
-                value.element.setAttribute("title", value.getValue("total_movimento"));
-
-                return `${value.value} %`;
-
+                return "";
             },
-            valueGetter: (params) => parseInt(params.value) || 0
         },
         {
-            field: 'total_movimento_porc', headerName: '% Eficiencia', flex: 1, type: 'number', align: 'center', headerAlign: 'left',
-            valueFormatter: (value) => {
-                if (!value.element) return
-
-                if (value.value < 20) {
-                    value.element.style.backgroundColor = "#FF6347";
-                } else if (value.value < 40) {
-                    value.element.style.backgroundColor = "#FFA500";
-                } else if (value.value < 60) {
-                    value.element.style.backgroundColor = "#FFFF00";
-                } else {
-                    value.element.style.backgroundColor = "#82ff47";
+            field: 'mac_macro', headerName: 'MACRO', flex: 1, align: 'left', headerAlign: 'left',
+            renderCell: (value) => {
+                let classColorMacro = "relatorio-macro-aguardando-color"
+                switch (value.value) {
+                    case 'pausar':
+                        classColorMacro = 'relatorio-macro-pausar-color'
+                        break;
+                    case 'iniciar':
+                        classColorMacro = 'relatorio-macro-iniciar-color'
+                        break;
+                    case 'deslocamento':
+                        classColorMacro = 'relatorio-macro-deslocamento-color'
+                        break;
+                    case 'finalizar':
+                        classColorMacro = 'relatorio-macro-finalizar-color'
+                        break;
                 }
-
-                value.element.style.cursor = "pointer";
-                value.element.setAttribute("title", value.getValue("total_movimento"));
-
-                return `${value.value} %`
-            },
-            valueGetter: (params) => parseInt(params.value) || 0
-        },
-        {
-            field: 'total_improdutivo_porc', headerName: '% Improdutivo', flex: 1, type: 'number', align: 'center', headerAlign: 'center',
-            valueFormatter: (value) => {
-                if (!value.element) return
-
-                if (value.value > 60) {
-                    value.element.style.backgroundColor = "#FF6347";
-                } else if (value.value > 40) {
-                    value.element.style.backgroundColor = "#FFA500";
-                } else if (value.value > 20) {
-                    value.element.style.backgroundColor = "#FFFF00";
-                } else {
-                    value.element.style.backgroundColor = "#82ff47";
-                }
-
-                value.element.style.cursor = "pointer";
-                value.element.setAttribute("title", value.getValue("total_improdutivo"));
-
-                return `${value.value} %`;
+               return <div className={`relatorio-coluna-macro ${classColorMacro}`}>{value.value}</div>
 
             },
-            valueGetter: (params) => parseInt(params.value) || 0
-        },
-        {
-            field: 'velocidade_media', headerName: 'Velocidade Media', flex: 1, type: 'number', align: 'center', headerAlign: 'left',
-            valueFormatter: (value) => {
-                return `${value.value} Km/h`
-            },
-            valueGetter: (params) => parseInt(params.value) || 0
-        },
-        {
-            field: 'odometro', headerName: 'Odometro', flex: 1, type: 'number', align: 'center', headerAlign: 'center',
-            valueFormatter: (value) => {
-                return `${value.value} Km/h`
-            },
-            valueGetter: (params) => parseInt(params.value) || 0
-        },
+        }
+        // {
+        //     field: 'total_movimento_porc', headerName: '% Eficiencia', flex: 1, type: 'number', align: 'center', headerAlign: 'left',
+        //     valueFormatter: (value) => {
+        //         if (!value.element) return
+
+        //         if (value.value < 20) {
+        //             value.element.style.backgroundColor = "#FF6347";
+        //         } else if (value.value < 40) {
+        //             value.element.style.backgroundColor = "#FFA500";
+        //         } else if (value.value < 60) {
+        //             value.element.style.backgroundColor = "#FFFF00";
+        //         } else {
+        //             value.element.style.backgroundColor = "#82ff47";
+        //         }
+
+        //         value.element.style.cursor = "pointer";
+        //         value.element.setAttribute("title", value.getValue("total_movimento"));
+
+        //         return `${value.value} %`
+        //     },
+        //     valueGetter: (params) => parseInt(params.value) || 0
+        // },
     ];
 
     function onChangeData(ev, picker) {
@@ -240,50 +165,74 @@ const Tabela = () => {
             setVeiculos(data.data);
         });
 
-        api.get('http://f-agro-api.fulltrackapp.com/eficiencia?data_ini=2021-03-01&data_fim=2021-03-20', {}, ({ data }) => {
-
-            data = data.map((row, index) => {
-                return { ...row, ...{ id: index } }
-            })
-            setConsolidadoGeral(data);
-        })
-
-        api.get('http://f-agro-api.fulltrackapp.com/eficiencia/detalhe?data_ini=2021-03-01&data_fim=2021-03-30&vei_id=47407', {}, ({ data }) => {
-
-            data = data.map((row, index) => {
-                return { ...row, ...{ id: index } }
-            })
-
-            setConsolidadoDetalhes(data);
-        })
-
     }, []);
 
-    function onClickDetalhesDataGrid(rowDataGrid) {
-        console.log(rowDataGrid);
+    function onClickOperacao(rowDataGrid) {
+        if (!rowDataGrid.id) return 
+        setMacros(rowDataGrid.macros);
     }
 
 
-    function onClickDetalhesToMap(rowDataGrid) {
-        rowDataGrid.data_init = rowDataGrid.data_f;
-        rowDataGrid.data_fim = rowDataGrid.data_f;
-        delete rowDataGrid.data_f;
-        history.push(`/mapa/${rowDataGrid.id_veiculo}`, rowDataGrid)
+    // function onClickDetalhesToMap(rowDataGrid) {
+    //     rowDataGrid.data_init = rowDataGrid.data_f;
+    //     rowDataGrid.data_fim = rowDataGrid.data_f;
+    //     delete rowDataGrid.data_f;
+    //     history.push(`/mapa/${rowDataGrid.id_veiculo}`, rowDataGrid)
+    // }
+
+    function validarDados() {
+        var valid = true;
+
+        if (!idMotorista && !idVeiculo) {
+            valid = false;
+            setErrorMotorista('error-border');
+            setErrorVeiculo('error-border');
+        }
+
+        return valid;
+    }
+
+    function clearFilterError() {
+        setErrorMotorista("");
+        setErrorVeiculo("");
     }
 
     function gerarRelatorio() {
-        var data = {
-            id_motorista: idMotorista,
-            id_veiculo: idVeiculo,
-            dt_inicio: inicioPeriodo,
-            dt_fim: fimPeriodo
-        }
+        clearFilterError()
+        if (validarDados()) {
 
-        
+            var form = new FormData();
+
+            form.append('id_motorista', idMotorista)
+            form.append('id_veiculo', idVeiculo)
+            form.append('data_ini', moment(inicioPeriodo, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss'))
+            form.append('data_fim', moment(fimPeriodo, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss'))
+
+            api.post('http://f-agro-api.fulltrackapp.com/ordemservico/generateReport', form, ({ data }) => {
+                if (data && data.length) {
+                    setOrdemServices(data);
+                } else {
+                    store.addNotification({
+                        title: "Erro ao gerar o Relatorio!",
+                        message: "Sem dados nesse periodo.",
+                        type: "warning",
+                        insert: "bottom",
+                        container: "bottom-right",
+                        animationIn: ["animate__animated", "animate__fadeIn"],
+                        animationOut: ["animate__animated", "animate__fadeOut"],
+                        dismiss: {
+                            duration: 5000,
+                            onScreen: true
+                        }
+                    });
+                }
+            })
+        }
     }
 
     function changeMenu() {
-        
+        let show = !showMenu;
+        setShowMenu(show);
     }
 
 
@@ -292,95 +241,91 @@ const Tabela = () => {
             <div className="panel-heading">
                 <div className="row">
                     <div className="col-lg-12">
-                        <h2><b>Realatorio de Ordem de Serviço</b></h2>
+                        <h2>
+                            <b>Realatorio de Ordem de Serviço</b>
+                            <HiFilter onClick={changeMenu} className="btn-relatorio-filtro" />
+                        </h2>
                     </div>
                 </div>
-                <div className="relatorio-filtro-container">
-                    <div className="relatorio-filtro-heading">
-                        <HiFilter onClick={changeMenu} cursor="pointer" /> Filtros
-                    </div>
-                    <div className="relatorio-filtro-body">
-                        <div>
-                            <label className="label-periodo-ordemservico">Periodo</label>
-                            <DateRangePicker
-                                onChangeData={onChangeData}
-                                initialSetings={{
-                                    startDate: inicioPeriodo,
-                                    endDate: fimPeriodo,
-                                    timePicker: true,
-                                    // timePicker24Hour: true,
-                                    linkedCalendars: false,
-                                    // timePickerSeconds: true,
-                                    autoApply: true,
-                                    locale: {
-                                        format: 'DD/MM/YYYY HH:mm:ss',
-                                    }
-                                }}
-                            />
+                <Fade in={showMenu}>
+                    <div className="relatorio-filtro-container">
+                        <div className="relatorio-filtro-heading">
+                            <HiFilter onClick={changeMenu} style={{ cursor: 'pointer', marginRight: '7px', fontSize: '24px' }} /> Filtros
                         </div>
-                        <div>
-                            <label className="label-form-ordem-servico" id="labelMotorista">Motorista</label>
-                            <select
-                                htmlFor="labelMotorista"
-                                id="selectMotorista"
-                                className={`select-form`}
-                                value={idMotorista}
-                                onChange={(e) => setIdMotorista(e.target.value)}
-                            >
-                                <option
-                                    key="0"
-                                    value=""
+                        <div className="relatorio-filtro-body">
+                            <div>
+                                <label className="label-periodo-ordemservico">Periodo</label>
+                                <DateRangePicker
+                                    onChangeData={onChangeData}
+                                    startDate={inicioPeriodo}
+                                    endDate={fimPeriodo}
+                                />
+                            </div>
+                            <div>
+                                <label className="label-form-ordem-servico" id="labelMotorista">Motorista</label>
+                                <select
+                                    htmlFor="labelMotorista"
+                                    id="selectMotorista"
+                                    className={`select-form ${errorMotorista}`}
+                                    value={idMotorista}
+                                    onChange={(e) => setIdMotorista(e.target.value)}
                                 >
-                                    Nenhum Selecionado
-                                </option>
-                                {motoristas.length && motoristas.map((mot) => (
                                     <option
-                                        key={mot.ras_mot_id}
-                                        value={mot.ras_mot_id}>
-                                        {mot.ras_mot_nome}
+                                        key="0"
+                                        value=""
+                                    >
+                                        Nenhum Selecionado
                                     </option>
-                                ))}
+                                    {motoristas.length && motoristas.map((mot) => (
+                                        <option
+                                            key={mot.ras_mot_id}
+                                            value={mot.ras_mot_id}>
+                                            {mot.ras_mot_nome}
+                                        </option>
+                                    ))}
 
-                            </select>
-                        </div>
-                        <div>
-                            <label className="label-form-ordem-servico" id="labelVeiculos">Veiculos</label>
-                            <select
-                                htmlFor="labelVeiculos"
-                                id="selectVeiculos"
-                                className={`select-form`}
-                                value={idVeiculo}
-                                onChange={(e) => setIdVeiculo(e.target.value)}
-                            >
-                                <option
-                                    key="0"
-                                    value=""
+                                </select>
+                            </div>
+                            <div>
+                                <label className="label-form-ordem-servico" id="labelVeiculos">Veiculos</label>
+                                <select
+                                    htmlFor="labelVeiculos"
+                                    id="selectVeiculos"
+                                    className={`select-form ${errorVeiculo}`}
+                                    value={idVeiculo}
+                                    onChange={(e) => setIdVeiculo(e.target.value)}
                                 >
-                                    Nenhum Selecionado
-                                </option>
-                                {veiculos.length && veiculos.map((vei) => (
                                     <option
-                                        key={vei.ras_vei_id}
-                                        value={vei.ras_vei_id}>
-                                        {vei.ras_vei_veiculo}
+                                        key="0"
+                                        value=""
+                                    >
+                                        Nenhum Selecionado
                                     </option>
-                                ))}
+                                    {veiculos.length && veiculos.map((vei) => (
+                                        <option
+                                            key={vei.ras_vei_id}
+                                            value={vei.ras_vei_id}>
+                                            {vei.ras_vei_veiculo}
+                                        </option>
+                                    ))}
 
-                            </select>
-                        </div>
-                        <div>
-                            <Button
-                                variant="contained"
-                                size="medium"
-                                id="btn-gerar-relatorio"
-                                onClick={() => gerarRelatorio()}
-                                startIcon={<HiOutlineDocumentReport />}
-                            >
-                                Gerar
-                            </Button>
+                                </select>
+                            </div>
+                            <div>
+                                <Button
+                                    variant="contained"
+                                    size="medium"
+                                    id="btn-gerar-relatorio"
+                                    onClick={() => gerarRelatorio()}
+                                    startIcon={<HiOutlineDocumentReport />}
+                                >
+                                    Gerar
+                                </Button>
+                            </div>
                         </div>
                     </div>
-                </div>
+
+                </Fade>
                 <div className="row">
                     <div className="col-lg-12">
                         <h4><b>Local:</b> Faz. Santa Cecília</h4>
@@ -413,11 +358,11 @@ const Tabela = () => {
                 </div>
             </div>
             <div className="row container-tabelas">
-                <div className="col-md-6">
-                    <DataGrid key="dataGrid1" className="DataGrid" rows={consolidadoGeral} columns={columnsConsolidadoGeral} />
+                <div className="col-md-8">
+                    <DataGrid key="dataGrid1" className="DataGrid" rows={orderServices} columns={columnsOrderServices} />
                 </div>
-                <div className="col-md-6">
-                    <DataGrid key="dataGrid2" className="DataGrid" rows={consolidadoDetalhes} columns={columnsConsolidadoDetalhes} />
+                <div className="col-md-4">
+                    <DataGrid key="dataGrid2" className="DataGrid" rows={macros} columns={columnsMacros} />
                 </div>
             </div>
 
