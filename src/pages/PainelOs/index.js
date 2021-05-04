@@ -53,11 +53,13 @@ const PainelOs = () => {
     function atualizarPainelOs (macro) {
         setDadosPainelOs((state) => {
             var newArr = [...state];
-            let indexOs = newArr.findIndex((row, index) => { 
-                if (row.osr_id == macro.mac_id_operacao ) {
-                    return index;
+            let indexOs = 0;
+
+            for(var i in newArr) {
+                if (newArr[i].osr_id == macro.mac_id_operacao ) {
+                    indexOs = i;
                 }
-            })
+            }
 
             newArr[indexOs].status = macro.mac_macro;
             return newArr;
