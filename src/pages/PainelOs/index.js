@@ -55,8 +55,8 @@ const PainelOs = () => {
             var newArr = [...state];
             let indexOs = 0;
 
-            for(var i in newArr) {
-                if (newArr[i].osr_id == macro.mac_id_operacao ) {
+            for (var i in newArr) {
+                if (parseInt(newArr[i].osr_id) === parseInt(macro.mac_id_operacao) ) {
                     indexOs = i;
                 }
             }
