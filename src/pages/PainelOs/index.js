@@ -54,7 +54,7 @@ const PainelOs = () => {
         setDadosPainelOs((state) => {
             var newArr = [...state];
             let indexOs = newArr.findIndex((row, index) => { 
-                if (row.osr_id === macro.mac_id_operacao ) {
+                if (row.osr_id == macro.mac_id_operacao ) {
                     return index;
                 }
             })
