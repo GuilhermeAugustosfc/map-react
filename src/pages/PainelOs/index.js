@@ -11,7 +11,7 @@ import moment from "moment";
 
 var client = mqtt.connect(process.env.REACT_APP_MQTT_HOSTNAME, {
     username: process.env.REACT_APP_MQTT_USERNAME,
-    port:process.env.REACT_APP_MQTT_PORT,
+    port: process.env.REACT_APP_MQTT_PORT,
     password: process.env.REACT_APP_MQTT_PASSWORD,
     protocol: 'ws',
     connectTimeout: 4000, // Timeout period
@@ -28,6 +28,7 @@ const PainelOs = () => {
             <div>
                 <div><strong>Motorista: </strong>{macro.mac_motorista}</div>
                 <div><strong>Ação: </strong>{macro.mac_macro}</div>
+                <div> <strong> {macro.entrou_cerca ? "Entrou na cerca" : "Não entrou na cerca"}</strong></div>
             </div>
         )
     }
@@ -46,11 +47,11 @@ const PainelOs = () => {
                 return <div className="tabela-painel-os-coluna-status-aguardando">{status}</div>
             default:
                 return <div className="tabela-painel-os-coluna-status-aguardando">{status}</div>
-            }
-        
+        }
+
     }
 
-    function atualizarPainelOs (macro) {
+    function atualizarPainelOs(macro) {
         setDadosPainelOs((state) => {
             var newArr = [...state];
             let indexOs = 0;
@@ -66,7 +67,7 @@ const PainelOs = () => {
         });
 
         store.addNotification({
-            title: "Ação do motorista!",
+            title: "Notificação!",
             message: templateMacro(macro),
             type: "info",
             insert: "bottom",
@@ -81,7 +82,7 @@ const PainelOs = () => {
     }
 
     useEffect(() => {
-        
+
         api.get('http://f-agro-api.fulltrackapp.com/ordemservico/painelOs', {}, ({ data }) => {
             setDadosPainelOs(data);
 
@@ -90,7 +91,7 @@ const PainelOs = () => {
                     console.log('conecotu mqtt');
                     client.subscribe('macro');
                 })
-            
+
                 client.on('message', function (topic, message) {
                     // message is Buffer
                     message = message.toString();
@@ -101,14 +102,14 @@ const PainelOs = () => {
                         console.log(error);
                         return
                     }
-    
+
                     atualizarPainelOs(macro);
                 })
-            } 
+            }
         })
     }, []);
 
-    
+
 
     return (
         <div className="container-painel-os">
@@ -141,7 +142,7 @@ const PainelOs = () => {
                                 <td className="paienl-os-coluna tabela-painel-os-coluna-implemento">{operacao.imp_descricao}</td>
                                 <td className="paienl-os-coluna tabela-painel-os-coluna-talhao">{operacao.tal_descricao}</td>
                                 <td className="paienl-os-coluna tabela-painel-os-coluna-cultura">{operacao.cul_descricao}</td>
-                                <td className="paienl-os-coluna tabela-painel-os-coluna-status">{operacao.hasOwnProperty('status') ? statusOSTabela(operacao.status) : statusOSTabela('aguardando') }
+                                <td className="paienl-os-coluna tabela-painel-os-coluna-status">{operacao.hasOwnProperty('status') ? statusOSTabela(operacao.status) : statusOSTabela('aguardando')}
                                 </td>
                             </tr>
                         ))}

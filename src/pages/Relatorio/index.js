@@ -84,7 +84,12 @@ const Tabela = () => {
                 return ""
 
             }
-        }
+        },
+        { field: 'tempo_pause', headerName: 'Pausar', flex: 1, align: 'center', headerAlign: 'center'},
+        { field: 'tempo_iniciar', headerName: 'Iniciar', flex: 1, align: 'center', headerAlign: 'center'},
+        { field: 'tempo_deslocamento', headerName: 'Deslocamaento', flex: 1, align: 'center', headerAlign: 'center'},
+        { field: 'tempo_finalizar', headerName: 'Finalizar', flex: 1, align: 'center', headerAlign: 'center'},
+
     ];
 
 
@@ -209,8 +214,9 @@ const Tabela = () => {
             form.append('data_fim', moment(fimPeriodo, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss'))
 
             api.post('http://f-agro-api.fulltrackapp.com/ordemservico/generateReport', form, ({ data }) => {
-                if (data && data.length) {
+                if (data && Object.values(data.length) > 0) {
                     setOrdemServices(data);
+                    setShowMenu(true);
                 } else {
                     store.addNotification({
                         title: "Erro ao gerar o Relatorio!",

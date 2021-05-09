@@ -8,6 +8,9 @@ import DateRangePicker from "../../../Componentes/DataRangerPicker/DataRangerPic
 import moment from 'moment';
 import BotaoForm from "../../../Componentes/BotaoForm/botaoForm";
 
+import { store } from 'react-notifications-component';
+
+
 import { GoCheck, GoArrowLeft } from 'react-icons/go'
 
 import Button from '@material-ui/core/Button';
@@ -317,7 +320,23 @@ function OrderServicoForm(props) {
                     osr_motorista: selectMotoristaRef.current.options[selectMotoristaRef.current.selectedIndex].text,
                     osr_veiculo: selectVeiculoRef.current.options[selectVeiculoRef.current.selectedIndex].text
                 }, (res) => {
-                    history.push(`/cadastros/ordemservico`);
+                    if (res.status === 200) {
+                        history.push(`/cadastros/ordemservico`);
+                    } else {
+                        store.addNotification({
+                            title: "Erro ao salvar!",
+                            message: res.data.msg,
+                            type: "danger",
+                            insert: "bottom",
+                            container: "top-right",
+                            animationIn: ["animate__animated", "animate__fadeIn"],
+                            animationOut: ["animate__animated", "animate__fadeOut"],
+                            dismiss: {
+                                duration: 15000,
+                                onScreen: true
+                            }
+                        });
+                    }
                 })
             } else {
 
@@ -346,7 +365,23 @@ function OrderServicoForm(props) {
 
 
                 api.post('http://f-agro-api.fulltrackapp.com/ordemservico/', form, (res) => {
-                    history.push(`/cadastros/ordemservico`);
+                    if (res.status === 200) {
+                        history.push(`/cadastros/ordemservico`);
+                    } else {
+                        store.addNotification({
+                            title: "Erro ao salvar!",
+                            message: res.data.msg,
+                            type: "danger",
+                            insert: "bottom",
+                            container: "top-right",
+                            animationIn: ["animate__animated", "animate__fadeIn"],
+                            animationOut: ["animate__animated", "animate__fadeOut"],
+                            dismiss: {
+                                duration: 15000,
+                                onScreen: true
+                            }
+                        });
+                    }
                 })
             }
         }
@@ -411,10 +446,10 @@ function OrderServicoForm(props) {
 
                         </select>
                     </BotaoForm>
-                    <div style={{display:'flex'}}>
-                        <div style={{flex:1, marginRight:'11px'}}>
+                    <div style={{ display: 'flex' }}>
+                        <div style={{ flex: 1, marginRight: '11px' }}>
                             <label className="label-form-ordem-servico" id="labelAno">Ano</label>
-                            
+
                             <BotaoForm chaveId={"ano_id"} chaveDesc={"ano_descricao"} states={setAnos} valor={anos} id={idAno} url={"ano"} >
                                 <select
                                     htmlFor="labelAno"
@@ -463,7 +498,7 @@ function OrderServicoForm(props) {
                                             {safra.saf_descricao}
                                         </option>
                                     ))}
-    
+
                                 </select>
                             </BotaoForm>
                         </div>
