@@ -325,7 +325,7 @@ function OrderServicoForm(props) {
                     } else {
                         store.addNotification({
                             title: "Erro ao salvar!",
-                            message: res.data.msg,
+                            message: res.data.message,
                             type: "danger",
                             insert: "bottom",
                             container: "top-right",
@@ -370,7 +370,7 @@ function OrderServicoForm(props) {
                     } else {
                         store.addNotification({
                             title: "Erro ao salvar!",
-                            message: res.data.msg,
+                            message: res.data.message,
                             type: "danger",
                             insert: "bottom",
                             container: "top-right",

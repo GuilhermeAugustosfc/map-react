@@ -19,7 +19,7 @@ var client = mqtt.connect(process.env.REACT_APP_MQTT_HOSTNAME, {
 })
 
 
-const PainelOs = () => {
+function PainelOs() {
 
     const [dadosPainelOs, setDadosPainelOs] = useState([]);
 
@@ -57,7 +57,7 @@ const PainelOs = () => {
             let indexOs = 0;
 
             for (var i in newArr) {
-                if (parseInt(newArr[i].osr_id) === parseInt(macro.mac_id_operacao) ) {
+                if (parseInt(newArr[i].osr_id) === parseInt(macro.mac_id_operacao)) {
                     indexOs = i;
                 }
             }
@@ -75,7 +75,7 @@ const PainelOs = () => {
             animationIn: ["animate__animated", "animate__fadeIn"],
             animationOut: ["animate__animated", "animate__fadeOut"],
             dismiss: {
-                duration: 15000,
+                duration: 5000,
                 onScreen: true
             }
         });

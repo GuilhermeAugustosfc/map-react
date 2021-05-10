@@ -213,14 +213,14 @@ const Tabela = () => {
             form.append('data_ini', moment(inicioPeriodo, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss'))
             form.append('data_fim', moment(fimPeriodo, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss'))
 
-            api.post('http://f-agro-api.fulltrackapp.com/ordemservico/generateReport', form, ({ data }) => {
-                if (data && Object.values(data.length) > 0) {
-                    setOrdemServices(data);
+            api.post('http://f-agro-api.fulltrackapp.com/ordemservico/generateReport', form, (res) => {
+                if (res.status === 200) {
+                    setOrdemServices(res.data);
                     setShowMenu(true);
                 } else {
                     store.addNotification({
                         title: "Erro ao gerar o Relatorio!",
-                        message: "Sem dados nesse periodo.",
+                        message: res.data.message,
                         type: "warning",
                         insert: "bottom",
                         container: "bottom-right",

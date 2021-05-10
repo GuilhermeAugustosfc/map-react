@@ -518,7 +518,15 @@ function TalhaoForm(props) {
             tal_coordenada: coordenadasTalhao,
             tal_imagem: location
           }, (res) => {
-            history.push(`/cadastros/talhao`);
+            if (res.status === 200) {
+              history.push(`/cadastros/talhao`);
+            } else {
+              Swal.fire(
+                "Erro !",
+                "Falha ao atualizar os dados!",
+                "danger"
+              );
+            }
           })
 
         } else {
@@ -532,7 +540,15 @@ function TalhaoForm(props) {
           form.append('tal_imagem', location);
 
           api.post('http://f-agro-api.fulltrackapp.com/talhao/', form, (res) => {
-            history.push(`/cadastros/talhao`);
+            if (res.status === 200) {
+              history.push(`/cadastros/talhao`);
+            } else {
+              Swal.fire(
+                "Erro !",
+                "Falha ao inserir os dados!",
+                "danger"
+              );
+            }
           })
         }
       }).catch((error) => {
