@@ -29,7 +29,7 @@ const REQUEST = {
                 localStorage.removeItem('token-fulltrack4');
                 this.post(url, dados, callback);
             } else {
-                callback(response.data);
+                callback(response);
             }
         }).catch((error) => {
             console.log(error);
