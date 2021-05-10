@@ -215,12 +215,12 @@ const Tabela = () => {
 
             api.post('http://f-agro-api.fulltrackapp.com/ordemservico/generateReport', form, (res) => {
                 if (res.status === 200) {
-                    setOrdemServices(res.data);
+                    setOrdemServices(res.data.data);
                     setShowMenu(true);
                 } else {
                     store.addNotification({
                         title: "Erro ao gerar o Relatorio!",
-                        message: res.data.message,
+                        message: res.message,
                         type: "warning",
                         insert: "bottom",
                         container: "bottom-right",

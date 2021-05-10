@@ -32,10 +32,13 @@ const REQUEST = {
                 callback(response);
             }
         }).catch((error) => {
-            console.log(error);
             if (error.request.status === 401) {
                 localStorage.removeItem('token-fulltrack4');
                 this.post(url, dados, callback);
+            } else {
+                var a = JSON.parse(error.request.response);
+                console.log(a);
+                callback(JSON.parse(error.request.response))
             }
         })
     },

@@ -288,7 +288,7 @@ function OrderServicoForm(props) {
             valid = false;
         }
 
-        if (!errorNumeroOrdem) {
+        if (!numeroOrdem) {
             setErrorNumeroOrdem("error-border")
         }
 
@@ -325,7 +325,7 @@ function OrderServicoForm(props) {
                     } else {
                         store.addNotification({
                             title: "Erro ao salvar!",
-                            message: res.data.message,
+                            message: res.message,
                             type: "danger",
                             insert: "bottom",
                             container: "top-right",
@@ -370,7 +370,7 @@ function OrderServicoForm(props) {
                     } else {
                         store.addNotification({
                             title: "Erro ao salvar!",
-                            message: res.data.message,
+                            message: res.message,
                             type: "danger",
                             insert: "bottom",
                             container: "top-right",
