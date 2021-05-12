@@ -7,6 +7,8 @@ import { store } from 'react-notifications-component';
 
 import './PainelOs.css';
 import moment from "moment";
+import {Howl} from 'howler';
+import alertMp3 from '../../media/audio3.mp3';
 
 var clientMqtt = mqtt.connect(process.env.REACT_APP_MQTT_HOSTNAME, {
     username: process.env.REACT_APP_MQTT_USERNAME,
@@ -65,9 +67,11 @@ function PainelOs() {
         setDadosPainelOs(newArr);
         
         
-        var audio = document.querySelector('#audio-notificacao');
-
-        audio.play();
+        var sound = new Howl({
+            src: [alertMp3]
+        });
+          
+        sound.play();
         
         store.addNotification({
             title: "Notificação!",
