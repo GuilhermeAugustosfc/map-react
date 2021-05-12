@@ -59,7 +59,7 @@ export default function Menu({ children }) {
                     </ListItem>
                 </Link>
             </List> */}
-            <List>
+            {/* <List>
                 <Link to="/mapa" className="link-menu">
                     <ListItem button key={'mapa'}>
                         <ListItemIcon>
@@ -68,7 +68,7 @@ export default function Menu({ children }) {
                         <ListItemText primary={'MAPA'} />
                     </ListItem>
                 </Link>
-            </List>
+            </List> */}
             <List>
                 <Link to="/cadastros/ordemservico" className="link-menu">
                     <ListItem button key={'ordemservico'}>

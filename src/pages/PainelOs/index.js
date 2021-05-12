@@ -8,8 +8,7 @@ import { store } from 'react-notifications-component';
 import './PainelOs.css';
 import moment from "moment";
 
-
-var client = mqtt.connect(process.env.REACT_APP_MQTT_HOSTNAME, {
+var clientMqtt = mqtt.connect(process.env.REACT_APP_MQTT_HOSTNAME, {
     username: process.env.REACT_APP_MQTT_USERNAME,
     port: process.env.REACT_APP_MQTT_PORT,
     password: process.env.REACT_APP_MQTT_PASSWORD,
@@ -51,21 +50,25 @@ function PainelOs() {
 
     }
 
-    function atualizarPainelOs(macro) {
-        setDadosPainelOs((state) => {
-            var newArr = [...state];
-            let indexOs = 0;
+    function atualizarPainelOs(macro, data) {
 
-            for (var i in newArr) {
-                if (parseInt(newArr[i].osr_id) === parseInt(macro.mac_id_operacao)) {
-                    indexOs = i;
-                }
+        var newArr = [...data];
+        let indexOs = 0;
+
+        for (var i in newArr) {
+            if (parseInt(newArr[i].osr_id) === parseInt(macro.mac_id_operacao) ) {
+                indexOs = i;
             }
+        }
 
-            newArr[indexOs].status = macro.mac_macro;
-            return newArr;
-        });
+        newArr[indexOs].status = macro.mac_macro;
+        setDadosPainelOs(newArr);
+        
+        
+        var audio = document.querySelector('#audio-notificacao');
 
+        audio.play();
+        
         store.addNotification({
             title: "Notificação!",
             message: templateMacro(macro),
@@ -86,13 +89,13 @@ function PainelOs() {
         api.get('http://f-agro-api.fulltrackapp.com/ordemservico/painelOs', {}, ({ data }) => {
             setDadosPainelOs(data);
 
-            if (!client.connected) {
-                client.on('connect', function () {
+            if (!clientMqtt.connected) {
+                clientMqtt.on('connect', function () {
                     console.log('conecotu mqtt');
-                    client.subscribe('macro');
-                })
-
-                client.on('message', function (topic, message) {
+                    clientMqtt.subscribe('macro');
+                });
+    
+                clientMqtt.on('message', function (topic, message) {
                     // message is Buffer
                     message = message.toString();
                     var macro = {};
@@ -102,8 +105,8 @@ function PainelOs() {
                         console.log(error);
                         return
                     }
-
-                    atualizarPainelOs(macro);
+    
+                    atualizarPainelOs(macro, data);
                 })
             }
         })

@@ -10,7 +10,7 @@ import './carrosel.css';
 function Carrosel({operacao, consolidado}) {
 
     const [templates, setTemplates] = useState([
-        InfoConsolidadoMapa, TemplateTest, TemplateTest, TemplateTest, TemplateTest
+        InfoConsolidadoMapa
     ]);
 
     const options = {
