@@ -47,7 +47,7 @@ function BotaoForm(props) {
   const id = open ? "simple-popover" : undefined;
 
   return (
-    <>
+    <React.Fragment>
       <Container>
         {props.children}
         <ButtonForm corBotao={"#1dd86c"} onClick={handleClick}>
@@ -148,7 +148,7 @@ function BotaoForm(props) {
           </div>
         </Typography>
       </Popover>
-    </>
+    </React.Fragment>
   );
 }
 

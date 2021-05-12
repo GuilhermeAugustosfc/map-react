@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import {
     ListItemIcon,
     ListItemText,
@@ -11,14 +11,25 @@ import {
 
 import { Link } from 'react-router-dom'
 
+import MyMQTT from '../../services/mqtt'
+
+import mqttContext from '../../Contexts/mqtt'
+
 import { GoCalendar, GoGrabber, GoGlobe, GoFileMedia, GoNote, GoDeviceDesktop } from 'react-icons/go'
 
 import "./Menu.css"
 
-
 export default function Menu({ children }) {
     const [open, setOpen] = React.useState(false);
     const menuRef = React.useRef(null);
+
+
+    const mymqtt = React.useRef(null);
+
+    useLayoutEffect(() => {
+        mymqtt.current = new MyMQTT();
+        mymqtt.current.init();
+    }, [])
 
     const toggleDrawer = (open) => (event) => {
         if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -115,9 +126,11 @@ export default function Menu({ children }) {
                 <MenuLateral />
             </SwipeableDrawer>
 
-            <div className="container-app" ref={menuRef}>
-                {children}
-            </div>
+            <mqttContext.Provider value={{instaceMqtt:mymqtt}}>
+                <div className="container-app" ref={menuRef}>
+                    {children}
+                </div>
+            </mqttContext.Provider>
         </React.Fragment>
     );
 }

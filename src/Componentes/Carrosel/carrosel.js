@@ -27,7 +27,7 @@ function Carrosel({operacao, consolidado}) {
 
     function TemplateTest() {
         return (
-            <>
+            <React.Fragment>
                 <h5>Ultimos evnetos</h5>
                 <ul>
                     <li><strong>Data</strong> : 12/11/2020</li>
@@ -37,7 +37,7 @@ function Carrosel({operacao, consolidado}) {
                     <li><strong>Velocidade</strong> : 20km</li>
                     <li><strong>Endereço</strong> : Rua das flores</li>
                 </ul>
-            </>
+            </React.Fragment>
         )
     }
     useEffect(() => {

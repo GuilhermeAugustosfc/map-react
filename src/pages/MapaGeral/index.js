@@ -262,7 +262,7 @@ function MapaGeral(props) {
       aux.featureMarkerAtual = aux.allFeaturesMarkers.features[sourceMarkerIndex[data.ras_vei_id]];
 
       aux.featureMarkerAtual.geometry.coordinates = aux.coordenadas;
-      aux.featureMarkerAtual.properties.image_marker = parseInt(data.ras_eve_ignicao) ? (parseInt(data.ras_eve_velocidade) > 0 ? 'marker-movimento' : 'marker-ligado') : 'marker-desligado';
+      aux.featureMarkerAtual.properties.image_marker = parseInt(data.ras_eve_ignicao, 10) ? (parseInt(data.ras_eve_velocidade, 10) > 0 ? 'marker-movimento' : 'marker-ligado') : 'marker-desligado';
       aux.featureMarkerAtual.properties.velocidade = data.ras_eve_velocidade;
       aux.featureMarkerAtual.properties.dt_gps = data.ras_eve_data_gps;
       aux.featureMarkerAtual.properties.desc_ativo = data.ras_vei_veiculo;
@@ -276,7 +276,7 @@ function MapaGeral(props) {
 
       sourceMarkerIndex[data.ras_vei_id] = sourceMarker.features.length;
       sourceMarker.features.push(turf.point(aux.coordenadas, {
-        image_marker: parseInt(data.ras_eve_ignicao) ? (parseInt(data.ras_eve_velocidade) > 0 ? 'marker-movimento' : 'marker-ligado') : 'marker-desligado',
+        image_marker: parseInt(data.ras_eve_ignicao, 10) ? (parseInt(data.ras_eve_velocidade, 10) > 0 ? 'marker-movimento' : 'marker-ligado') : 'marker-desligado',
         velocidade: data.ras_eve_velocidade,
         dt_gps: data.ras_eve_data_gps,
         desc_ativo: data.ras_vei_veiculo,
@@ -294,7 +294,7 @@ function MapaGeral(props) {
   function buscarDados(form, map) {
 
     if (map && map.getSource('rota')) {
-      map.removeSource('rota')
+      map.removeSource('rota');
     }
 
     api.post('http://api-fulltrack4.ftdata.com.br/relatorio/Rota/gerar/', form, (data) => {
@@ -452,7 +452,7 @@ function MapaGeral(props) {
 
     setOperacaoConfig({
       cerca:turf.polygon(coordenadasTalhao),
-      velocidade:parseInt(orderServico.osr_velocidade)
+      velocidade:parseInt(orderServico.osr_velocidade, 10)
     })
 
     let feature = {
@@ -518,11 +518,11 @@ function MapaGeral(props) {
   }
 
   function templatePopup(obj) {
-    let color = parseInt(obj.ignicao) ? (parseInt(obj.velocidade) > 0 ? '#3972EE' : '#0A6249') : '#F5F5F5';
-    let backgroud = parseInt(obj.ignicao) ? (parseInt(obj.velocidade) > 0 ? '#E6EEFF' : '#90ee9080') : '#8E969B';
+    let color = parseInt(obj.ignicao, 10) ? (parseInt(obj.velocidade, 10) > 0 ? '#3972EE' : '#0A6249') : '#F5F5F5';
+    let backgroud = parseInt(obj.ignicao, 10) ? (parseInt(obj.velocidade, 10) > 0 ? '#E6EEFF' : '#90ee9080') : '#8E969B';
     return `<div id="popup">
               <div class="info_popup popup_ignicao" style="color:${color}; background:${backgroud}">
-                ${parseInt(obj.ignicao) ? "ON" : "OFF"}
+                ${parseInt(obj.ignicao, 10) ? "ON" : "OFF"}
               </div>
               <div class="info_popup popup_velocidade">
                 ${obj.velocidade} km/h
@@ -612,10 +612,10 @@ function MapaGeral(props) {
 
 
   return (
-    <>
+    <React.Fragment>
       <MapBox onStyleLoad={onLoadMap} {...mapOptions} />
       <Carrosel operacao={operacao} consolidado={dadosConsolidado} />
-    </>
+    </React.Fragment>
   );
 }
 

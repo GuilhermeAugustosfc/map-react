@@ -5,7 +5,6 @@ const SOCKET = {
         if (this.socket) {
             return
         }
-
         this.socket = new WebSocket(process.env.REACT_APP_URL_SOCKET);
 
         this.socket.onopen = (con) => {

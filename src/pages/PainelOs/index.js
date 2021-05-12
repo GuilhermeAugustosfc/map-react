@@ -1,38 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 
 import api from '../../services/api'
 
-import mqtt from 'mqtt'
-import { store } from 'react-notifications-component';
-
 import './PainelOs.css';
 import moment from "moment";
-import {Howl} from 'howler';
+
+import { Howl } from 'howler';
+
 import alertMp3 from '../../media/audio3.mp3';
 
-var clientMqtt = mqtt.connect(process.env.REACT_APP_MQTT_HOSTNAME, {
-    username: process.env.REACT_APP_MQTT_USERNAME,
-    port: process.env.REACT_APP_MQTT_PORT,
-    password: process.env.REACT_APP_MQTT_PASSWORD,
-    protocol: 'ws',
-    connectTimeout: 4000, // Timeout period
-    clientId: 1,
-})
+import mqttContext from '../../Contexts/mqtt'
 
 
 function PainelOs() {
-
+    
+    var mqttConnection = useContext(mqttContext);
     const [dadosPainelOs, setDadosPainelOs] = useState([]);
-
-    function templateMacro(macro) {
-        return (
-            <div>
-                <div><strong>Motorista: </strong>{macro.mac_motorista}</div>
-                <div><strong>Ação: </strong>{macro.mac_macro}</div>
-                <div> <strong> {macro.entrou_cerca ? "Entrou na cerca" : "Não entrou na cerca"}</strong></div>
-            </div>
-        )
-    }
 
     function statusOSTabela(status) {
         switch (status) {
@@ -52,67 +35,36 @@ function PainelOs() {
 
     }
 
-    function atualizarPainelOs(macro, data) {
+    function messageMqtt(macro) {
+        setDadosPainelOs((data) => {
+            var newArr = [...data];
+            let indexOs = 0;
 
-        var newArr = [...data];
-        let indexOs = 0;
-
-        for (var i in newArr) {
-            if (parseInt(newArr[i].osr_id) === parseInt(macro.mac_id_operacao) ) {
-                indexOs = i;
+            for (var i in newArr) {
+                if (parseInt(newArr[i].osr_id, 10) === parseInt(macro.mac_id_operacao) ) {
+                    indexOs = i;
+                }
             }
-        }
 
-        newArr[indexOs].status = macro.mac_macro;
-        setDadosPainelOs(newArr);
-        
-        
+            newArr[indexOs].status = macro.mac_macro;
+
+            return newArr;
+        })
+      
         var sound = new Howl({
             src: [alertMp3]
         });
           
         sound.play();
-        
-        store.addNotification({
-            title: "Notificação!",
-            message: templateMacro(macro),
-            type: "info",
-            insert: "bottom",
-            container: "bottom-right",
-            animationIn: ["animate__animated", "animate__fadeIn"],
-            animationOut: ["animate__animated", "animate__fadeOut"],
-            dismiss: {
-                duration: 5000,
-                onScreen: true
-            }
-        });
     }
 
     useEffect(() => {
 
+        var instanciaMqtt = mqttConnection.instaceMqtt.current;
+        instanciaMqtt.setFuctionMessageMqtt(messageMqtt);
+
         api.get('http://f-agro-api.fulltrackapp.com/ordemservico/painelOs', {}, ({ data }) => {
             setDadosPainelOs(data);
-
-            if (!clientMqtt.connected) {
-                clientMqtt.on('connect', function () {
-                    console.log('conecotu mqtt');
-                    clientMqtt.subscribe('macro');
-                });
-    
-                clientMqtt.on('message', function (topic, message) {
-                    // message is Buffer
-                    message = message.toString();
-                    var macro = {};
-                    try {
-                        macro = JSON.parse(message)
-                    } catch (error) {
-                        console.log(error);
-                        return
-                    }
-    
-                    atualizarPainelOs(macro, data);
-                })
-            }
         })
     }, []);
 
