@@ -518,7 +518,7 @@ function TalhaoForm(props) {
             tal_coordenada: coordenadasTalhao,
             tal_imagem: location
           }, (res) => {
-            if (res.status === 200) {
+            if (res.status) {
               history.push(`/cadastros/talhao`);
             } else {
               Swal.fire(
@@ -540,7 +540,7 @@ function TalhaoForm(props) {
           form.append('tal_imagem', location);
 
           api.post('http://f-agro-api.fulltrackapp.com/talhao/', form, (res) => {
-            if (res.status === 200) {
+            if (res.status) {
               history.push(`/cadastros/talhao`);
             } else {
               Swal.fire(

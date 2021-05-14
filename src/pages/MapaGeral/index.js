@@ -11,6 +11,8 @@ import ZoomControl from 'mapbox-gl-controls/lib/zoom';
 import * as turf from "@turf/turf"
 import api from '../../services/api';
 
+import { store } from 'react-notifications-component';
+
 import SocketFulltrack from '../../services/socket'
 
 function MapaGeral(props) {
@@ -297,18 +299,36 @@ function MapaGeral(props) {
       map.removeSource('rota');
     }
 
-    api.post('http://api-fulltrack4.ftdata.com.br/relatorio/Rota/gerar/', form, (data) => {
-      let posicoesTratadas = data.map((row) => {
-        return [row.lst_localizacao[1], row.lst_localizacao[0]]
-      })
-
-      for (var i in data) {
-        // INVERTENDO AS POSCISAO DAS COORDENADAS
-        data[i].lst_localizacao = [data[i].lst_localizacao[1], data[i].lst_localizacao[0]];
+    api.post('http://api-fulltrack4.ftdata.com.br/relatorio/Rota/gerar/', form, (res) => {
+      if (res.status) {
+        var data = res.data;
+        let posicoesTratadas = data.map((row) => {
+          return [row.lst_localizacao[1], row.lst_localizacao[0]]
+        })
+  
+        for (var i in data) {
+          // INVERTENDO AS POSCISAO DAS COORDENADAS
+          data[i].lst_localizacao = [data[i].lst_localizacao[1], data[i].lst_localizacao[0]];
+        }
+  
+        setDados(data);
+        zoomRota(posicoesTratadas, map)
+        
+      } else {
+        store.addNotification({
+          title: "Erro ao trazer a rota!",
+          message: res.message,
+          type: "warning",
+          insert: "bottom",
+          container: "bottom-right",
+          animationIn: ["animate__animated", "animate__fadeIn"],
+          animationOut: ["animate__animated", "animate__fadeOut"],
+          dismiss: {
+              duration: 5000,
+              onScreen: true
+          }
+      });
       }
-
-      setDados(data);
-      zoomRota(posicoesTratadas, map)
     })
   }
 

@@ -320,7 +320,7 @@ function OrderServicoForm(props) {
                     osr_motorista: selectMotoristaRef.current.options[selectMotoristaRef.current.selectedIndex].text,
                     osr_veiculo: selectVeiculoRef.current.options[selectVeiculoRef.current.selectedIndex].text
                 }, (res) => {
-                    if (res.status === 200) {
+                    if (res.status) {
                         history.push(`/cadastros/ordemservico`);
                     } else {
                         store.addNotification({
@@ -365,7 +365,7 @@ function OrderServicoForm(props) {
 
 
                 api.post('http://f-agro-api.fulltrackapp.com/ordemservico/', form, (res) => {
-                    if (res.status === 200) {
+                    if (res.status) {
                         history.push(`/cadastros/ordemservico`);
                     } else {
                         store.addNotification({

@@ -36,9 +36,9 @@ const REQUEST = {
                 localStorage.removeItem('token-fulltrack4');
                 this.post(url, dados, callback);
             } else {
-                var a = JSON.parse(error.request.response);
-                console.log(a);
-                callback(JSON.parse(error.request.response))
+                var resposta = JSON.parse(error.request.response)
+                resposta.status = false;
+                callback(resposta);
             }
         })
     },

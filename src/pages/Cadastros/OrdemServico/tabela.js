@@ -4,6 +4,8 @@ import { useHistory } from "react-router";
 
 import { GoPlay, GoPlus, GoChecklist, GoClock } from 'react-icons/go'
 
+import { AiFillEdit } from 'react-icons/ai';
+
 
 import './tabela.css'
 import moment from "moment";
@@ -27,11 +29,14 @@ const OrdemServicoTabela = () => {
     function statusOperacao(operacao) {
         
         if (operacao.status === "agendado") {
-            return <div className="status-ordem-servico" style={{background:'#ffa5009e'}}>Agendado</div>;
+            return <div className="status-ordem-servico" onClick={() => clickOrdemServico('editar', operacao)} style={{background:'#ffa5009e'}}>Agendado</div>;
         } else if (operacao.status === "andamento") {
-            return <div className="status-ordem-servico" style={{background:'#00fa005e'}}>Em Andamento</div>;
+            return <div style={{display:'flex',marginTop:'18px', justifyContent:'center', alignItems:'center'}}>
+                        <div className="status-ordem-servico" onClick={() => clickOrdemServico('mapa', operacao)} style={{background:'#00fa005e', flex:5, marginTop:0, marginRight:'3px'}}>Em Andamento</div>
+                        <AiFillEdit style={{flex:1, fontSize:'30px', borderRadius:'4px',backgroundColor:'#ffa5004d', cursor:'pointer'}} onClick={() => clickOrdemServico('editar', operacao)} />
+                    </div>
         } else {
-            return <div className="status-ordem-servico" style={{background:'#8080803b'}}>Finalizada</div>;
+            return <div className="status-ordem-servico" onClick={() => clickOrdemServico('mapa', operacao)} style={{background:'#8080803b'}}>Finalizada</div>;
         }
 
     }
@@ -47,11 +52,11 @@ const OrdemServicoTabela = () => {
     }
 
 
-    function clickOrdemServico(operacao) {
-        if (operacao.status === "agendado") {
+    function clickOrdemServico(acao, operacao) {
+        if (acao === "editar") {
         history.push(`/cadastros/ordemservico/form/${operacao.osr_id}`);
            
-        } else if (operacao.status === "andamento" || operacao.status === "finalizado") {
+        } else if (acao === "mapa") {
             operacao.data_init = moment(operacao.osr_periodo_ini , "YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY HH:ss:mm");
             operacao.data_fim = moment(operacao.osr_periodo_fim , "YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY HH:ss:mm");
             
@@ -72,7 +77,7 @@ const OrdemServicoTabela = () => {
                 </div>
             </div>
             {dadosOrdemServico && dadosOrdemServico.length && dadosOrdemServico.map((row) => (
-                <div className="card-ordemservico" key={row.osr_id} onClick={() => clickOrdemServico(row)}>
+                <div className="card-ordemservico" key={row.osr_id}>
                     <div style={{ display: 'flex' }}>
                         {row.tal_imagem ? (
                             <img className="image-talhao-order-servico" alt="imagem-talhao" width={100} height={100} src={row.tal_imagem} />
@@ -102,9 +107,7 @@ const OrdemServicoTabela = () => {
                         <div>
                             <strong>Periodo: </strong>{moment(row.osr_periodo_ini, 'YYYY-MM-DD HH:mm:ss').format("DD/MM/YYYY HH:mm:ss")} - {moment(row.osr_periodo_fim, 'YYYY-MM-DD HH:mm:ss').format("DD/MM/YYYY HH:mm:ss")}
                         </div>
-                        <div className="status-operacao">
-                            {statusOperacao(row)}
-                        </div>
+                        {statusOperacao(row)}
                     </div>
                 </div>
             ))}

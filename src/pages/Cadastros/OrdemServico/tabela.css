@@ -15,7 +15,6 @@
     box-shadow: 0 0 8px 0px #ccc;
     width: 23%;
     position: relative;
-    cursor: pointer;
 }
 
 .card-novo-ordemservico {
@@ -39,6 +38,7 @@
     font-weight: 600;
     transition: all 0.2s ease-in-out;
     margin-top: 18px;
+    cursor: pointer;
 }
 
 .image-talhao-order-servico {
