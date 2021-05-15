@@ -32,7 +32,6 @@ class MyMQTT {
             try {
                 macro = JSON.parse(message)
             } catch (error) {
-                console.log(error);
                 return
             }
 
@@ -67,7 +66,7 @@ class MyMQTT {
             <div>
                 <div><strong>Motorista: </strong>{macro.mac_motorista}</div>
                 <div><strong>Ação: </strong>{macro.mac_macro}</div>
-                <div> <strong> {macro.entrou_cerca ? "Entrou na cerca" : "Não entrou na cerca"}</strong></div>
+                <div> <strong> {macro.dentro_cerca ? "Dentro do talhao!" : "Fora do talhao!"}</strong></div>
             </div>
         )
 

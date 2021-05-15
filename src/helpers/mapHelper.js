@@ -116,10 +116,10 @@ export const consolidado = {
         }
 
         if (!this.dataInicioViagem) {
-            this.dataInicioViagem = obj.eventoAtual.dt_gps;
+            this.dataInicioViagem = obj.eventoAtual.ras_eve_data_gps;
         }
 
-        this.dtGpsAtualDateTime = new Date(moment(obj.eventoAtual.dt_gps, "DD/MM/YYYY HH:m:ss").format("YYYY-MM-DD HH:m:ss"));
+        this.dtGpsAtualDateTime = new Date(moment(obj.eventoAtual.ras_eve_data_gps, "DD/MM/YYYY HH:m:ss").format("YYYY-MM-DD HH:m:ss"));
 
         if (turf.inside(turf.point(obj.eventoAtual.lst_localizacao), obj.cercaConsolidado)) { // DENTRO DA CERCA
 
