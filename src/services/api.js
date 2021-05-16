@@ -24,7 +24,6 @@ const REQUEST = {
     post: async function (url, dados, callback) {
         await this.configAxios(url);
         this.axios.post(url, dados).then((response) => {
-            console.log(response);
             if (response.status === 401) {
                 localStorage.removeItem('token-fulltrack4');
                 this.post(url, dados, callback);

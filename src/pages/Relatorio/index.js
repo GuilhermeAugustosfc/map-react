@@ -13,6 +13,8 @@ import Button from '@material-ui/core/Button';
 
 import { store } from 'react-notifications-component';
 import { HiOutlineDocumentReport, HiFilter } from 'react-icons/hi'
+import { RiRoadMapLine } from 'react-icons/ri'
+
 
 import { Fade } from '@material-ui/core';
 
@@ -57,9 +59,15 @@ const Tabela = () => {
 
     const columnsOrderServices = [
         {
-            field: 'id', headerName: 'Action', align: 'left', headerAlign: 'left',
+            field: 'id', headerName: 'Macros', align: 'left', headerAlign: 'left',
             renderCell: (value) => {
-                return <GoBook size={30} style={{ cursor: 'pointer', color: '#355b9a' }} onClick={() => onClickOperacao(value.row)} />;
+                return <GoBook size={30} style={{ cursor: 'pointer', color: '#355b9a' }} onClick={() => onClickDetalhesOperacao(value.row)} />;
+            }
+        },
+        {
+            field: 'osr_id', headerName: 'Mapa', align: 'left', headerAlign: 'left',
+            renderCell: (value) => {
+                return <RiRoadMapLine size={30} style={{ cursor: 'pointer', color: '#355b9a' }} onClick={() => onClickMapaOperacao(value.row)} />;
             }
         },
         { field: 'ope_descricao', headerName: 'Operação', align: 'center', headerAlign: 'center' },
@@ -205,23 +213,20 @@ function onChangeData(ev, picker) {
     setFimPeriodo(picker.endDate.format('DD/MM/YYYY HH:mm:ss'))
 }
 
-useEffect(() => {
-
-    api.get(`http://f-agro-api.fulltrackapp.com/motorista`, {}, ({ data }) => {
-        setMotoristas(data.data);
-    });
-
-    api.get(`http://f-agro-api.fulltrackapp.com/veiculo`, {}, ({ data }) => {
-        setVeiculos(data.data);
-    });
-
-}, []);
-
-function onClickOperacao(rowDataGrid) {
+function onClickDetalhesOperacao(rowDataGrid) {
     if (!rowDataGrid.id || !rowDataGrid.hasOwnProperty('macros')) return
     setMacros(rowDataGrid.macros);
 }
 
+function onClickMapaOperacao(operacao) {
+    operacao.data_init = moment(operacao.osr_periodo_ini, "YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY HH:mm:ss");
+    operacao.data_fim = moment(operacao.osr_periodo_fim, "YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY HH:mm:ss");
+    
+    delete operacao.osr_periodo_fim;
+    delete operacao.osr_periodo_ini;
+    
+    history.push(`/mapa/${operacao.osr_id_veiculo}`, operacao);
+}
 
 // function onClickDetalhesToMap(rowDataGrid) {
 //     rowDataGrid.data_init = rowDataGrid.data_f;
@@ -286,6 +291,17 @@ function changeMenu() {
     setShowMenu(show);
 }
 
+useEffect(() => {
+
+    api.get(`http://f-agro-api.fulltrackapp.com/motorista`, {}, ({ data }) => {
+        setMotoristas(data.data);
+    });
+
+    api.get(`http://f-agro-api.fulltrackapp.com/veiculo`, {}, ({ data }) => {
+        setVeiculos(data.data);
+    });
+
+}, []);
 
 return (
     <div className="container-relatorio">

@@ -551,10 +551,7 @@ function TalhaoForm(props) {
             }
           })
         }
-      }).catch((error) => {
-        console.log('errro upload s3');
-        console.log(error);
-      });
+      }).catch((error) => {});
     }
   }
 

@@ -20,12 +20,12 @@ function MapaGeral(props) {
   const [dados, setDados] = useState([]);
 
   const [operacaoConfig, setOperacaoConfig] = useState({
-    cerca:null,
-    velocidade:null
+    cerca: null,
+    velocidade: null
   })
 
   const [operacao, setOperacao] = useState({});
-  
+
   const [dadosConsolidado, setDadosConsolidado] = useState({
     tempoTrabalho: "00:00:00",
     deslocamento: "00:00:00",
@@ -61,7 +61,7 @@ function MapaGeral(props) {
   var sourceMarker = {};
   var sourceMarkerIndex = {};
 
-  var imagesMarkers = [
+  var imagesMarkersVeiculo = [
     {
       url: "https://fulltrackstatic.s3.amazonaws.com/anuncio/Dm4aomaD9om6gr4D42kr0Pgn4Dlnml0l73o52p7D499p4png63-pt-br.png",
       nome: "marker-desligado"
@@ -75,6 +75,26 @@ function MapaGeral(props) {
       nome: "marker-movimento"
     }
   ]
+
+  var imagesMarkersMacro = [
+    {
+      url: "https://fulltrackstatic.s3.amazonaws.com/anuncio/81gn1143p383124211p488128831113n231n333n1831n3n-pt-br.png",
+      nome: "macro-pausar"
+    },
+    {
+      url: "https://fulltrackstatic.s3.amazonaws.com/anuncio/pg1826232323n3831232382232322g22218n311p22333-pt-br.png",
+      nome: "macro-iniciar"
+    },
+    {
+      url: "https://fulltrackstatic.s3.amazonaws.com/anuncio/82838313881n33g22ggp1382622pn32n36n1323226g622-pt-br.png",
+      nome: "macro-deslocamento"
+    },
+    {
+      url: "https://fulltrackstatic.s3.amazonaws.com/anuncio/12g223p311n3433g281814g28813n1211323228n38g3n1p22-pt-br.png",
+      nome: "macro-finalizar"
+    }
+  ]
+
 
   useEffect(() => {
 
@@ -114,7 +134,7 @@ function MapaGeral(props) {
 
       let geojson = formatLineInMap.resume(dados, operacaoConfig.velocidade);
 
-      let ultimaPosicaoRota = dados[dados.length -1];
+      let ultimaPosicaoRota = dados[dados.length - 1];
       ultimaPosicaoVeiculo.current[ultimaPosicaoRota.id_ativo] = [ultimaPosicaoRota.lst_localizacao];
 
       map.addSource('rota', {
@@ -142,12 +162,12 @@ function MapaGeral(props) {
 
     aux.coordenadas = [parseFloat(data.ras_eve_longitude), parseFloat(data.ras_eve_latitude)];
 
-      // IMENDANDO AS POSICOES DO SOCKET COM A ROTA DELE ----
+    // IMENDANDO AS POSICOES DO SOCKET COM A ROTA DELE ----
     if (ultimaPosicaoVeiculo.current.hasOwnProperty(data.ras_vei_id)) {
       aux.rotaAtual = map.getSource(`rota`)._data;
       ultimaPosicaoVeiculo.current[data.ras_vei_id].push(aux.coordenadas);
       aux.indexCor = calcColorSpeed(data.ras_eve_velocidade, operacaoConfig.velocidade);
-    
+
       aux.rotaAtual.features.push({
         'type': 'Feature',
         'properties': {
@@ -162,16 +182,16 @@ function MapaGeral(props) {
           'coordinates': ultimaPosicaoVeiculo.current[data.ras_vei_id]
         }
       })
-  
+
       map.getSource(`rota`).setData(aux.rotaAtual)
-  
+
       ultimaPosicaoVeiculo.current[data.ras_vei_id] = [];
       ultimaPosicaoVeiculo.current[data.ras_vei_id] = [aux.coordenadas]
-      
+
     }
 
 
-      // ------------------------------------------------
+    // ------------------------------------------------
 
     // if (sourceLine.hasOwnProperty(data.ras_vei_id)) {
 
@@ -305,15 +325,15 @@ function MapaGeral(props) {
         let posicoesTratadas = data.map((row) => {
           return [row.lst_localizacao[1], row.lst_localizacao[0]]
         })
-  
+
         for (var i in data) {
           // INVERTENDO AS POSCISAO DAS COORDENADAS
           data[i].lst_localizacao = [data[i].lst_localizacao[1], data[i].lst_localizacao[0]];
         }
-  
+
         setDados(data);
-        zoomRota(posicoesTratadas, map)
-        
+        zoomRota(posicoesTratadas, map);
+
       } else {
         store.addNotification({
           title: "Erro ao trazer a rota!",
@@ -324,10 +344,10 @@ function MapaGeral(props) {
           animationIn: ["animate__animated", "animate__fadeIn"],
           animationOut: ["animate__animated", "animate__fadeOut"],
           dismiss: {
-              duration: 5000,
-              onScreen: true
+            duration: 5000,
+            onScreen: true
           }
-      });
+        });
       }
     })
   }
@@ -350,6 +370,7 @@ function MapaGeral(props) {
       setOperacao(operacaoAtual);
 
       addTalhaoOrdemServico(operacaoAtual, map);
+      addMacrosOrdemServico(operacaoAtual, map);
 
       buscarDados({
         dt_inicial: operacaoAtual.data_init,
@@ -364,7 +385,7 @@ function MapaGeral(props) {
 
       if (operacaoAtual.status === 'andamento') {
 
-        imagesMarkers.forEach(item => {
+        imagesMarkersVeiculo.forEach(item => {
           map.loadImage(item.url, function (error, image) {
             map.addImage(item.nome, image)
           })
@@ -467,12 +488,100 @@ function MapaGeral(props) {
     });
   }
 
+  function addMacrosOrdemServico(orderServico, map) {
+
+    if (orderServico.hasOwnProperty('macros')) {
+      imagesMarkersMacro.forEach(item => {
+        map.loadImage(item.url, function (error, image) {
+          map.addImage(item.nome, image)
+        })
+      });
+
+      var featuresMarkersMacro = [];
+      var nomeImageMacro = "";
+
+      for (var i in orderServico.macros) {
+
+        switch (orderServico.macros[i].mac_macro) {
+          case 'pausar':
+            nomeImageMacro = "macro-pausar";
+            break;
+          case 'deslocamento':
+            nomeImageMacro = "macro-deslocamento";
+            break;
+          case 'iniciar':
+            nomeImageMacro = "macro-iniciar";
+            break;
+          case 'finalizar':
+            nomeImageMacro = "macro-finalizar";
+            break;
+          default:
+            nomeImageMacro = "macro-iniciar";
+            break
+        }
+
+        orderServico.macros[i].mac_localizacao = JSON.parse(orderServico.macros[i].mac_localizacao);
+
+        featuresMarkersMacro.push({
+          'type': 'Feature',
+          'properties': {
+            'desc_macro': orderServico.macros[i].mac_macro,
+            'image_macro': nomeImageMacro
+          },
+          'geometry': {
+            'type': 'Point',
+            'coordinates': orderServico.macros[i].mac_localizacao.reverse()
+          }
+        })
+      }
+
+
+      map.addSource('markersMacroSymbol', {
+        'type': 'geojson',
+        'data': {
+          'type': 'FeatureCollection',
+          'features': featuresMarkersMacro
+        }
+      });
+
+
+      map.addLayer({
+        'id': 'markersMacroSymbol',
+        'type': 'symbol',
+        'source': 'markersMacroSymbol',
+        'layout': {
+          'icon-size': 1,
+          'icon-image': ['get', 'image_macro'],
+          'icon-allow-overlap': true,
+          // 'icon-ignore-placement':true,
+          // get the title name from the source's "title" property
+          'text-field': ['get', 'desc_macro'],
+          'text-font': [
+            'Open Sans Semibold',
+            'Arial Unicode MS Bold'
+          ],
+          'text-anchor': 'bottom',
+          'text-transform': 'uppercase',
+          'text-letter-spacing': 0.05,
+          'text-offset': [0, 1.5],
+          'icon-offset': [0, -18]
+        },
+        'paint': {
+          'text-color': '#202',
+          'text-halo-color': '#fff',
+          'text-halo-width': 2
+        }
+      });
+    }
+
+  }
+
   function addTalhaoOrdemServico(orderServico, map) {
     var coordenadasTalhao = JSON.parse(orderServico.tal_coordenada);
 
     setOperacaoConfig({
-      cerca:turf.polygon(coordenadasTalhao),
-      velocidade:parseInt(orderServico.osr_velocidade, 10)
+      cerca: turf.polygon(coordenadasTalhao),
+      velocidade: parseInt(orderServico.osr_velocidade, 10)
     })
 
     let feature = {
