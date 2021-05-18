@@ -209,8 +209,8 @@ function OrderServicoForm(props) {
                 setIdSafra(ordemServico.osr_id_safra);
                 setIdVeiculo(ordemServico.osr_id_veiculo);
                 setMarchaOrdemServico(ordemServico.osr_marcha);
-                setInicioPeriodo(moment(ordemServico.osr_periodo_fim, "YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY HH:mm:ss"));
-                setFimPeriodo(moment(ordemServico.osr_periodo_ini, "YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY HH:mm:ss"));
+                setInicioPeriodo(moment(ordemServico.osr_periodo_ini, "YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY HH:mm:ss"));
+                setFimPeriodo(moment(ordemServico.osr_periodo_fim, "YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY HH:mm:ss"));
                 setRpmOrdemServico(ordemServico.osr_rpm);
                 setTempoCinquentaMetro(ordemServico.osr_tmp_cinq_metros);
                 setVelocidadeOrdemServico(ordemServico.osr_velocidade);
