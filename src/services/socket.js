@@ -13,7 +13,7 @@ const SOCKET = {
         }
         this.socket.onmessage = ({ data }) => {
             data = JSON.parse(data);
-            call(data)
+            call(data);
         }
     },
     disconectSocket: function() {

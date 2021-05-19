@@ -94,6 +94,10 @@ function MapaGeral(props) {
     }
   ]
 
+  useEffect(() => {
+    return () => SocketFulltrack.disconectSocket();
+  }, [])
+
 
   useEffect(() => {
 
@@ -156,7 +160,6 @@ function MapaGeral(props) {
       });
     }
 
-    return () => SocketFulltrack.disconectSocket();
   }, [dados, map, operacaoConfig])
 
   function atualizarMarkerMapa(data, map, aux) {
