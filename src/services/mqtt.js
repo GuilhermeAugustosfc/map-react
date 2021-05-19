@@ -30,12 +30,14 @@ class MyMQTT {
             message = message.toString();
             var macro = {};
             try {
-                macro = JSON.parse(message)
+                macro = JSON.parse(message);
             } catch (error) {
                 return
             }
 
-            this.messageMqtt(macro);
+            if (typeof this.messageMqtt == 'function') {
+                this.messageMqtt(macro);
+            }
 
             this.notificacao(macro);
         })

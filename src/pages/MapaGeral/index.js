@@ -42,8 +42,7 @@ function MapaGeral(props) {
   });
 
   const [map, setMap] = useState(null);
-  const colorsSpeed = [{ color: '#868b00' }, { color: '#00008b' }, { color: 'darkred' }, { color: 'black' }]
-
+  const colorsSpeed = [{ color: 'yellow' }, { color: 'green' }, { color: 'darkred' }];
   const [mapOptions, setMapOptions] = useState({
     center: [-49.654063, -22.215288],
     style: "mapbox://styles/mapbox/satellite-v9",
@@ -156,6 +155,8 @@ function MapaGeral(props) {
         }
       });
     }
+
+    return () => SocketFulltrack.disconectSocket();
   }, [dados, map, operacaoConfig])
 
   function atualizarMarkerMapa(data, map, aux) {
@@ -366,7 +367,7 @@ function MapaGeral(props) {
     if (id) {
 
       let operacaoAtual = props.location.state;
-
+      
       setOperacao(operacaoAtual);
 
       addTalhaoOrdemServico(operacaoAtual, map);
@@ -384,7 +385,6 @@ function MapaGeral(props) {
 
 
       if (operacaoAtual.status === 'andamento') {
-
         imagesMarkersVeiculo.forEach(item => {
           map.loadImage(item.url, function (error, image) {
             map.addImage(item.nome, image)
@@ -497,7 +497,7 @@ function MapaGeral(props) {
         })
       });
 
-      var featuresMarkersMacro = [];
+      var featuresMarkersMacro  = [] , lineMacro = [];
       var nomeImageMacro = "";
 
       for (var i in orderServico.macros) {
@@ -520,8 +520,9 @@ function MapaGeral(props) {
             break
         }
 
-        orderServico.macros[i].mac_localizacao = JSON.parse(orderServico.macros[i].mac_localizacao);
+        orderServico.macros[i].mac_localizacao = JSON.parse(orderServico.macros[i].mac_localizacao).reverse();
 
+        lineMacro.push(orderServico.macros[i].mac_localizacao);
         featuresMarkersMacro.push({
           'type': 'Feature',
           'properties': {
@@ -530,7 +531,7 @@ function MapaGeral(props) {
           },
           'geometry': {
             'type': 'Point',
-            'coordinates': orderServico.macros[i].mac_localizacao.reverse()
+            'coordinates': orderServico.macros[i].mac_localizacao
           }
         })
       }
@@ -543,6 +544,18 @@ function MapaGeral(props) {
           'features': featuresMarkersMacro
         }
       });
+
+      map.addSource('lineMacro', {
+        'type': 'geojson',
+        'data': {
+          'type': 'Feature',
+          'geometry': {
+            'type': 'Polygon',
+            'coordinates': [lineMacro]
+          },
+          'properties': {}
+        }
+      })
 
 
       map.addLayer({
@@ -572,6 +585,18 @@ function MapaGeral(props) {
           'text-halo-width': 2
         }
       });
+
+      map.addLayer({
+        'id': 'macro_line',
+        'type': 'line',
+        'source': 'lineMacro',
+        'layout': {},
+        'paint': {
+          'line-color': 'white',
+          'line-width': 2,
+          'line-dasharray': [1,2,3,4,5,6,7,8,9]
+        }
+      })
     }
 
   }

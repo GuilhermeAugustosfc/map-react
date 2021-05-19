@@ -139,12 +139,6 @@ const Tabela = () => {
 
     const columnsMacros = [
         {
-            field: 'id', headerName: 'Action', align: 'left', headerAlign: 'left',
-            renderCell: (value) => {
-                return <GoBook size={30} style={{ cursor: 'pointer', color: '#355b9a' }} />;
-            }
-        },
-        {
             field: 'mac_data', headerName: 'Data da Macro', flex: 1, align: 'center', headerAlign: 'center',
             valueFormatter: (value) => {
                 if (value.value) {
