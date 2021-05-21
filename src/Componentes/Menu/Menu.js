@@ -10,12 +10,14 @@ import {
 } from '@material-ui/core';
 
 import { Link } from 'react-router-dom'
+import LocalStorage from '../../services/storage'
 
 import MyMQTT from '../../services/mqtt'
 
 import mqttContext from '../../Contexts/mqtt'
 
-import { GoCalendar, GoGrabber, GoGlobe, GoFileMedia, GoNote, GoDeviceDesktop } from 'react-icons/go'
+import { GoCalendar, GoGrabber, GoFileMedia, GoNote, GoDeviceDesktop } from 'react-icons/go'
+import { BiLogOutCircle } from 'react-icons/bi'
 
 import "./Menu.css"
 
@@ -38,6 +40,11 @@ export default function Menu({ children }) {
         setOpen(open);
     };
 
+    function logout() {
+        children.props.history.push("/")
+        LocalStorage.clearStorage()
+    }
+
     const MenuLateral = () => (
         <div
             className="menu-lateral"
@@ -51,7 +58,7 @@ export default function Menu({ children }) {
                 </Typography>
             </List>
             <List>
-                <Link to="/" className="link-menu">
+                <Link to="/painel" className="link-menu">
                     <ListItem button key={'painelOs'}>
                         <ListItemIcon>
                             <GoDeviceDesktop color={'black'} size={25} />
@@ -116,6 +123,10 @@ export default function Menu({ children }) {
         <React.Fragment key={'left'}>
             <IconButton id="menu-navbar" onClick={toggleDrawer(true)} edge="start" color="inherit" aria-label="menu">
                 <GoGrabber />
+            </IconButton>
+
+            <IconButton id="logout" onClick={logout} edge="start" color="inherit" aria-label="logout">
+                <BiLogOutCircle />
             </IconButton>
             <SwipeableDrawer
                 anchor={'left'}

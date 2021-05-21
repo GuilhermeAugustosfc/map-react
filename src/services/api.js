@@ -31,13 +31,15 @@ const REQUEST = {
                 callback(response);
             }
         }).catch((error) => {
-            if (error.request.status === 401) {
-                localStorage.removeItem('token-fulltrack4');
-                this.post(url, dados, callback);
-            } else {
-                var resposta = JSON.parse(error.request.response)
-                resposta.status = false;
-                callback(resposta);
+            if (!error) {   
+                if (error.request.status === 401) {
+                    localStorage.removeItem('token-fulltrack4');
+                    this.post(url, dados, callback);
+                } else if(error.request.status === 500){
+                    var a = JSON.parse(error.request.response);
+                    console.log(a);
+                    callback(JSON.parse(error.request.response))
+                }
             }
         })
     },

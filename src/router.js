@@ -11,6 +11,7 @@ import Relatorio from "./pages/Relatorio";
 
 import TalhaoTabela from "./pages/Cadastros/Talhao/tabela";
 import TalhaoForm from "./pages/Cadastros/Talhao/form";
+import Login from "./pages/Login/index";
 
 import OrdemServicoTabela from "./pages/Cadastros/OrdemServico/tabela";
 import OrdemServicoForm from "./pages/Cadastros/OrdemServico/form";
@@ -19,10 +20,11 @@ import Mapa from "./pages/MapaGeral";
 import PainelOs from "./pages/PainelOs";
 
 import isLogged from "./validacao/routerValidacao"
+import LocalStorage from "./services/storage"
 
 const PrivateRoute = ({component: Component, ...rest}) => (
     <Route {...rest} render={(props) => (
-        isLogged() ? (
+        LocalStorage.getStorage().token ? (
             <Menu>
                 <Component {...props} />
             </Menu>
@@ -34,8 +36,9 @@ const PrivateRoute = ({component: Component, ...rest}) => (
 const Routes = () => (
     <BrowserRouter>
         <Switch>
-            <PrivateRoute exact path="/" component={(props) => <PainelOs {...props} />} />
-            {/* <Route exact path="/login" component={Login} /> */}
+            <PrivateRoute exact path="/painel" component={(props) => <PainelOs {...props} />} />
+            <Route exact path="/login" component={Login} />
+            <Route exact path="/" component={Login} />
 
             <PrivateRoute exact path="/cadastros/talhao" component={(props) => <TalhaoTabela {...props} />} />
             <PrivateRoute exact path="/cadastros/talhao/form" component={(props) => <TalhaoForm {...props} />} />

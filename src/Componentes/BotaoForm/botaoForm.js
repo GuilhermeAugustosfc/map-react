@@ -41,7 +41,7 @@ function BotaoForm(props) {
 
 
   function removeItem(arr, refId, chave) {
-    return arr.filter(ar => ar[`${chave}`] != refId);
+    return arr.filter(ar => ar[`${chave}`] !== refId);
   }
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
