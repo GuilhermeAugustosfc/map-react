@@ -23,7 +23,7 @@ function Login() {
   const history = useHistory()
 
   function validaLogin(e = null) {
-    if (senha !== "" && email !== "") { 
+    if (senha !== "" && email !== "") {
       let dados = new FormData();
       dados.append("email", email);
       dados.append("senha", senha);
@@ -31,7 +31,7 @@ function Login() {
         if (data.status) {
           LocalStorage.setStorage(data.data)
           history.push(`/painel`);
-        }else{
+        } else {
           e.preventDefault();
           Swal.fire(
             "Atenção !",
@@ -40,7 +40,7 @@ function Login() {
           );
         }
       })
-    }else{
+    } else {
       e.preventDefault();
       Swal.fire(
         "Atenção !",
@@ -54,7 +54,7 @@ function Login() {
     <BackImage>
       <Container>
         <ContainerLogin>
-          
+
           <ContainerLogo >
             <div> <UncontrolledLottie /> </div>
             <div> F/ Agro  </div>

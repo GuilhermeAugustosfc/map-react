@@ -1,10 +1,9 @@
 import axios from 'axios'
-
+import LocalStorage from './storage'
 const REQUEST = {
     axios: null,
     configAxios: async function (url) {
-        let token = '08deaf2eacf29799dd6dbfb0b74f506e12f3125f'; // TOKEN AGRO INDICE 5554 PPA
-
+        let token = LocalStorage.getStorage().token; // TOKEN AGRO INDICE 5554 PPA
         if (url.includes('fulltrack4')) {
 
             if (localStorage.getItem('token-fulltrack4')) {
