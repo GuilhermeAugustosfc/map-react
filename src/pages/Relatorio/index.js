@@ -337,7 +337,7 @@ return (
                                 >
                                     Nenhum Selecionado
                                     </option>
-                                {motoristas.length && motoristas.map((mot) => (
+                                {motoristas && motoristas.length && motoristas.map((mot) => (
                                     <option
                                         key={mot.ras_mot_id}
                                         value={mot.ras_mot_id}>
@@ -362,7 +362,7 @@ return (
                                 >
                                     Nenhum Selecionado
                                     </option>
-                                {veiculos.length && veiculos.map((vei) => (
+                                {veiculos && veiculos.length && veiculos.map((vei) => (
                                     <option
                                         key={vei.ras_vei_id}
                                         value={vei.ras_vei_id}>

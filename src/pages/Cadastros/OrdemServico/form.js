@@ -436,7 +436,7 @@ function OrderServicoForm(props) {
                             >
                                 Nenhum Selecionado
                             </option>
-                            {culturas.length && culturas.map((cultura) => (
+                            {culturas && culturas.length && culturas.map((cultura) => (
                                 <option
                                     key={cultura.cul_id}
                                     value={cultura.cul_id}>
@@ -464,7 +464,7 @@ function OrderServicoForm(props) {
                                     >
                                         Nenhum Selecionado
                                     </option>
-                                    {anos.length && anos.map((anos) => (
+                                    {anos && anos.length && anos.map((anos) => (
                                         <option
                                             key={anos.ano_id}
                                             value={anos.ano_id}>
@@ -491,7 +491,7 @@ function OrderServicoForm(props) {
                                     >
                                         Nenhum Selecionado
                                     </option>
-                                    {safras.length && safras.map((safra) => (
+                                    {safras && safras.length && safras.map((safra) => (
                                         <option
                                             key={safra.saf_id}
                                             value={safra.saf_id}>
@@ -519,7 +519,7 @@ function OrderServicoForm(props) {
                             >
                                 Nenhum Selecionado
                             </option>
-                            {fazendas.length && fazendas.map((fazenda) => (
+                            {fazendas && fazendas.length && fazendas.map((fazenda) => (
                                 <option
                                     key={fazenda.faz_id}
                                     value={fazenda.faz_id}>
@@ -551,7 +551,7 @@ function OrderServicoForm(props) {
                             >
                                 Nenhum Selecionado
                         </option>
-                            {operacoes.length && operacoes.map((operacao) => (
+                            {operacoes && operacoes.length && operacoes.map((operacao) => (
                                 <option
                                     key={operacao.ope_id}
                                     value={operacao.ope_id}>
@@ -591,7 +591,7 @@ function OrderServicoForm(props) {
                         >
                             Nenhum Selecionado
                     </option>
-                        {talhoes.length && talhoes.map((talhao) => (
+                        {talhoes && talhoes.length && talhoes.map((talhao) => (
                             <option
                                 key={talhao.tal_id}
                                 value={talhao.tal_id}>
@@ -627,7 +627,7 @@ function OrderServicoForm(props) {
                         >
                             Nenhum Selecionado
                         </option>
-                        {motoristas.length && motoristas.map((mot) => (
+                        {motoristas && motoristas.length && motoristas.map((mot) => (
                             <option
                                 key={mot.ras_mot_id}
                                 value={mot.ras_mot_id}>
@@ -657,7 +657,7 @@ function OrderServicoForm(props) {
                         >
                             Nenhum Selecionado
                     </option>
-                        {veiculos.length && veiculos.map((vei) => (
+                        {veiculos && veiculos.length && veiculos.map((vei) => (
                             <option
                                 key={vei.ras_vei_id}
                                 value={vei.ras_vei_id}>
@@ -682,7 +682,7 @@ function OrderServicoForm(props) {
                             >
                                 Nenhum Selecionado
                         </option>
-                            {implementos.length && implementos.map((imp) => (
+                            {implementos && implementos.length && implementos.map((imp) => (
                                 <option
                                     key={imp.imp_id}
                                     value={imp.imp_id}>
