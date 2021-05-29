@@ -29,6 +29,9 @@ function TalhaoForm(props) {
   const [descricao, setDescricao] = useState('');
   const [areaUtil, setAreaUtil] = useState(0);
   const [coordenadasTalhao, setCoordenadasTalhao] = useState([]);
+  const [coordenadasLine, setCoordenadasLine] = useState([]);
+
+
   const [id_talhao, setIdTalhao] = useState(0);
   const [fileNameTalhaoEdicao, setFileNameTalhaoEdicao] = useState(null);
 
@@ -443,7 +446,16 @@ function TalhaoForm(props) {
     return new File([u8arr], filename, { type: mime });
   }
 
+  function featureJsonToFile(content) {
+    return new Blob([content], { type: 'json' });
+  }
+
   function generateHash(name) {
+    var Data = new Date();
+
+    name = name + Data.getHours.toString() + Data.getMinutes().toString() + Data.getSeconds().toString()
+      + Data.getMilliseconds().toString() + Math.floor(Math.random() * 500);
+
     var length = 50,
       retVal = "";
     for (var i = 0, n = name.length; i < length; ++i) {
@@ -490,15 +502,13 @@ function TalhaoForm(props) {
   }
 
 
-  function saveTalhao() {
+  async function saveTalhao() {
     if (validData()) {
-      var img = map.getCanvas().toDataURL();
-      var Data = new Date();
-      var filename = fileNameTalhaoEdicao ? fileNameTalhaoEdicao : generateHash(`${descricao}_talhao.png` + Data.getHours.toString()
-        + Data.getMinutes().toString() + Data.getSeconds().toString()
-        + Data.getMilliseconds().toString() + Math.floor(Math.random() * 500));
 
-      var file = dataURLtoFile(img, filename);
+      var toDataURL = map.getCanvas().toDataURL();
+      var filenameImgTalhao = fileNameTalhaoEdicao ? fileNameTalhaoEdicao : generateHash(`${descricao}_talhao.png`);
+
+      var file = dataURLtoFile(toDataURL, filenameImgTalhao);
 
       const ReactS3Client = new S3({
         bucketName: process.env.REACT_APP_BUCKET_NAME,
@@ -508,50 +518,62 @@ function TalhaoForm(props) {
         dirName: process.env.REACT_APP_DIR_NAME
       });
 
-      ReactS3Client.uploadFile(file, filename).then(({ location }) => {
-        if (id_talhao > 0) {
-          // PUT REQUETS ONLY JSON DATA
-          api.put(`http://f-agro-api.fulltrackapp.com/talhao/${id_talhao}/`, {
-            tal_codigo: codigo,
-            tal_descricao: descricao,
-            tal_area_util: areaUtil,
-            tal_coordenada: coordenadasTalhao,
-            tal_imagem: location
-          }, (res) => {
-            if (res.status) {
-              history.push(`/cadastros/talhao`);
-            } else {
-              Swal.fire(
-                "Erro !",
-                "Falha ao atualizar os dados!",
-                "danger"
-              );
-            }
-          })
+      let responseLine = {
+        location: "",
+      }
 
-        } else {
-          // POST REQUETS ONLY FORM DATA
+      if (coordenadasLine && coordenadasLine.length) {
+        var fileFeatureLine = featureJsonToFile(coordenadasLine);
+        var fileNameLine = generateHash(`${descricao}_line`) + ".json";
+        responseLine = await ReactS3Client.uploadFile(fileFeatureLine, fileNameLine);
+      }
 
-          let form = new FormData();
-          form.append('tal_codigo', codigo);
-          form.append('tal_descricao', descricao);
-          form.append('tal_area_util', areaUtil);
-          form.append('tal_coordenada', coordenadasTalhao);
-          form.append('tal_imagem', location);
+      let responseImgTalhao = await ReactS3Client.uploadFile(file, filenameImgTalhao);
 
-          api.post('http://f-agro-api.fulltrackapp.com/talhao/', form, (res) => {
-            if (res.status) {
-              history.push(`/cadastros/talhao`);
-            } else {
-              Swal.fire(
-                "Erro !",
-                "Falha ao inserir os dados!",
-                "danger"
-              );
-            }
-          })
-        }
-      }).catch((error) => {});
+      if (id_talhao > 0) {
+        // PUT REQUETS ONLY JSON DATA
+        api.put(`http://f-agro-api.fulltrackapp.com/talhao/${id_talhao}/`, {
+          tal_codigo: codigo,
+          tal_descricao: descricao,
+          tal_area_util: areaUtil,
+          tal_coordenada: coordenadasTalhao,
+          tal_coordenada_line: responseLine.location,
+          tal_imagem: responseImgTalhao.location
+        }, (res) => {
+          if (res.status) {
+            history.push(`/cadastros/talhao`);
+          } else {
+            Swal.fire(
+              "Erro !",
+              "Falha ao atualizar os dados!",
+              "danger"
+            );
+          }
+        })
+
+      } else {
+        // POST REQUETS ONLY FORM DATA
+
+        let form = new FormData();
+        form.append('tal_codigo', codigo);
+        form.append('tal_descricao', descricao);
+        form.append('tal_area_util', areaUtil);
+        form.append('tal_coordenada', coordenadasTalhao);
+        form.append('tal_imagem', responseImgTalhao.location);
+        form.append('tal_coordenada_line', responseLine.location);
+
+        api.post('http://f-agro-api.fulltrackapp.com/talhao/', form, (res) => {
+          if (res.status) {
+            history.push(`/cadastros/talhao`);
+          } else {
+            Swal.fire(
+              "Erro !",
+              "Falha ao inserir os dados!",
+              "danger"
+            );
+          }
+        })
+      }
     }
   }
 
@@ -578,27 +600,40 @@ function TalhaoForm(props) {
   function readerLoad() {
     if (this.readyState === 2 && !this.error) {
       var geojson = shp.parseZip(this.result);
-      var coordenadasShapefile = geojson.features[0].geometry.coordinates;
+      var coordenadaPolygon = null
+      var featuresLine = {
+        features: [],
+        type: "FeatureCollection"
+      };
 
-      if (coordenadasShapefile.length > 0) {
-        coordenadasShapefile = coordenadasShapefile.length === 1 ? coordenadasShapefile : [coordenadasShapefile];
+      if (geojson.length) {
+        for (var i in geojson) {
+          if (geojson[i].features[0].geometry.type === "Polygon") {
+            coordenadaPolygon = geojson[0].features[0].geometry.coordinates;
+          } else {
+            featuresLine.features = [...featuresLine.features, ...geojson[i].features];
+          }
+        }
+
+        if (featuresLine.features.length) {
+          draw.add(featuresLine);
+          setCoordenadasLine(JSON.stringify(featuresLine));
+        }
+
+        if (coordenadaPolygon.length) {
+          draw.add(geojson[0]);
+          setCoordenadasTalhao(JSON.stringify(coordenadaPolygon));
+        }
+
+        var bounds = coordenadaPolygon[0].reduce(function (bounds, coord) {
+          return bounds.extend(coord);
+        }, new mapboxgl.LngLatBounds(coordenadaPolygon[0][0], coordenadaPolygon[0][0]));
+
+        map.fitBounds(bounds, {
+          padding: 20,
+          maxZoom: 15,
+        });
       }
-
-      geojson.features[0].geometry.coordinates = coordenadasShapefile;
-      geojson.features[0].geometry.type = "Polygon";
-
-      draw.add(geojson);
-
-      setCoordenadasTalhao(JSON.stringify(coordenadasShapefile));
-
-      var bounds = coordenadasShapefile[0].reduce(function (bounds, coord) {
-        return bounds.extend(coord);
-      }, new mapboxgl.LngLatBounds(coordenadasShapefile[0][0], coordenadasShapefile[0][0]));
-
-      map.fitBounds(bounds, {
-        padding: 20,
-        maxZoom: 15,
-      });
     }
     else {
       alert('error read zip file');
