@@ -1,9 +1,14 @@
 import React from 'react';
 import './InfoOperacaoMapa.css'
 
+import { BsArrowUpDown } from 'react-icons/bs'
+
 const InfoOperacaoMapa = function ({ operacao }) {
 
     return <div id="painel-operacao">
+        <button className="btn-toogle-carrosel">
+            <BsArrowUpDown size={20} onClick={() => {}}/>
+        </button>
         <div className="operacao">
             {operacao.ope_descricao}
         </div>

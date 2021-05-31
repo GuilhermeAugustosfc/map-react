@@ -1,6 +1,7 @@
 #painel-operacao {
     height: 100%;
     padding: 9px;
+    position: relative;
 }
 
 .info-operacao {
@@ -16,4 +17,11 @@
 
 .bloco-operacao {
     flex-direction: column;
+}
+
+.btn-toogle-carrosel {
+    position: absolute;
+    left: 11px;
+    background-color: #2b2e34;
+    transform: translateY(-7px);
 }

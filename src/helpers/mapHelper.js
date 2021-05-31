@@ -405,7 +405,7 @@ export const formatLineInMap = {
         }.bind(this), 10);
     },
 
-    resume: function (dados, velocidadeCorreta) {
+    lineOfSpeed: function (dados, velocidadeCorreta) {
 
         this.dados = dados;
 
@@ -425,6 +425,49 @@ export const formatLineInMap = {
                 'type': 'Feature',
                 'properties': {
                     'color': this.colorsSpeed[this.optionIdx].color,
+                    'velocidade': this.dados[i].vl_velocidade,
+                    'ignicao': this.dados[i].flg_ignicao,
+                    'dt_gps': this.dados[i].dt_gps,
+                    'desc_ativo': this.dados[i].desc_ativo
+                },
+                'geometry': {
+                    'type': 'LineString',
+                    'coordinates': this.segmentLatlngs
+                }
+            })
+
+            this.segmentLatlngs = [this.dados[i].lst_localizacao];
+        }
+
+        return geojson;
+    },
+    lineOfEficiet: function (dados, cerca) {
+
+        this.dados = dados;
+
+        let geojson = {
+            'type': 'FeatureCollection',
+            'features': []
+        };
+
+        this.line_width = 1;
+         
+        for (let i = 1; i < this.dados.length; ++i) {
+
+            if (i === 1) {
+                this.segmentLatlngs = [this.dados[0].lst_localizacao];
+            }
+
+            this.segmentLatlngs.push(this.dados[i].lst_localizacao);
+
+            if (turf.inside(turf.point(dados[i].lst_localizacao), cerca)) {
+                this.line_width = 7;
+            }
+
+            geojson.features.push({
+                'type': 'Feature',
+                'properties': {
+                    'line_width': this.line_width,
                     'velocidade': this.dados[i].vl_velocidade,
                     'ignicao': this.dados[i].flg_ignicao,
                     'dt_gps': this.dados[i].dt_gps,

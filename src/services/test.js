@@ -92,7 +92,7 @@ export default Mapbox;
 
 // map.on('load', async function () {
 
-//     let retorno = await fetch("https://fulltrackstatic.s3.amazonaws.com/kmz/118z18onond7713j617j6s6j738fao3a18ann7sn177jzad78-pt-br.json");
+//     let retorno = await fetch("https://fulltrackstatic.s3-sa-east-1.amazonaws.com/talhao/3o]te(c[-3-est(ofl5)cO3u44r3tieolnilogc20uotv.json");
 //     let geojson = await retorno.json(); 
 
 //     map.addSource('fazenda', {

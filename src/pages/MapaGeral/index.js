@@ -11,6 +11,8 @@ import ZoomControl from 'mapbox-gl-controls/lib/zoom';
 import * as turf from "@turf/turf"
 import api from '../../services/api';
 
+import Filtro from '../../Componentes/FiltroMapa/FiltroMapa'
+
 import { store } from 'react-notifications-component';
 
 import SocketFulltrack from '../../services/socket'
@@ -116,130 +118,139 @@ function MapaGeral(props) {
       if (conso) {
         setDadosConsolidado(conso);
 
-        if (markersOciosos.current.length > 0) {
-          for (var i in markersOciosos.current) {
-            markersOciosos.current[i].remove();
-          }
+        // if (markersOciosos.current.length > 0) {
+        //   for (var i in markersOciosos.current) {
+        //     markersOciosos.current[i].remove();
+        //   }
 
-          markersOciosos.current = [];
-        }
+        //   markersOciosos.current = [];
+        // }
 
-        if (conso.posicoesOciosas.length) {
-          for (var j in conso.posicoesOciosas) {
-            markersOciosos.current.push(
-              new mapboxgl.Marker({ color: 'orange' })
-                .setLngLat(conso.posicoesOciosas[j])
-                .addTo(map)
-            )
-          }
-        }
+        // if (conso.posicoesOciosas.length) {
+        //   for (var j in conso.posicoesOciosas) {
+        //     markersOciosos.current.push(
+        //       new mapboxgl.Marker({ color: 'orange' })
+        //         .setLngLat(conso.posicoesOciosas[j])
+        //         .addTo(map)
+        //     )
+        //   }
+        // }
+
       }
 
-      let geojson = formatLineInMap.resume(dados, operacaoConfig.velocidade);
-
+      
       let ultimaPosicaoRota = dados[dados.length - 1];
       ultimaPosicaoVeiculo.current[ultimaPosicaoRota.id_ativo] = [ultimaPosicaoRota.lst_localizacao];
-
-      map.addSource('rota', {
-        'type': 'geojson',
-        'data': geojson,
-      });
-
-      map.addLayer({
-        'id': 'rota',
-        'type': 'line',
-        'source': 'rota',
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round',
-        },
-        'paint': {
-          'line-color': ['get', 'color'],
-          'line-width': 3,
-        }
-      });
+      
+      addRotaVeiculoVelocidade(map, dados, operacaoConfig.velocidade)
     }
 
   }, [dados, map, operacaoConfig])
 
-  function atualizarMarkerMapa(data, map, aux) {
+  function addRotaVeiculoVelocidade(map, dados, velocidade) {
 
-    aux.coordenadas = [parseFloat(data.ras_eve_longitude), parseFloat(data.ras_eve_latitude)];
+    let geojson = formatLineInMap.lineOfSpeed(dados, velocidade);
 
+    map.addSource('rota', {
+      'type': 'geojson',
+      'data': geojson,
+    });
+
+    map.addLayer({
+      'id': 'rota',
+      'type': 'line',
+      'source': 'rota',
+      'layout': {
+        'line-join': 'round',
+        'line-cap': 'round',
+      },
+      'paint': {
+        'line-color': ['get', 'color'],
+        'line-width': ['get', 'line-width'],
+      }
+    });
+  }
+
+  function atualizarMarkerMapa(dadosVeiculo, map, aux) {
+
+    var coordenadas = [parseFloat(dadosVeiculo.ras_eve_longitude), parseFloat(dadosVeiculo.ras_eve_latitude)];
+    var rotaAtual = {};
+    var indexCor = null;
     // IMENDANDO AS POSICOES DO SOCKET COM A ROTA DELE ----
-    if (ultimaPosicaoVeiculo.current.hasOwnProperty(data.ras_vei_id)) {
-      aux.rotaAtual = map.getSource(`rota`)._data;
-      ultimaPosicaoVeiculo.current[data.ras_vei_id].push(aux.coordenadas);
-      aux.indexCor = calcColorSpeed(data.ras_eve_velocidade, operacaoConfig.velocidade);
 
-      aux.rotaAtual.features.push({
+    if (ultimaPosicaoVeiculo.current.hasOwnProperty(dadosVeiculo.ras_vei_id)) {
+      rotaAtual = map.getSource(`rota`)._data;
+      ultimaPosicaoVeiculo.current[dadosVeiculo.ras_vei_id].push(coordenadas);
+      indexCor = calcColorSpeed(dadosVeiculo.ras_eve_velocidade, operacaoConfig.velocidade);
+
+      rotaAtual.features.push({
         'type': 'Feature',
         'properties': {
-          'color': colorsSpeed[aux.indexCor].color,
-          'velocidade': data.ras_eve_velocidade,
-          'dt_gps': data.ras_eve_data_gps,
-          'desc_ativo': data.ras_vei_veiculo,
-          'ignicao': data.ras_eve_ignicao
+          'color': colorsSpeed[indexCor].color,
+          'velocidade': dadosVeiculo.ras_eve_velocidade,
+          'dt_gps': dadosVeiculo.ras_eve_data_gps,
+          'desc_ativo': dadosVeiculo.ras_vei_veiculo,
+          'ignicao': dadosVeiculo.ras_eve_ignicao
         },
         'geometry': {
           'type': 'LineString',
-          'coordinates': ultimaPosicaoVeiculo.current[data.ras_vei_id]
+          'coordinates': ultimaPosicaoVeiculo.current[dadosVeiculo.ras_vei_id]
         }
       })
 
-      map.getSource(`rota`).setData(aux.rotaAtual)
+      map.getSource(`rota`).setData(rotaAtual)
 
-      ultimaPosicaoVeiculo.current[data.ras_vei_id] = [];
-      ultimaPosicaoVeiculo.current[data.ras_vei_id] = [aux.coordenadas]
+      ultimaPosicaoVeiculo.current[dadosVeiculo.ras_vei_id] = [];
+      ultimaPosicaoVeiculo.current[dadosVeiculo.ras_vei_id] = [coordenadas]
 
     }
 
 
     // ------------------------------------------------
 
-    // if (sourceLine.hasOwnProperty(data.ras_vei_id)) {
+    // if (sourceLine.hasOwnProperty(dadosVeiculo.ras_vei_id)) {
 
-    //   ultimaPosicaoVeiculo[data.ras_vei_id].push(aux.coordenadas);
-    //   aux.rotaAtual = map.getSource(`source_${data.ras_vei_id}`)._data;
+    //   ultimaPosicaoVeiculo[dadosVeiculo.ras_vei_id].push(coordenadas);
+    //   rotaAtual = map.getSource(`source_${dadosVeiculo.ras_vei_id}`)._data;
 
-    //   aux.rotaAtual.features.push({
+    //   rotaAtual.features.push({
     //     'type': 'Feature',
     //     'properties': {
-    //       'color': colorsSpeed[aux.indexCor].color,
-    //       'velocidade': data.ras_eve_velocidade,
-    //       'dt_gps': data.ras_eve_data_gps,
-    //       'desc_ativo': data.ras_vei_veiculo,
-    //       'ignicao': data.ras_eve_ignicao
+    //       'color': colorsSpeed[indexCor].color,
+    //       'velocidade': dadosVeiculo.ras_eve_velocidade,
+    //       'dt_gps': dadosVeiculo.ras_eve_data_gps,
+    //       'desc_ativo': dadosVeiculo.ras_vei_veiculo,
+    //       'ignicao': dadosVeiculo.ras_eve_ignicao
     //     },
     //     'geometry': {
     //       'type': 'LineString',
-    //       'coordinates': ultimaPosicaoVeiculo[data.ras_vei_id]
+    //       'coordinates': ultimaPosicaoVeiculo[dadosVeiculo.ras_vei_id]
     //     }
     //   })
 
-    //   map.getSource(`source_${data.ras_vei_id}`).setData(aux.rotaAtual)
+    //   map.getSource(`source_${dadosVeiculo.ras_vei_id}`).setData(rotaAtual)
 
-    //   ultimaPosicaoVeiculo[data.ras_vei_id] = [];
-    //   ultimaPosicaoVeiculo[data.ras_vei_id] = [aux.coordenadas]
+    //   ultimaPosicaoVeiculo[dadosVeiculo.ras_vei_id] = [];
+    //   ultimaPosicaoVeiculo[dadosVeiculo.ras_vei_id] = [coordenadas]
 
     // } else {
 
-    //   sourceLine[data.ras_vei_id] = [];
-    //   sourceLine[data.ras_vei_id] = {
+    //   sourceLine[dadosVeiculo.ras_vei_id] = [];
+    //   sourceLine[dadosVeiculo.ras_vei_id] = {
     //     features: [],
     //     type: "FeatureCollection"
     //   }
 
-    //   map.addSource(`source_${data.ras_vei_id}`, {
+    //   map.addSource(`source_${dadosVeiculo.ras_vei_id}`, {
     //     'type': 'geojson',
-    //     'data': sourceLine[data.ras_vei_id],
+    //     'data': sourceLine[dadosVeiculo.ras_vei_id],
     //   });
 
 
     //   map.addLayer({
-    //     'id': `source_${data.ras_vei_id}`,
+    //     'id': `source_${dadosVeiculo.ras_vei_id}`,
     //     'type': 'line',
-    //     'source': `source_${data.ras_vei_id}`,
+    //     'source': `source_${dadosVeiculo.ras_vei_id}`,
     //     'layout': {
     //       'line-join': 'round',
     //       'line-cap': 'round',
@@ -250,70 +261,70 @@ function MapaGeral(props) {
     //     }
     //   });
 
-    //   // map.jumpTo({ 'center': aux.coordenadas, 'zoom': 15 });
+    //   // map.jumpTo({ 'center': coordenadas, 'zoom': 15 });
 
-    //   aux.indexCor = calcColorSpeed(data.ras_eve_velocidade, operacaoConfig.velocidade);
+    //   indexCor = calcColorSpeed(dadosVeiculo.ras_eve_velocidade, operacaoConfig.velocidade);
 
-    //   if (!ultimaPosicaoVeiculo.hasOwnProperty(data.ras_vei_id)) {
-    //     ultimaPosicaoVeiculo[data.ras_vei_id] = [];
-    //     ultimaPosicaoVeiculo[data.ras_vei_id].push(aux.coordenadas)
+    //   if (!ultimaPosicaoVeiculo.hasOwnProperty(dadosVeiculo.ras_vei_id)) {
+    //     ultimaPosicaoVeiculo[dadosVeiculo.ras_vei_id] = [];
+    //     ultimaPosicaoVeiculo[dadosVeiculo.ras_vei_id].push(coordenadas)
     //   }
 
-    //   ultimaPosicaoVeiculo[data.ras_vei_id].push(aux.coordenadas);
+    //   ultimaPosicaoVeiculo[dadosVeiculo.ras_vei_id].push(coordenadas);
 
-    //   aux.rotaAtual = map.getSource(`source_${data.ras_vei_id}`)._data;
-    //   aux.rotaAtual.features.push({
+    //   rotaAtual = map.getSource(`source_${dadosVeiculo.ras_vei_id}`)._data;
+    //   rotaAtual.features.push({
     //     'type': 'Feature',
     //     'properties': {
-    //       'color': colorsSpeed[aux.indexCor].color,
-    //       'velocidade': data.ras_eve_velocidade,
-    //       'dt_gps': data.ras_eve_data_gps,
-    //       'desc_ativo': data.ras_vei_veiculo,
-    //       'ignicao': data.ras_eve_ignicao,
+    //       'color': colorsSpeed[indexCor].color,
+    //       'velocidade': dadosVeiculo.ras_eve_velocidade,
+    //       'dt_gps': dadosVeiculo.ras_eve_data_gps,
+    //       'desc_ativo': dadosVeiculo.ras_vei_veiculo,
+    //       'ignicao': dadosVeiculo.ras_eve_ignicao,
     //     },
     //     'geometry': {
     //       'type': 'LineString',
-    //       'coordinates': ultimaPosicaoVeiculo[data.ras_vei_id]
+    //       'coordinates': ultimaPosicaoVeiculo[dadosVeiculo.ras_vei_id]
     //     }
     //   })
 
-    //   map.getSource(`source_${data.ras_vei_id}`).setData(aux.rotaAtual)
+    //   map.getSource(`source_${dadosVeiculo.ras_vei_id}`).setData(rotaAtual)
 
-    //   ultimaPosicaoVeiculo[data.ras_vei_id] = [];
-    //   ultimaPosicaoVeiculo[data.ras_vei_id] = [aux.coordenadas]
+    //   ultimaPosicaoVeiculo[dadosVeiculo.ras_vei_id] = [];
+    //   ultimaPosicaoVeiculo[dadosVeiculo.ras_vei_id] = [coordenadas]
     // }
 
-    if (sourceMarkerIndex.hasOwnProperty(data.ras_vei_id)) {
-      aux.allFeaturesMarkers = map.getSource('markersSymbol')._data;
-      aux.featureMarkerAtual = aux.allFeaturesMarkers.features[sourceMarkerIndex[data.ras_vei_id]];
+    if (sourceMarkerIndex.hasOwnProperty(dadosVeiculo.ras_vei_id)) {
+      let allFeaturesMarkers = map.getSource('markersSymbol')._data;
+      aux.featureMarkerAtual = allFeaturesMarkers.features[sourceMarkerIndex[dadosVeiculo.ras_vei_id]];
 
-      aux.featureMarkerAtual.geometry.coordinates = aux.coordenadas;
-      aux.featureMarkerAtual.properties.image_marker = parseInt(data.ras_eve_ignicao, 10) ? (parseInt(data.ras_eve_velocidade, 10) > 0 ? 'marker-movimento' : 'marker-ligado') : 'marker-desligado';
-      aux.featureMarkerAtual.properties.velocidade = data.ras_eve_velocidade;
-      aux.featureMarkerAtual.properties.dt_gps = data.ras_eve_data_gps;
-      aux.featureMarkerAtual.properties.desc_ativo = data.ras_vei_veiculo;
-      aux.featureMarkerAtual.properties.ignicao = data.ras_eve_ignicao;
+      aux.featureMarkerAtual.geometry.coordinates = coordenadas;
+      aux.featureMarkerAtual.properties.image_marker = parseInt(dadosVeiculo.ras_eve_ignicao, 10) ? (parseInt(dadosVeiculo.ras_eve_velocidade, 10) > 0 ? 'marker-movimento' : 'marker-ligado') : 'marker-desligado';
+      aux.featureMarkerAtual.properties.velocidade = dadosVeiculo.ras_eve_velocidade;
+      aux.featureMarkerAtual.properties.dt_gps = dadosVeiculo.ras_eve_data_gps;
+      aux.featureMarkerAtual.properties.desc_ativo = dadosVeiculo.ras_vei_veiculo;
+      aux.featureMarkerAtual.properties.ignicao = dadosVeiculo.ras_eve_ignicao;
 
-      aux.allFeaturesMarkers.features[sourceMarkerIndex[data.ras_vei_id]] = aux.featureMarkerAtual;
+      allFeaturesMarkers.features[sourceMarkerIndex[dadosVeiculo.ras_vei_id]] = aux.featureMarkerAtual;
 
-      map.getSource('markersSymbol').setData(aux.allFeaturesMarkers)
+      map.getSource('markersSymbol').setData(allFeaturesMarkers)
 
     } else {
 
-      sourceMarkerIndex[data.ras_vei_id] = sourceMarker.features.length;
-      sourceMarker.features.push(turf.point(aux.coordenadas, {
-        image_marker: parseInt(data.ras_eve_ignicao, 10) ? (parseInt(data.ras_eve_velocidade, 10) > 0 ? 'marker-movimento' : 'marker-ligado') : 'marker-desligado',
-        velocidade: data.ras_eve_velocidade,
-        dt_gps: data.ras_eve_data_gps,
-        desc_ativo: data.ras_vei_veiculo,
-        ignicao: data.ras_eve_ignicao,
+      sourceMarkerIndex[dadosVeiculo.ras_vei_id] = sourceMarker.features.length;
+      sourceMarker.features.push(turf.point(coordenadas, {
+        image_marker: parseInt(dadosVeiculo.ras_eve_ignicao, 10) ? (parseInt(dadosVeiculo.ras_eve_velocidade, 10) > 0 ? 'marker-movimento' : 'marker-ligado') : 'marker-desligado',
+        velocidade: dadosVeiculo.ras_eve_velocidade,
+        dt_gps: dadosVeiculo.ras_eve_data_gps,
+        desc_ativo: dadosVeiculo.ras_vei_veiculo,
+        ignicao: dadosVeiculo.ras_eve_ignicao,
       }))
 
       map.getSource('markersSymbol').setData(sourceMarker)
 
     }
 
-    // map.panTo([parseFloat(data.ras_eve_longitude), parseFloat(data.ras_eve_latitude)]);
+    // map.panTo([parseFloat(dadosVeiculo.ras_eve_longitude), parseFloat(dadosVeiculo.ras_eve_latitude)]);
 
   }
 
@@ -368,10 +379,15 @@ function MapaGeral(props) {
     map.addControl(new ZoomControl(), 'top-left');
 
     if (id) {
-
       let operacaoAtual = props.location.state;
-      
+      operacaoAtual.tal_coordenada = JSON.parse(orderServico.tal_coordenada);
+
       setOperacao(operacaoAtual);
+
+      setOperacaoConfig({
+        cerca: turf.polygon(orderServico.tal_coordenada),
+        velocidade: parseInt(orderServico.osr_velocidade, 10)
+      });
 
       addTalhaoOrdemServico(operacaoAtual, map);
       addMacrosOrdemServico(operacaoAtual, map);
@@ -388,6 +404,9 @@ function MapaGeral(props) {
 
 
       if (operacaoAtual.status === 'andamento') {
+
+        configMapaOperacaoAndamento(map);
+
         imagesMarkersVeiculo.forEach(item => {
           map.loadImage(item.url, function (error, image) {
             map.addImage(item.nome, image)
@@ -397,7 +416,6 @@ function MapaGeral(props) {
         var aux = {
           rotaAtual: [],
           indexCor: null,
-          coordenadas: [],
           allFeaturesMarkers: [],
           featureMarkerAtual: []
         }
@@ -448,36 +466,39 @@ function MapaGeral(props) {
 
       }
 
-      var popup = new mapboxgl.Popup({
-        closeButton: false,
-        closeOnClick: false
-      });
-
-      map.on('click', 'markersSymbol', function (e) {
-        map.getCanvas().style.cursor = 'pointer';
-
-        var coordinates = e.features[0].geometry.coordinates.slice();
-
-        var dadosPopup = {
-          'velocidade': e.features[0].properties.velocidade,
-          'dt_gps': e.features[0].properties.dt_gps,
-          'desc_ativo': e.features[0].properties.desc_ativo,
-          'ignicao': e.features[0].properties.ignicao
-        }
-
-        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-          coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-        }
-
-        popup.setLngLat(coordinates).setHTML(templatePopup(dadosPopup)).addTo(map);
-      });
-
-      map.on('mouseleave', 'markersSymbol', function () {
-        map.getCanvas().style.cursor = '';
-        popup.remove();
-      });
-
+      addPopupVeiculo(map);
     }
+  }
+
+  function addPopupVeiculo(map) {
+    var popup = new mapboxgl.Popup({
+      closeButton: false,
+      closeOnClick: false
+    });
+
+    map.on('click', 'markersSymbol', function (e) {
+      map.getCanvas().style.cursor = 'pointer';
+
+      var coordinates = e.features[0].geometry.coordinates.slice();
+
+      var dadosPopup = {
+        'velocidade': e.features[0].properties.velocidade,
+        'dt_gps': e.features[0].properties.dt_gps,
+        'desc_ativo': e.features[0].properties.desc_ativo,
+        'ignicao': e.features[0].properties.ignicao
+      }
+
+      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+      }
+
+      popup.setLngLat(coordinates).setHTML(templatePopup(dadosPopup)).addTo(map);
+    });
+
+    map.on('mouseleave', 'markersSymbol', function () {
+      map.getCanvas().style.cursor = '';
+      popup.remove();
+    });
   }
 
 
@@ -500,7 +521,7 @@ function MapaGeral(props) {
         })
       });
 
-      var featuresMarkersMacro  = [] , lineMacro = [];
+      var featuresMarkersMacro = [], lineMacro = [];
       var nomeImageMacro = "";
 
       for (var i in orderServico.macros) {
@@ -597,69 +618,94 @@ function MapaGeral(props) {
         'paint': {
           'line-color': 'white',
           'line-width': 2,
-          'line-dasharray': [1,2,3,4,5,6,7,8,9]
+          'line-dasharray': [1, 2, 3, 4, 5, 6, 7, 8, 9]
         }
       })
     }
 
   }
 
-  function addTalhaoOrdemServico(orderServico, map) {
-    var coordenadasTalhao = JSON.parse(orderServico.tal_coordenada);
+  async function addTalhaoOrdemServico(orderServico, map, config = {}) {
 
-    setOperacaoConfig({
-      cerca: turf.polygon(coordenadasTalhao),
-      velocidade: parseInt(orderServico.osr_velocidade, 10)
-    })
-
-    let feature = {
+    // GEOJSON TALHAO
+    let featureTalhao = {
       'type': 'Feature',
       'geometry': {
         'type': 'Polygon',
-        'coordinates': coordenadasTalhao
+        'coordinates': orderServico.tal_coordenada
       },
       'properties': {
         'talhao': orderServico.tal_descricao,
         'cultura': orderServico.cul_descricao
       }
     }
+    
+    // ADD GEOJSON
 
     if (map.getSource('talhao')) {
-      map.getSource('talhao').setData(feature)
+      map.getSource('talhao').setData(featureTalhao)
     } else {
       map.addSource('talhao', {
         'type': 'geojson',
-        'data': feature
+        'data': featureTalhao
       })
     }
 
+    // ADD LAYER BACKGROUND TALHAO
     !map.getLayer('talhao_fill') && map.addLayer({
       'id': 'talhao_fill',
       'type': 'fill',
       'source': 'talhao',
       'layout': {},
       'paint': {
-        'fill-color': 'white',
-        'fill-opacity': 0.1,
+        'fill-color': config.fillColor,
+        'fill-opacity': config.opacity,
         'fill-outline-color': 'black'
       }
     });
 
-    !map.getLayer('talhao_line') && map.addLayer({
-      'id': 'talhao_line',
-      'type': 'line',
-      'source': 'talhao',
-      'layout': {},
-      'paint': {
-        'line-color': 'black',
-        'line-width': 4
-      }
-    });
+    if (config.contorno) {
+      // ADD LAYER CONTORNO TALHAO
+      !map.getLayer('talhao_contorno') && map.addLayer({
+        'id': 'talhao_contorno',
+        'type': 'line',
+        'source': 'talhao',
+        'layout': {},
+        'paint': {
+          'line-color': 'black',
+          'line-width': 4
+        }
+      });
+    }
+
+    if (config.linesTalhao && orderServico.tal_coordenada_line) {
+      let retorno = await fetch(orderServico.tal_coordenada_line);
+      let geojson = await retorno.json();
+  
+      map.addSource('talhao_line', {
+        'type': 'geojson',
+        'data': geojson
+      });
+
+      map.addLayer({
+        'id': 'layer_talhao_line',
+        'type': 'line',
+        'source': 'talhao_line',
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        'paint': {
+          'line-color': 'white',
+          'line-width': 1
+        }
+      });
+    }
 
     // DAR ZOOM NO TALHAO DA ORDEM DE SERVICO
-    var bounds = coordenadasTalhao[0].reduce(function (bounds, coord) {
+    var bounds = orderServico.tal_coordenada[0].reduce(function (bounds, coord) {
       return bounds.extend(coord);
-    }, new mapboxgl.LngLatBounds(coordenadasTalhao[0][0], coordenadasTalhao[0][0]));
+    }, new mapboxgl.LngLatBounds(orderServico.tal_coordenada[0][0], orderServico.tal_coordenada[0][0]));
 
     map.fitBounds(bounds, {
       padding: 20,
@@ -688,6 +734,42 @@ function MapaGeral(props) {
                 ${obj.dt_gps}
               </div>
             </div>`
+  }
+
+
+  function onChangeMapSelectMap(value) {
+    console.log(value);
+    if (value == 'velocidade') {
+      addTalhaoOrdemServico(operacao, map, {contorno: true, linestalhao: true, fillColor:'white', opacity: 0.1});
+      addRotaVeiculoVelocidade(map, dados, operacaoConfig.velocidade);
+    } else if (value == 'eficiencia') {
+      addTalhaoOrdemServico(operacao, map, {contorno: false, linestalhao: false, fillColor:'red', opacity: 1});
+      addRotaVeiculoEficiencia(map, dados, operacaoConfig.cerca);
+    }
+  }
+
+  function addRotaVeiculoEficiencia(map, dados, cerca) {
+    let geojson = formatLineInMap.lineOfEficiet(dados, cerca);
+
+    map.addSource('rota', {
+      'type': 'geojson',
+      'data': geojson,
+    });
+
+    map.addLayer({
+      'id': 'rota',
+      'type': 'line',
+      'source': 'rota',
+      'layout': {
+        'line-join': 'round',
+        'line-cap': 'round',
+      },
+      'paint': {
+        'line-color': 'white',
+        'line-width': ['get', 'line-width'],
+      }
+    });
+    
   }
 
   // function onClickConsolidado(stringConsolidado, dados) {
@@ -771,6 +853,7 @@ function MapaGeral(props) {
   return (
     <React.Fragment>
       <MapBox onStyleLoad={onLoadMap} {...mapOptions} />
+      <Filtro onChangeMapSelectMap={onChangeMapSelectMap} />
       <Carrosel operacao={operacao} consolidado={dadosConsolidado} />
     </React.Fragment>
   );
