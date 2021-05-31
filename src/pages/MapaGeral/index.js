@@ -380,13 +380,13 @@ function MapaGeral(props) {
 
     if (id) {
       let operacaoAtual = props.location.state;
-      operacaoAtual.tal_coordenada = JSON.parse(orderServico.tal_coordenada);
+      operacaoAtual.tal_coordenada = JSON.parse(operacaoAtual.tal_coordenada);
 
       setOperacao(operacaoAtual);
 
       setOperacaoConfig({
-        cerca: turf.polygon(orderServico.tal_coordenada),
-        velocidade: parseInt(orderServico.osr_velocidade, 10)
+        cerca: turf.polygon(operacaoAtual.tal_coordenada),
+        velocidade: parseInt(operacaoAtual.osr_velocidade, 10)
       });
 
       addTalhaoOrdemServico(operacaoAtual, map);
@@ -405,69 +405,70 @@ function MapaGeral(props) {
 
       if (operacaoAtual.status === 'andamento') {
 
-        configMapaOperacaoAndamento(map);
-
-        imagesMarkersVeiculo.forEach(item => {
-          map.loadImage(item.url, function (error, image) {
-            map.addImage(item.nome, image)
-          })
-        });
-
-        var aux = {
-          rotaAtual: [],
-          indexCor: null,
-          allFeaturesMarkers: [],
-          featureMarkerAtual: []
-        }
-
-        sourceMarker = {
-          'type': 'FeatureCollection',
-          'features': []
-        }
-
-        map.addSource('markersSymbol', {
-          'type': 'geojson',
-          'data': sourceMarker
-        });
-
-        SocketFulltrack.init((data) => {
-          if (data.ras_vei_id === id) {
-            atualizarMarkerMapa(data, map, aux);
-          }
-        })
-
-        map.addLayer({
-          'id': 'markersSymbol',
-          'type': 'symbol',
-          'source': 'markersSymbol',
-          'layout': {
-            'icon-size': 1,
-            'icon-image': ['get', 'image_marker'],
-            'icon-allow-overlap': true,
-            // get the title name from the source's "title" property
-            'text-field': ['get', 'desc_ativo'],
-            'text-font': [
-              'Open Sans Semibold',
-              'Arial Unicode MS Bold'
-            ],
-            // 'text-offset': [0, 1.25],
-            'text-anchor': 'bottom',
-            'text-transform': 'uppercase',
-            'text-letter-spacing': 0.05,
-            'text-offset': [0, 1.5],
-            'icon-offset': [0, -18]
-          },
-          'paint': {
-            'text-color': '#202',
-            'text-halo-color': '#fff',
-            'text-halo-width': 2
-          }
-        });
-
+        configMapaOperacaoAndamento(map, id);
       }
 
       addPopupVeiculo(map);
     }
+  }
+
+  function configMapaOperacaoAndamento(map, id) {
+    imagesMarkersVeiculo.forEach(item => {
+      map.loadImage(item.url, function (error, image) {
+        map.addImage(item.nome, image)
+      })
+    });
+
+    var aux = {
+      rotaAtual: [],
+      indexCor: null,
+      allFeaturesMarkers: [],
+      featureMarkerAtual: []
+    }
+
+    sourceMarker = {
+      'type': 'FeatureCollection',
+      'features': []
+    }
+
+    map.addSource('markersSymbol', {
+      'type': 'geojson',
+      'data': sourceMarker
+    });
+
+    SocketFulltrack.init((data) => {
+      if (data.ras_vei_id === id) {
+        atualizarMarkerMapa(data, map, aux);
+      }
+    })
+
+    map.addLayer({
+      'id': 'markersSymbol',
+      'type': 'symbol',
+      'source': 'markersSymbol',
+      'layout': {
+        'icon-size': 1,
+        'icon-image': ['get', 'image_marker'],
+        'icon-allow-overlap': true,
+        // get the title name from the source's "title" property
+        'text-field': ['get', 'desc_ativo'],
+        'text-font': [
+          'Open Sans Semibold',
+          'Arial Unicode MS Bold'
+        ],
+        // 'text-offset': [0, 1.25],
+        'text-anchor': 'bottom',
+        'text-transform': 'uppercase',
+        'text-letter-spacing': 0.05,
+        'text-offset': [0, 1.5],
+        'icon-offset': [0, -18]
+      },
+      'paint': {
+        'text-color': '#202',
+        'text-halo-color': '#fff',
+        'text-halo-width': 2
+      }
+    });
   }
 
   function addPopupVeiculo(map) {
