@@ -389,7 +389,7 @@ function MapaGeral(props) {
         velocidade: parseInt(operacaoAtual.osr_velocidade, 10)
       });
 
-      addTalhaoOrdemServico(operacaoAtual, map);
+      addTalhaoOrdemServico(operacaoAtual, map, {contorno: true, linestalhao: true, fillColor:'white', opacity: 0.1});
       addMacrosOrdemServico(operacaoAtual, map);
 
       buscarDados({
