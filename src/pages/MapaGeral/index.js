@@ -679,7 +679,7 @@ function MapaGeral(props) {
       });
     }
 
-    if (config.linesTalhao && orderServico.tal_coordenada_line) {
+    if (config.linestalhao && orderServico.tal_coordenada_line) {
       let retorno = await fetch(orderServico.tal_coordenada_line);
       let geojson = await retorno.json();
   
