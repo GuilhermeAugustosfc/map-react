@@ -428,7 +428,8 @@ export const formatLineInMap = {
                     'velocidade': this.dados[i].vl_velocidade,
                     'ignicao': this.dados[i].flg_ignicao,
                     'dt_gps': this.dados[i].dt_gps,
-                    'desc_ativo': this.dados[i].desc_ativo
+                    'desc_ativo': this.dados[i].desc_ativo,
+                    'line-width': 3
                 },
                 'geometry': {
                     'type': 'LineString',
@@ -450,28 +451,30 @@ export const formatLineInMap = {
             'features': []
         };
 
-        this.line_width = 1;
-         
+        
         for (let i = 1; i < this.dados.length; ++i) {
-
+            
             if (i === 1) {
                 this.segmentLatlngs = [this.dados[0].lst_localizacao];
             }
-
+            
             this.segmentLatlngs.push(this.dados[i].lst_localizacao);
+            
+            this.line_width = 1;
 
             if (turf.inside(turf.point(dados[i].lst_localizacao), cerca)) {
-                this.line_width = 7;
+                this.line_width = 20;
             }
 
             geojson.features.push({
                 'type': 'Feature',
                 'properties': {
-                    'line_width': this.line_width,
                     'velocidade': this.dados[i].vl_velocidade,
                     'ignicao': this.dados[i].flg_ignicao,
                     'dt_gps': this.dados[i].dt_gps,
-                    'desc_ativo': this.dados[i].desc_ativo
+                    'desc_ativo': this.dados[i].desc_ativo,
+                    'line-width': this.line_width,
+                    'color': 'white'
                 },
                 'geometry': {
                     'type': 'LineString',

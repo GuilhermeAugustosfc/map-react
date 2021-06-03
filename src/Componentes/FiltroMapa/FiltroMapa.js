@@ -1,6 +1,5 @@
 
-import React, { useState } from 'react'
-import * as moment from 'moment'
+import React from 'react'
 import './FiltroMapa.css'
 
 // import DateRangePicker from "../DataRangerPicker/DataRangerPicker"

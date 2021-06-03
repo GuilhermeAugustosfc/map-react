@@ -61,11 +61,11 @@ function Login() {
           </ContainerLogo>
 
           <ContainerInputs>
-            <InputsLogin type="email" placeholder="Digite seu login" onKeyDown={(e) => (e.key == 'Enter') ? validaLogin(e) : ""} onChange={(e) => setEmail(e.target.value)}></InputsLogin>
+            <InputsLogin type="email" placeholder="Digite seu login" onKeyDown={(e) => (e.key === 'Enter') ? validaLogin(e) : ""} onChange={(e) => setEmail(e.target.value)}></InputsLogin>
           </ContainerInputs>
 
           <ContainerInputs>
-            <InputsLogin type="password" placeholder="Digite sua senha" onKeyDown={(e) => (e.key == 'Enter') ? validaLogin(e) : ""} onChange={(e) => setSenha(e.target.value)}></InputsLogin>
+            <InputsLogin type="password" placeholder="Digite sua senha" onKeyDown={(e) => (e.key === 'Enter') ? validaLogin(e) : ""} onChange={(e) => setSenha(e.target.value)}></InputsLogin>
           </ContainerInputs>
 
           <ContainerInputs>
