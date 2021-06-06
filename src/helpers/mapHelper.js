@@ -220,37 +220,36 @@ export const consolidado = {
             return
         }
 
+        let largura = 2; // 2 metros de largura
+        let distanciaPercorridaMetros = 0;
         for (var i in dados) {
-
             if (!this.dataInicioViagem) {
-
                 this.dataInicioViagem = dados[i].dt_gps;
             }
 
             this.dtGpsAtualDateTime = new Date(moment(dados[i].dt_gps, "DD/MM/YYYY HH:m:ss").format("YYYY-MM-DD HH:m:ss"));
 
             if (turf.inside(turf.point(dados[i].lst_localizacao), cercaConsolidado)) { // DENTRO DA CERCA
-
                 this.calcularTempo(['deslocamento'], this.dtGpsAtualDateTime);
 
                 if (!this.ultimoEventoDentroCerca) {
                     this.ultimoEventoDentroCerca = this.dtGpsAtualDateTime;
                 }
 
+                let proxIndex = parseInt(i) + 1;
+
+                if (proxIndex <= dados.length - 1) {
+                    distanciaPercorridaMetros += turf.distance(turf.point(dados[i].lst_localizacao), turf.point(dados[proxIndex].lst_localizacao), {units: 'meters'});
+                }
+
                 if (dados[i].flg_ignicao) {
-
                     if (dados[i].vl_velocidade > 0) {
-
                         if (!this.ultimoEventoDentroCercaTrabalhando) {
                             this.ultimoEventoDentroCercaTrabalhando = this.dtGpsAtualDateTime;
                         }
-
                         this.posicoesTrabalhando.push(dados[i].lst_localizacao)
-
                         this.calcularTempo(['ocioso', 'desligado'], this.dtGpsAtualDateTime);
-
                     } else {
-
                         this.posicoesOciosas.push(dados[i].lst_localizacao);
 
                         if (!this.ultimoEventoDentroCercaOcioso) {
@@ -258,10 +257,8 @@ export const consolidado = {
                         }
 
                         this.calcularTempo(['trabalhando', 'desligado'], this.dtGpsAtualDateTime);
-
                     }
                 } else {
-
                     this.posicoesDesligadas.push(dados[i].lst_localizacao);
 
                     if (!this.ultimoEventoDentroCercaDesligado) {
@@ -269,7 +266,6 @@ export const consolidado = {
                     }
 
                     this.calcularTempo(['ocioso', 'trabalhando'], this.dtGpsAtualDateTime);
-
                 }
 
             } else { //  FORA DA CERCA
@@ -285,8 +281,11 @@ export const consolidado = {
         }
 
         this.calcularTempo(['ocioso', 'desligado', 'deslocamento', 'trabalhando', 'dentro_cerca'], this.dtGpsAtualDateTime);
-
-
+        let kilometroQuadrados = distanciaPercorridaMetros + largura; 
+        console.log(kilometroQuadrados);
+        console.log("Metros quadrados");
+        // console.log(turf.convertArea(kilometroQuadrados.toFixed(2), 'kilometers', 'hectares'));
+        // console.log('Hectares percorrido');
         this.dtFinalSeg = new Date(moment(dados[(dados.length - 1)].dt_gps, "DD/MM/YYYY HH:m:ss").format("YYYY-MM-DD HH:m:ss"));
         this.dtInicialSeg = new Date(moment(dados[0].dt_gps, "DD/MM/YYYY HH:m:ss").format("YYYY-MM-DD HH:m:ss"));
         this.tempoTrabalhoAtual = ((this.dtFinalSeg - this.dtInicialSeg) / 1000);
@@ -442,7 +441,7 @@ export const formatLineInMap = {
 
         return geojson;
     },
-    lineOfEficiet: function (dados, cerca) {
+    lineOfWidht: function (dados, cerca) {
 
         this.dados = dados;
 
@@ -486,6 +485,49 @@ export const formatLineInMap = {
         }
 
         return geojson;
+    },
+    lineOfComplete: function(geojsonLinesTalhao, dadosVeiculos) {
+
+        for (var i in dadosVeiculos) {
+            for (var j in geojsonLinesTalhao.features) {
+                var pt = turf.point(dadosVeiculos[i].lst_localizacao);
+                var line = turf.lineString(geojsonLinesTalhao.features[j].geometry.coordinates);
+                let distancia = turf.pointToLineDistance(pt, line, {units: 'meters'});
+
+                if (distancia < 3) {
+                    if (!geojsonLinesTalhao.features[j].properties.hasOwnProperty('qtd_passou')) {
+                        geojsonLinesTalhao.features[j].properties.qtd_passou = 0;
+                    }
+
+                    if (!geojsonLinesTalhao.features[j].properties.hasOwnProperty('datas_passadas')) {
+                        geojsonLinesTalhao.features[j].properties.datas_passadas = [];
+                    }
+
+                    if (!geojsonLinesTalhao.features[j].properties.hasOwnProperty('total')) {
+                        geojsonLinesTalhao.features[j].properties.total = geojsonLinesTalhao.features[j].geometry.coordinates.length;
+                    }
+
+                    geojsonLinesTalhao.features[j].properties.qtd_passou++
+                    geojsonLinesTalhao.features[j].properties.datas_passadas.push(dadosVeiculos[i].dt_gps);
+
+                    geojsonLinesTalhao.features[j].properties.name_talhao = j;
+                    
+
+                    if (geojsonLinesTalhao.features[j].properties.qtd_passou >= 10 || geojsonLinesTalhao.features[j].properties.qtd_passou > (geojsonLinesTalhao.features[j].geometry.coordinates.length / 2)) {
+                        geojsonLinesTalhao.features[j].properties.color = 'green'
+                    }
+                }
+            }
+        }
+
+        for (var m in geojsonLinesTalhao.features) {
+            if (geojsonLinesTalhao.features[m].properties.hasOwnProperty('datas_passadas')) {
+                geojsonLinesTalhao.features[m].properties.porc = (100 / geojsonLinesTalhao.features[m].geometry.coordinates.length) * geojsonLinesTalhao.features[m].properties.qtd_passou;
+                console.log(geojsonLinesTalhao.features[m].properties);
+            }
+        }
+
+        return geojsonLinesTalhao;
     }
 
 

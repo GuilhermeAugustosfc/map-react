@@ -104,11 +104,6 @@ function MapaGeral(props) {
 
     if (!map) return
 
-    if (map.getSource('rota')) {
-      map.removeLayer('rota');
-      map.removeSource('rota');
-    }
-
     consolidado.resetConsolidado();
 
     if (dados.length) {
@@ -343,18 +338,27 @@ function MapaGeral(props) {
     api.post('http://api-fulltrack4.ftdata.com.br/relatorio/Rota/gerar/', form, (res) => {
       if (res.status) {
         var data = res.data;
-        let posicoesTratadas = data.map((row) => {
-          return [row.lst_localizacao[1], row.lst_localizacao[0]]
-        })
+        // let posicoesTratadas = data.map((row) => {
+        //   return [row.lst_localizacao[1], row.lst_localizacao[0]]
+        // })
 
         for (var i in data) {
           // INVERTENDO AS POSCISAO DAS COORDENADAS
+          
+          let prox = parseInt(i) + 1;
+          if (
+            (data.length - 1) >= prox &&
+            data[i].lst_localizacao[0] == data[prox].lst_localizacao[0] && 
+            data[i].lst_localizacao[1] == data[prox].lst_localizacao[1]
+         ) {
+             delete data[i];
+         } else if ((data.length - 1) >= i){
           data[i].lst_localizacao = [data[i].lst_localizacao[1], data[i].lst_localizacao[0]];
+         }
         }
-
+        data = Object.values(data);
         setDados(data);
-        zoomRota(posicoesTratadas, map);
-
+        // zoomRota(posicoesTratadas, map);
       } else {
         store.addNotification({
           title: "Erro ao trazer a rota!",
@@ -376,9 +380,7 @@ function MapaGeral(props) {
   async function onLoadMap(map) {
 
     setMap(map);
-
-    map.on('click', 'rota', (e) => onClickRota(e, map));
-    // map.on('mousemove', 'rota', (e) => onMouseOverFeature(e, map));
+    addPopupRota(map);
 
     let { id } = props.match.params;
 
@@ -388,6 +390,7 @@ function MapaGeral(props) {
       let operacaoAtual = props.location.state;
       operacaoAtual.tal_coordenada = JSON.parse(operacaoAtual.tal_coordenada);
 
+      console.log(operacaoAtual);
       setOperacao(operacaoAtual);
 
       setOperacaoConfig({
@@ -413,9 +416,27 @@ function MapaGeral(props) {
 
         configMapaOperacaoAndamento(map, id);
       }
-
       addPopupVeiculo(map);
     }
+  }
+ 
+
+  function addPopupRota(map) {
+    var popupRota = new mapboxgl.Popup({
+      closeButton: false,
+      closeOnClick: false
+    });
+
+    map.on('mousemove', 'rota', (e) => {
+      popupRota.setLngLat(e.lngLat)
+      .setHTML(templatePopup(e.features[0].properties))
+      .addTo(map);
+    });
+
+    map.on('mouseleave', 'rota', function () {
+      map.getCanvas().style.cursor = '';
+      popupRota.remove();
+    });
   }
 
   function configMapaOperacaoAndamento(map, id) {
@@ -636,9 +657,10 @@ function MapaGeral(props) {
 
     // GEOJSON TALHAO
     let areaTalhaoMetrosQuadrados = turf.area(turf.polygon(orderServico.tal_coordenada));
-    let areaTalhaoHectares = turf.convertArea(areaTalhaoMetrosQuadrados, 'meters', 'hectares').toFixed(2);
+    let areaTalhaoHectares = turf.convertArea(areaTalhaoMetrosQuadrados, 'meters', 'kilometers');
 
-    console.log(areaTalhaoHectares + " Hectares");
+    console.log(areaTalhaoMetrosQuadrados + " Metros qudrados Talhão");
+    // console.log(areaTalhaoHectares + " Hectares");
 
     let featureTalhao = {
       'type': 'Feature',
@@ -703,6 +725,10 @@ function MapaGeral(props) {
       let retorno = await fetch(orderServico.tal_coordenada_line);
       let geojsonLineTalhao = await retorno.json();
 
+      if (config.hasOwnProperty('dadosVeiculo')) {
+        geojsonLineTalhao = formatLineInMap.lineOfComplete(geojsonLineTalhao, config.dadosVeiculo);
+      }
+
       if (map.getSource('talhao_line')) {
         map.getSource('talhao_line').setData(geojsonLineTalhao)
       } else {
@@ -710,7 +736,7 @@ function MapaGeral(props) {
           'type': 'geojson',
           'data': geojsonLineTalhao
         });
-      }
+      } 
 
       if (map.getLayer('layer_talhao_line')) {
         map.removeLayer('layer_talhao_line');
@@ -725,14 +751,36 @@ function MapaGeral(props) {
           'line-cap': 'round'
         },
         'paint': {
-          'line-color': 'white',
-          'line-width': 2
+          'line-color': ['get','color'],
+          'line-width': 10
         }
       });
       
+
+      // popup talhao teste
+      var popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false
+      });
+  
+      map.on('click', 'layer_talhao_line', function (e) {
+        map.getCanvas().style.cursor = 'pointer';
+
+        var coordinates = e.features[0].geometry.coordinates[0].slice();
+        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+          coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+        }
+  
+        popup.setLngLat(coordinates).setHTML(`<div>${e.features[0].properties.name_talhao}</div>`).addTo(map);
+      });
+  
+      // fim popup talhao teste
+      
     } else {
-      map.removeLayer('layer_talhao_line');
-      map.removeSource('talhao_line');
+      if (map.getLayer('layer_talhao_line')) {
+        map.removeLayer('layer_talhao_line');
+        map.removeSource('talhao_line');
+      }
     }
 
     // DAR ZOOM NO TALHAO DA ORDEM DE SERVICO
@@ -746,15 +794,13 @@ function MapaGeral(props) {
     });
   }
 
-  function onClickRota(e, map) {
-    new mapboxgl.Popup()
-      .setLngLat(e.lngLat)
+  function onClickRota(e, map, popup) {
+    popup.setLngLat(e.lngLat)
       .setHTML(templatePopup(e.features[0].properties))
       .addTo(map);
   }
 
   function templatePopup(obj) {
-    console.log(obj);
     let color = parseInt(obj.ignicao, 10) ? (parseInt(obj.velocidade, 10) > 0 ? '#3972EE' : '#0A6249') : '#F5F5F5';
     let backgroud = parseInt(obj.ignicao, 10) ? (parseInt(obj.velocidade, 10) > 0 ? '#E6EEFF' : '#90ee9080') : '#8E969B';
     return `<div id="popup">
@@ -770,7 +816,6 @@ function MapaGeral(props) {
             </div>`
   }
 
-
   function onChangeMapSelectMap(value) {
     if (value === 'velocidade') {
       addTalhaoOrdemServico(operacao, map, { contorno: true, linestalhao: true, fillColor: 'white', fillOpacity: 0.1 });
@@ -778,9 +823,11 @@ function MapaGeral(props) {
       addRotaVeiculo(map, geojson);
     } else if (value === 'eficiencia') {
       addTalhaoOrdemServico(operacao, map, { contorno: false, linestalhao: false, fillColor: 'red', fillOpacity: 0.7});
-      let geojson = formatLineInMap.lineOfEficiet(dados, operacaoConfig.cerca);
-      console.log(geojson);
+      let geojson = formatLineInMap.lineOfWidht(dados, operacaoConfig.cerca);
       addRotaVeiculo(map, geojson);
+      
+    } else if (value == 'streetComplete') {
+      addTalhaoOrdemServico(operacao, map, { contorno: false, linestalhao: true, fillColor: 'white', fillOpacity: 0.1, dadosVeiculo: dados});
     }
   }
 

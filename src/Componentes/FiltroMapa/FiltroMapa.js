@@ -19,6 +19,7 @@ function Filtro(props) {
             <select className="filtro-select-mapas" onChange={(e) => props.onChangeMapSelectMap(e.target.value)}>
                 <option value="velocidade">Velocidade</option>
                 <option value="eficiencia">Eficiencia Ha.</option>
+                <option value="streetComplete">Ruas completas</option>
             </select>
         </div>
     )
