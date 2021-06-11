@@ -600,6 +600,7 @@ function TalhaoForm(props) {
   function readerLoad() {
     if (this.readyState === 2 && !this.error) {
       var geojson = shp.parseZip(this.result);
+      debugger
       var coordenadaPolygon = null
       var featuresLine = {
         features: [],
