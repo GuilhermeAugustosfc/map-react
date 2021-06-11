@@ -28,13 +28,13 @@ function BotaoForm(props) {
   function addNewOption(chave, url, callback) {
     let dados = new FormData();
     dados.append(chave, descricao);
-    api.post(`http://f-agro-api.fulltrackapp.com/${url}`, dados, ({ data }) => {
+    api.post(`/${url}`, dados, ({ data }) => {
       callback(data);
     });
   }
 
   function deleteOption(valor, url, callback) {
-    api.delete(`http://f-agro-api.fulltrackapp.com/${url}/${valor}`, {}, (data) => {
+    api.delete(`/${url}/${valor}`, {}, (data) => {
       callback(data);
     });
   }

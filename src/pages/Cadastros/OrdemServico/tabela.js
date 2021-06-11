@@ -17,7 +17,7 @@ const OrdemServicoTabela = () => {
     const [dadosOrdemServico, setDadosOrdemServico] = useState([]);
 
     useEffect(() => {
-        api.get('http://f-agro-api.fulltrackapp.com/ordemservico/', {}, ({ data }) => {
+        api.get('/ordemservico/', {}, ({ data }) => {
             setDadosOrdemServico(data);
         })
     }, []);

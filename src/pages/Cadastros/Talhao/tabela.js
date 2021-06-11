@@ -19,7 +19,7 @@ const TalhaoTabela = () => {
     }, []);
 
     function getDados() {
-        api.get('http://f-agro-api.fulltrackapp.com/talhao/', {}, ({ data }) => {
+        api.get('/talhao/', {}, ({ data }) => {
             setDadosTalhao(data);
         })
     }
@@ -50,7 +50,7 @@ const TalhaoTabela = () => {
                     form.append('filename', url_s3_image.split('talhao/')[1])
                 }
 
-                api.post(`http://f-agro-api.fulltrackapp.com/talhao/delete`, form, ({ data }) => {
+                api.post(`/talhao/delete`, form, ({ data }) => {
                     Swal.fire(
                         'Deletado !',
                         'O talhão foi deletado com sucesso.',

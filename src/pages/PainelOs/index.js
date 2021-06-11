@@ -63,7 +63,7 @@ function PainelOs() {
         var instanciaMqtt = mqttConnection.instaceMqtt.current;
         instanciaMqtt.setFuctionMessageMqtt(messageMqtt);
 
-        api.get('http://f-agro-api.fulltrackapp.com/ordemservico/painelOs', {}, ({ data }) => {
+        api.get('/ordemservico/painelOs', {}, ({ data }) => {
             setDadosPainelOs(data);
         })
     }, []);

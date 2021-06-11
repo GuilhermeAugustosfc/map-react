@@ -27,7 +27,7 @@ function Login() {
       let dados = new FormData();
       dados.append("email", email);
       dados.append("senha", senha);
-      api.post("http://f-agro-api.fulltrackapp.com/Login/loginIndice", dados, ({ data }) => {
+      api.post("/Login/loginIndice", dados, ({ data }) => {
         if (data.status) {
           LocalStorage.setStorage(data.data)
           history.push(`/painel`);

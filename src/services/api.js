@@ -4,8 +4,9 @@ const REQUEST = {
     axios: null,
     configAxios: async function (url) {
         let token = LocalStorage.getStorage().token; // TOKEN AGRO INDICE 5554 PPA
+        let baseURL = 'http://api-fagro.ftdata.com.br';
         if (url.includes('fulltrack4')) {
-
+            baseURL = "http://api-fulltrack4.ftdata.com.br";
             if (localStorage.getItem('token-fulltrack4')) {
                 token = JSON.parse(localStorage.getItem('token-fulltrack4')).access_token;
             } else {
@@ -14,6 +15,7 @@ const REQUEST = {
         }
 
         this.axios = axios.create({
+            baseURL: baseURL,
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'

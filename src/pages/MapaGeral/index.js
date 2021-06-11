@@ -335,7 +335,7 @@ function MapaGeral(props) {
       map.removeSource('rota');
     }
 
-    api.post('http://api-fulltrack4.ftdata.com.br/relatorio/Rota/gerar/', form, (res) => {
+    api.post('/relatorio/Rota/gerar/', form, (res) => {
       if (res.status) {
         var data = res.data;
         // let posicoesTratadas = data.map((row) => {

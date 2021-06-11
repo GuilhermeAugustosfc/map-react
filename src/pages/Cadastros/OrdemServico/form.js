@@ -149,41 +149,41 @@ function OrderServicoForm(props) {
 
         map.addControl(new ZoomControl());
 
-        api.get(`http://f-agro-api.fulltrackapp.com/talhao`, {}, ({ data }) => {
+        api.get(`/talhao`, {}, ({ data }) => {
             if (data.length) {
                 setTalhoes(data);
             }
         });
 
-        api.get(`http://f-agro-api.fulltrackapp.com/implemento`, {}, ({ data }) => {
+        api.get(`/implemento`, {}, ({ data }) => {
             setImplementos(data);
         });
 
-        api.get(`http://f-agro-api.fulltrackapp.com/motorista`, {}, ({ data }) => {
+        api.get(`/motorista`, {}, ({ data }) => {
             setMotoristas(data.data);
         });
 
-        api.get(`http://f-agro-api.fulltrackapp.com/veiculo`, {}, ({ data }) => {
+        api.get(`/veiculo`, {}, ({ data }) => {
             setVeiculos(data.data);
         });
 
-        api.get(`http://f-agro-api.fulltrackapp.com/cultura`, {}, ({ data }) => {
+        api.get(`/cultura`, {}, ({ data }) => {
             setCulturas(data);
         });
 
-        api.get(`http://f-agro-api.fulltrackapp.com/safra`, {}, ({ data }) => {
+        api.get(`/safra`, {}, ({ data }) => {
             setSafras(data);
         });
 
-        api.get(`http://f-agro-api.fulltrackapp.com/operacao`, {}, ({ data }) => {
+        api.get(`/operacao`, {}, ({ data }) => {
             setOperacoes(data);
         });
 
-        api.get(`http://f-agro-api.fulltrackapp.com/fazenda`, {}, ({ data }) => {
+        api.get(`/fazenda`, {}, ({ data }) => {
             setFazendas(data);
         });
 
-        api.get(`http://f-agro-api.fulltrackapp.com/ano`, {}, ({ data }) => {
+        api.get(`/ano`, {}, ({ data }) => {
             setAnos(data);
         });
 
@@ -193,7 +193,7 @@ function OrderServicoForm(props) {
 
             setIdOrdemServico(id);
 
-            api.get(`http://f-agro-api.fulltrackapp.com/ordemservico/${id}`, {}, ({ data }) => {
+            api.get(`/ordemservico/${id}`, {}, ({ data }) => {
                 var ordemServico = data[0];
                 setIdOperacao(ordemServico.osr_id_operacao);
                 setCombustivel(ordemServico.osr_cons_combustivel);
@@ -299,7 +299,7 @@ function OrderServicoForm(props) {
 
         if (validDataOrdemServices()) {
             if (idOrdemServico > 0) {
-                api.put(`http://f-agro-api.fulltrackapp.com/ordemservico/${idOrdemServico}`, {
+                api.put(`/ordemservico/${idOrdemServico}`, {
                     osr_id_operacao: idOperacao,
                     osr_id_veiculo: idVeiculo,
                     osr_id_implemento: idImplemento,
@@ -364,7 +364,7 @@ function OrderServicoForm(props) {
                 form.append('osr_veiculo', selectVeiculoRef.current.options[selectVeiculoRef.current.selectedIndex].text);
 
 
-                api.post('http://f-agro-api.fulltrackapp.com/ordemservico/', form, (res) => {
+                api.post('/ordemservico/', form, (res) => {
                     if (res.status) {
                         history.push(`/cadastros/ordemservico`);
                     } else {

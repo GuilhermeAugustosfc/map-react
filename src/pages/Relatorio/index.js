@@ -257,7 +257,7 @@ function gerarRelatorio() {
         form.append('data_ini', moment(inicioPeriodo, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss'))
         form.append('data_fim', moment(fimPeriodo, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss'))
 
-        api.post('http://f-agro-api.fulltrackapp.com/ordemservico/generateReport', form, (res) => {
+        api.post('/ordemservico/generateReport', form, (res) => {
             if (res.status) {
                 setOrdemServices(res.data.data);
                 setShowMenu(false);
@@ -287,11 +287,11 @@ function changeMenu() {
 
 useEffect(() => {
 
-    api.get(`http://f-agro-api.fulltrackapp.com/motorista`, {}, ({ data }) => {
+    api.get(`/motorista`, {}, ({ data }) => {
         setMotoristas(data.data);
     });
 
-    api.get(`http://f-agro-api.fulltrackapp.com/veiculo`, {}, ({ data }) => {
+    api.get(`/veiculo`, {}, ({ data }) => {
         setVeiculos(data.data);
     });
 

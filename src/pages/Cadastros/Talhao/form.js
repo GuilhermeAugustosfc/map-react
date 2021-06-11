@@ -111,7 +111,7 @@ function TalhaoForm(props) {
 
       setIdTalhao(id);
 
-      api.get(`http://f-agro-api.fulltrackapp.com/talhao/${id}`, {}, ({ data }) => {
+      api.get(`/talhao/${id}`, {}, ({ data }) => {
         var talhao = data[0];
         updateDataEdit(map, talhao, newDraw)
 
@@ -532,7 +532,7 @@ function TalhaoForm(props) {
 
       if (id_talhao > 0) {
         // PUT REQUETS ONLY JSON DATA
-        api.put(`http://f-agro-api.fulltrackapp.com/talhao/${id_talhao}/`, {
+        api.put(`/talhao/${id_talhao}/`, {
           tal_codigo: codigo,
           tal_descricao: descricao,
           tal_area_util: areaUtil,
@@ -562,7 +562,7 @@ function TalhaoForm(props) {
         form.append('tal_imagem', responseImgTalhao.location);
         form.append('tal_coordenada_line', responseLine.location);
 
-        api.post('http://f-agro-api.fulltrackapp.com/talhao/', form, (res) => {
+        api.post('/talhao', form, (res) => {
           if (res.status) {
             history.push(`/cadastros/talhao`);
           } else {
@@ -600,7 +600,6 @@ function TalhaoForm(props) {
   function readerLoad() {
     if (this.readyState === 2 && !this.error) {
       var geojson = shp.parseZip(this.result);
-      debugger
       var coordenadaPolygon = null
       var featuresLine = {
         features: [],
