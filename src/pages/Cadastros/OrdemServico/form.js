@@ -93,7 +93,7 @@ function OrderServicoForm(props) {
 
 
     useEffect(() => {
-        if (idTalhao && map) {
+        if (idTalhao && map && talhoes.length) {
 
             let talhaoSelecionado = talhoes.filter((talhao) => idTalhao === talhao.tal_id)[0]
             let coordenadasTalhao = JSON.parse(talhaoSelecionado.tal_coordenada);
