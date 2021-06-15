@@ -5,7 +5,8 @@ const REQUEST = {
     configAxios: async function (url) {
         let token = LocalStorage.getStorage().token; // TOKEN AGRO INDICE 5554 PPA
         let baseURL = 'http://api-fagro.ftdata.com.br';
-        if (url.includes('fulltrack4')) {
+        
+        if (url.includes('Rota')) {
             baseURL = "http://api-fulltrack4.ftdata.com.br";
             if (localStorage.getItem('token-fulltrack4')) {
                 token = JSON.parse(localStorage.getItem('token-fulltrack4')).access_token;
