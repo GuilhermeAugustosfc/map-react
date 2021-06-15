@@ -170,6 +170,8 @@ function MapaGeral(props) {
         'line-width': ['get', 'line-width'],
       }
     });
+    console.log(`add rota`);
+
   }
 
   function atualizarMarkerMapa(dadosVeiculo, map, aux) {
@@ -755,8 +757,9 @@ function MapaGeral(props) {
           'line-width': 10
         }
       });
-      
 
+      console.log(`add linhas`);
+      
       // popup talhao teste
       var popup = new mapboxgl.Popup({
         closeButton: false,
@@ -816,18 +819,22 @@ function MapaGeral(props) {
             </div>`
   }
 
-  function onChangeMapSelectMap(value) {
+  async function onChangeMapSelectMap(value) {
+    if (map.getSource("rota")) {
+      map.removeLayer("rota");
+      map.removeSource("rota");
+    }
+
     if (value === 'velocidade') {
-      addTalhaoOrdemServico(operacao, map, { contorno: true, linestalhao: true, fillColor: 'white', fillOpacity: 0.1 });
+      await addTalhaoOrdemServico(operacao, map, { contorno: true, linestalhao: true, fillColor: 'white', fillOpacity: 0.1 });
       let geojson = formatLineInMap.lineOfSpeed(dados, operacaoConfig.velocidade);
       addRotaVeiculo(map, geojson);
     } else if (value === 'eficiencia') {
-      addTalhaoOrdemServico(operacao, map, { contorno: false, linestalhao: false, fillColor: 'red', fillOpacity: 0.7});
+      await addTalhaoOrdemServico(operacao, map, { contorno: false, linestalhao: false, fillColor: 'red', fillOpacity: 0.7});
       let geojson = formatLineInMap.lineOfWidht(dados, operacaoConfig.cerca);
       addRotaVeiculo(map, geojson);
-      
     } else if (value == 'streetComplete') {
-      addTalhaoOrdemServico(operacao, map, { contorno: false, linestalhao: true, fillColor: 'white', fillOpacity: 0.1, dadosVeiculo: dados});
+      await addTalhaoOrdemServico(operacao, map, { contorno: false, linestalhao: true, fillColor: 'white', fillOpacity: 0.1, dadosVeiculo: dados});
     }
   }
 
