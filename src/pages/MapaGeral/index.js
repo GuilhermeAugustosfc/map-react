@@ -913,7 +913,7 @@ function MapaGeral(props) {
     <React.Fragment>
       <MapBox onStyleLoad={onLoadMap} {...mapOptions} />
       <Filtro onChangeMapSelectMap={onChangeMapSelectMap} />
-      <Carrosel operacao={operacao} consolidado={dadosConsolidado} />
+      {/* <Carrosel operacao={operacao} consolidado={dadosConsolidado} /> */}
     </React.Fragment>
   );
 }
