@@ -189,6 +189,7 @@ function MapaGeral(props) {
       rotaAtual.features.push({
         'type': 'Feature',
         'properties': {
+          'line-width':3,
           'color': colorsSpeed[indexCor].color,
           'velocidade': dadosVeiculo.ras_eve_velocidade,
           'dt_gps': dadosVeiculo.ras_eve_data_gps,
