@@ -46,8 +46,8 @@ function MapaGeral(props) {
   const colorsSpeed = [{ color: 'yellow' }, { color: 'green' }, { color: 'darkred' }];
   const [mapOptions, setMapOptions] = useState({
     center: [-49.654063, -22.215288],
-    style: "mapbox://styles/mapbox/dark-v9",
-    // style: "mapbox://styles/mapbox/streets-v9",
+    // style: "mapbox://styles/mapbox/dark-v9",
+    style: "mapbox://styles/mapbox/satellite-v9",
     containerStyle: {
       height: '100vh',
       width: '100vw'
