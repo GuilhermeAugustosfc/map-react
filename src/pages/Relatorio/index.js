@@ -304,7 +304,6 @@ return (
                 <div className="col-lg-12">
                     <h2>
                         <b>Relatório de Ordem de Serviço</b>
-                        <HiFilter onClick={changeMenu} className="btn-relatorio-filtro" />
                     </h2>
                 </div>
             </div>
@@ -389,7 +388,11 @@ return (
             </Fade>
             <div className="row">
                 <div className="col-lg-12">
-                    <h4><b>Local:</b> Faz. Santa Cecília</h4>
+                    <h4>
+                        <b>Local:</b>
+                        Faz. Santa Cecília
+                        <HiFilter onClick={changeMenu} className="btn-relatorio-filtro" />
+                    </h4>
                 </div>
             </div>
             <div className="row">

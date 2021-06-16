@@ -60,7 +60,6 @@
 .btn-relatorio-filtro {
     float: right;
     font-size: 33px;
-    transform: translateY(7px);
     cursor: pointer;
     background: #ccc0;
 }
