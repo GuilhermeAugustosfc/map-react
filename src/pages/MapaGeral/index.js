@@ -40,10 +40,13 @@ function MapaGeral(props) {
     porcDentroCercaOcioso: 0,
     porcDentroCercaDesligado: 0,
     porcDentroCercaTrabalhando: 0,
+    distanciaPercorridaHectares:0,
+    porcTalhaoTrabalhado:0
   });
 
   const [map, setMap] = useState(null);
   const colorsSpeed = [{ color: 'yellow' }, { color: 'green' }, { color: 'darkred' }];
+  const [areaTalhaoHectares, setAreaTalhaoHectares] = useState(0);
   const [mapOptions, setMapOptions] = useState({
     center: [-49.654063, -22.215288],
     // style: "mapbox://styles/mapbox/dark-v9",
@@ -170,8 +173,6 @@ function MapaGeral(props) {
         'line-width': ['get', 'line-width'],
       }
     });
-    console.log(`add rota`);
-
   }
 
   function atualizarMarkerMapa(dadosVeiculo, map, aux) {
@@ -393,7 +394,6 @@ function MapaGeral(props) {
       let operacaoAtual = props.location.state;
       operacaoAtual.tal_coordenada = JSON.parse(operacaoAtual.tal_coordenada);
 
-      console.log(operacaoAtual);
       setOperacao(operacaoAtual);
 
       setOperacaoConfig({
@@ -640,18 +640,6 @@ function MapaGeral(props) {
           'text-halo-width': 2
         }
       });
-
-      map.addLayer({
-        'id': 'macro_line',
-        'type': 'line',
-        'source': 'lineMacro',
-        'layout': {},
-        'paint': {
-          'line-color': 'white',
-          'line-width': 2,
-          'line-dasharray': [1, 2, 3, 4, 5, 6, 7, 8, 9]
-        }
-      })
     }
 
   }
@@ -660,10 +648,9 @@ function MapaGeral(props) {
 
     // GEOJSON TALHAO
     let areaTalhaoMetrosQuadrados = turf.area(turf.polygon(orderServico.tal_coordenada));
-    let areaTalhaoHectares = turf.convertArea(areaTalhaoMetrosQuadrados, 'meters', 'kilometers');
+    let areaTalhaoHectares = turf.convertArea(areaTalhaoMetrosQuadrados, 'meters', 'hectares');
 
-    console.log(areaTalhaoMetrosQuadrados + " Metros qudrados Talhão");
-    // console.log(areaTalhaoHectares + " Hectares");
+    setAreaTalhaoHectares(areaTalhaoHectares.toFixed(2));
 
     let featureTalhao = {
       'type': 'Feature',
@@ -758,8 +745,6 @@ function MapaGeral(props) {
           'line-width': 10
         }
       });
-
-      console.log(`add linhas`);
       
       // popup talhao teste
       var popup = new mapboxgl.Popup({
@@ -832,6 +817,14 @@ function MapaGeral(props) {
       addRotaVeiculo(map, geojson);
     } else if (value === 'eficiencia') {
       await addTalhaoOrdemServico(operacao, map, { contorno: false, linestalhao: false, fillColor: 'red', fillOpacity: 0.7});
+      console.log(areaTalhaoHectares);
+      console.log(dadosConsolidado.distanciaPercorridaHectares);
+      let porcTalhaoTrabalhado = (dadosConsolidado.distanciaPercorridaHectares * 100) / parseFloat(areaTalhaoHectares);
+      setDadosConsolidado((conso) => ({...conso, porcTalhaoTrabalhado: porcTalhaoTrabalhado}))
+      console.log();
+
+
+
       let geojson = formatLineInMap.lineOfWidht(dados, operacaoConfig.cerca);
       addRotaVeiculo(map, geojson);
     } else if (value == 'streetComplete') {
@@ -921,7 +914,7 @@ function MapaGeral(props) {
     <React.Fragment>
       <MapBox onStyleLoad={onLoadMap} {...mapOptions} />
       <Filtro onChangeMapSelectMap={onChangeMapSelectMap} />
-      {/* <Carrosel operacao={operacao} consolidado={dadosConsolidado} /> */}
+      <Carrosel operacao={operacao} consolidado={dadosConsolidado} />
     </React.Fragment>
   );
 }

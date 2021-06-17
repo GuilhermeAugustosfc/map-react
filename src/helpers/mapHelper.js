@@ -281,11 +281,10 @@ export const consolidado = {
         }
 
         this.calcularTempo(['ocioso', 'desligado', 'deslocamento', 'trabalhando', 'dentro_cerca'], this.dtGpsAtualDateTime);
-        let kilometroQuadrados = distanciaPercorridaMetros + largura; 
-        console.log(kilometroQuadrados);
-        console.log("Metros quadrados");
-        // console.log(turf.convertArea(kilometroQuadrados.toFixed(2), 'kilometers', 'hectares'));
-        // console.log('Hectares percorrido');
+
+        let metrosQuadrados = distanciaPercorridaMetros * largura; 
+        let hectaresPercorrido = turf.convertArea(metrosQuadrados.toFixed(2), 'meters', 'hectares');
+
         this.dtFinalSeg = new Date(moment(dados[(dados.length - 1)].dt_gps, "DD/MM/YYYY HH:m:ss").format("YYYY-MM-DD HH:m:ss"));
         this.dtInicialSeg = new Date(moment(dados[0].dt_gps, "DD/MM/YYYY HH:m:ss").format("YYYY-MM-DD HH:m:ss"));
         this.tempoTrabalhoAtual = ((this.dtFinalSeg - this.dtInicialSeg) / 1000);
@@ -305,7 +304,8 @@ export const consolidado = {
             posicoesDesligadas: this.posicoesDesligadas,
             posicoesOciosas: this.posicoesOciosas,
             posicoesDeslocamento: this.posicoesDeslocamento,
-            posicoesTrabalhando: this.posicoesTrabalhando
+            posicoesTrabalhando: this.posicoesTrabalhando,
+            distanciaPercorridaHectares: hectaresPercorrido.toFixed(2),
         }
 
         return this.consolidado

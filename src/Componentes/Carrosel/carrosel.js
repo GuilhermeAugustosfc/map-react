@@ -41,8 +41,12 @@ function Carrosel({operacao, consolidado}) {
     //     )
     // }
     useEffect(() => {
+       console.log(consolidado);
+    }, [consolidado])
+
+    useEffect(() => {
         if (Object.keys(operacao).length) {
-            setTemplates((templates) => [...[TemplateOperacao, TemplateConfigOperacao],...templates])
+            setTemplates((templates) => [...templates, ...[TemplateOperacao, TemplateConfigOperacao]])
         }
     }, [operacao])
 
