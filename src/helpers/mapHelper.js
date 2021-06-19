@@ -513,7 +513,7 @@ export const formatLineInMap = {
                     geojsonLinesTalhao.features[j].properties.name_talhao = j;
                     
 
-                    if (geojsonLinesTalhao.features[j].properties.qtd_passou >= 10 || geojsonLinesTalhao.features[j].properties.qtd_passou > (geojsonLinesTalhao.features[j].geometry.coordinates.length / 2)) {
+                    if (geojsonLinesTalhao.features[j].properties.qtd_passou >= 10 || geojsonLinesTalhao.features[j].properties.qtd_passou >= (geojsonLinesTalhao.features[j].geometry.coordinates.length / 2)) {
                         geojsonLinesTalhao.features[j].properties.color = 'green'
                     }
                 }
