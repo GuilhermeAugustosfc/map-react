@@ -473,7 +473,7 @@ export const formatLineInMap = {
                     'dt_gps': this.dados[i].dt_gps,
                     'desc_ativo': this.dados[i].desc_ativo,
                     'line-width': this.line_width,
-                    'color': 'white'
+                    'color': 'blue'
                 },
                 'geometry': {
                     'type': 'LineString',

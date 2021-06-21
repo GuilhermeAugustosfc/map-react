@@ -820,7 +820,7 @@ function MapaGeral(props) {
       console.log(areaTalhaoHectares);
       console.log(dadosConsolidado.distanciaPercorridaHectares);
       let porcTalhaoTrabalhado = (dadosConsolidado.distanciaPercorridaHectares * 100) / parseFloat(areaTalhaoHectares);
-      setDadosConsolidado((conso) => ({...conso, porcTalhaoTrabalhado: porcTalhaoTrabalhado}))
+      setDadosConsolidado((conso) => ({...conso, porcTalhaoTrabalhado: porcTalhaoTrabalhado, porcTalhaoRestante: (100 - porcTalhaoTrabalhado)}))
       
 
 
@@ -913,7 +913,7 @@ function MapaGeral(props) {
   return (
     <React.Fragment>
       <MapBox onStyleLoad={onLoadMap} {...mapOptions} />
-      <Filtro onChangeMapSelectMap={onChangeMapSelectMap} />
+      <Filtro onChangeMapSelectMap={onChangeMapSelectMap} dadosConsolidado={dadosConsolidado} />
       {/* <Carrosel operacao={operacao} consolidado={dadosConsolidado} /> */}
     </React.Fragment>
   );

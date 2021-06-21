@@ -10,5 +10,22 @@
 }
 
 .filtro-select-mapas {
+    display: block;
+    width: 100%;
+}
+
+.areas {
+    padding: 10px;
+}
+
+.areas .trabalhados {
+    color: darkblue;
+    border-bottom: 2px solid darkblue;
+   
+}
+
+.areas .restantes {
+    color: darkred;
+    border-bottom: 2px solid darkred;
     
 }
