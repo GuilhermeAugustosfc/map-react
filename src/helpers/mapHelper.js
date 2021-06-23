@@ -220,7 +220,7 @@ export const consolidado = {
             return
         }
 
-        let largura = 2; // 2 metros de largura
+        let largura = 3.6; // largura da rua dos talhoes
         let distanciaPercorridaMetros = 0;
         for (var i in dados) {
             if (!this.dataInicioViagem) {
