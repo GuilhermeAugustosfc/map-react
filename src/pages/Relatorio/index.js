@@ -48,7 +48,7 @@ const Tabela = () => {
         tempo_jornada: "",
         porc_ocioso: 0.00,
         porc_eficiencia: 0.00,
-        porc_deslocamento: 0.00
+        tempo_deslocamento: "00:00:00"
     }]);
 
     const [macros, setMacros] = useState([{
@@ -126,10 +126,10 @@ const Tabela = () => {
             },
         },
         {
-            field: 'porc_deslocamento', headerName: 'Deslocamaento', flex: 1, align: 'center', headerAlign: 'center',
+            field: 'tempo_deslocamento', headerName: 'Deslocamaento', flex: 1, align: 'center', headerAlign: 'center',
             valueFormatter: (value) => {
                 if (value.value) {
-                    return value.value.toFixed(2);
+                    return value.value;
                 }
                 return " - "
 
